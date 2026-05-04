@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ps-hud-primary: #3b82f6;
+  --ps-hud-secondary: #2563eb;
+  --ps-hud-primary-hover: #60a5fa;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --radius: 0.5rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.vehicle-number {
+  font-size: 2.4vh;
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
+    -1px 1px 0 rgba(0, 0, 0, 0.7), 1px 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+.vehicle-text {
+  font-weight: 900;
+  text-shadow: -1px -1px 0 rgba(0, 0, 0, 0.7), 1px -1px 0 rgba(0, 0, 0, 0.7),
+    -1px 1px 0 rgba(0, 0, 0, 0.7), 1px 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+@media (min-width: 800px) {
+  .vehicle-number { font-size: 2vh !important; }
+  .vehicle-text { font-size: 0.9vh !important; }
+}
+
+@media (width: 3840px) and (height: 2160px) {
+  .vehicle-number { font-size: 1.2vh !important; }
+  .vehicle-text { font-size: 0.6vh !important; }
+}
+
+@media (width: 3440px) and (height: 1440px) {
+  .vehicle-number { font-size: 1.4vh !important; }
+  .vehicle-text { font-size: 0.7vh !important; }
+}
+
+@media (width: 2560px) and (height: 1440px) {
+  .vehicle-number { font-size: 1.4vh !important; }
+  .vehicle-text { font-size: 0.7vh !important; }
+}
+
+@media (width: 1920px) and (height: 1080px) {
+  .vehicle-number { font-size: 2vh !important; }
+  .vehicle-text { font-size: 1.1vh !important; }
+}
+
+@media (width: 1280px) and (height: 720px) {
+  .vehicle-number { font-size: 3vh !important; }
+  .vehicle-text { font-size: 1.4vh !important; }
+}
+
+/* Standard layout 720p scale-down */
+@media (width: 1280px) and (height: 720px) {
+  .standard-layout {
+    transform: scale(0.7) !important;
+    left: -3vw !important;
+    bottom: -1vh !important;
+  }
+}
+
+/* Vehicle HUD responsive positioning */
+.responsive { position: absolute !important; }
+
+@media (min-width: 800px) {
+  .responsive {
+    margin-left: 32vh !important;
+    transform: scale(1, 1);
+    bottom: 6.9vh !important;
+  }
+  #speedometer { position: relative; left: 2.5vh !important; }
+  #fuelgauge { position: relative; left: 7vh !important; bottom: 6.7vh !important; }
+  #altitudegauge { position: relative; left: 11vh !important; }
+  #seatbelt { position: relative; left: 8.5vh !important; }
+}
+
+@media (width: 1920px) and (height: 1080px) {
+  .responsive {
+    margin-left: 17vw !important;
+    transform: scale(1, 1);
+    bottom: 5.8vh !important;
+  }
+  #speedometer { position: relative; left: 2.5vh !important; }
+  #fuelgauge { position: relative; left: 3.9vw !important; bottom: 5.1vh !important; }
+  #altitudegauge { position: relative; left: 5.9vw !important; }
+  #seatbelt { position: relative; left: 6.5vw !important; }
+  #seatbeltAltitude { position: relative; left: 4.7vw !important; bottom: 11vh !important; }
+}
+
+@media (width: 1280px) and (height: 720px) {
+  .responsive {
+    margin-left: 30vh !important;
+    transform: scale(1, 1);
+    bottom: 5.8vh !important;
+  }
+  #speedometer { position: relative; left: 2.5vh !important; }
+  #fuelgauge { position: relative; left: 4.8vw !important; bottom: 4.7vh !important; }
+  #altitudegauge { position: relative; left: 7.5vw !important; }
+  #seatbelt { position: relative; left: 7.7vw !important; }
+  #seatbeltAltitude { position: relative; left: 5.9vw !important; bottom: 13vh !important; }
+}
+
+/* Custom scrollbar for menu */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: rgba(10,15,28,0.6); }
+::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.5); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.8); }
+

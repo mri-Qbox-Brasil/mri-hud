@@ -1,0 +1,102 @@
+{
+  "lua_to_nui": {
+    "hudtick": {
+      "topics": ["display", "status"],
+      "payload": {
+        "display": {"show": "boolean"},
+        "status": {
+          "show": "boolean",
+          "health": "number",
+          "playerDead": "boolean",
+          "armor": "number",
+          "thirst": "number",
+          "hunger": "number",
+          "stress": "number",
+          "voice": "number",
+          "radioChannel": "number",
+          "radioTalking": "boolean",
+          "talking": "boolean",
+          "armed": "boolean",
+          "oxygen": "number",
+          "parachute": "number",
+          "nos": "number",
+          "cruise": "boolean",
+          "nitroActive": "boolean",
+          "harness": "boolean",
+          "hp": "number",
+          "speed": "number",
+          "engine": "number",
+          "cinematic": "boolean",
+          "dev": "boolean"
+        }
+      }
+    },
+    "car": {
+      "topics": ["display", "status"],
+      "payload": {
+        "display": {"show": "boolean", "seatbelt": "boolean"},
+        "status": {
+          "show": "boolean",
+          "isPaused": "boolean",
+          "seatbelt": "boolean",
+          "speed": "number",
+          "fuel": "number",
+          "altitude": "number",
+          "showAltitude": "boolean",
+          "showSeatbelt": "boolean",
+          "showSquareB": "boolean",
+          "showCircleB": "boolean",
+          "useMPH": "boolean"
+        }
+      }
+    },
+    "externalstatus": {
+      "topics": ["buff", "enhancement"],
+      "payload": {
+        "buff": {"display": "boolean", "iconColor": "string", "iconName": "string", "buffName": "string", "progressValue": "number", "progressColor": "string"},
+        "enhancement": {"display": "boolean", "iconColor": "string", "enhancementName": "string"}
+      }
+    },
+    "menu": {
+      "topics": ["adminonly", "restart"],
+      "payload": {"adminOnly": "boolean", "isAdmin": "boolean"}
+    },
+    "open": {"payload": null},
+    "show": {"payload": "money show"},
+    "showconstant": {"payload": "money show constant"},
+    "update": {"payload": "compass heading"},
+    "updatemoney": {"payload": {"amount": "number", "bank": "number", "cash": "number", "minus": "boolean", "plus": "boolean", "type": "string"}},
+    "updateUISettings": {"payload": {"icons": "object", "layout": "object", "colors": "object"}},
+    "setLang": {"payload": {"lang": "string"}}
+  },
+  "nui_to_lua": {
+    "closeMenu": {"payload": null},
+    "restartHud": {"payload": null},
+    "resetStorage": {"payload": null},
+    "openMenuSounds": {"payload": {"checked": "boolean"}},
+    "resetHudSounds": {"payload": {"checked": "boolean"}},
+    "checklistSounds": {"payload": {"checked": "boolean"}},
+    "showOutMap": {"payload": {"checked": "boolean"}},
+    "saveUISettings": {"payload": {"icons": "object", "layout": "object", "colors": "object"}},
+    "showOutCompass": {"payload": {"checked": "boolean"}},
+    "showFollowCompass": {"payload": {"checked": "boolean"}},
+    "showMapNotif": {"payload": {"checked": "boolean"}},
+    "showFuelAlert": {"payload": {"checked": "boolean"}},
+    "showCinematicNotif": {"payload": {"checked": "boolean"}},
+    "dynamicChange": {"payload": null},
+    "HideMap": {"payload": {"checked": "boolean"}},
+    "ToggleMapShape": {"payload": {"shape": "string"}},
+    "ToggleMapBorders": {"payload": {"checked": "boolean"}},
+    "showCompassBase": {"payload": {"checked": "boolean"}},
+    "showStreetsNames": {"payload": {"checked": "boolean"}},
+    "showPointerIndex": {"payload": {"checked": "boolean"}},
+    "showDegreesNum": {"payload": {"checked": "boolean"}},
+    "changeCompassFPS": {"payload": {"fps": "string"}},
+    "cinematicMode": {"payload": {"checked": "boolean"}},
+    "updateMenuSettingsToClient": {"payload": {"isOutMapChecked": "boolean", "isOutCompassChecked": "boolean", "isCompassFollowChecked": "boolean", "isOpenMenuSoundsChecked": "boolean", "isResetSoundsChecked": "boolean", "isListSoundsChecked": "boolean", "isMapNotifyChecked": "boolean", "isLowFuelAlertChecked": "boolean", "isCinematicNotifyChecked": "boolean", "isToggleMapShapeChecked": "string", "isMapEnabledChecked": "boolean", "isToggleMapBordersChecked": "boolean", "isShowCompassChecked": "boolean", "isShowStreetsChecked": "boolean", "isPointerShowChecked": "boolean", "isCinematicModeChecked": "boolean"}},
+    "open": {"payload": null},
+    "show": {"payload": {"type": "string", "cash": "number", "bank": "number"}},
+    "showconstant": {"payload": {"cash": "number", "bank": "number"}},
+    "update": {"payload": {"value": "number"}}
+  }
+}

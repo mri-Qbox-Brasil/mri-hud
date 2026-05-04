@@ -1,0 +1,16 @@
+{
+  "icons": {
+    "health": { "shape": "circle-fill", "iconScaling": 1.0, "isShowing": true, "progressValue": 100 },
+    "armor": { "shape": "circle-ring", "isShowing": true, "progressValue": 50 }
+  },
+  "layout": {
+    "layout": "standard",
+    "iconBetweenSpacing": 10,
+    "xAxisSpacing": 20,
+    "yAxisSpacing": 2
+  },
+  "colors": {
+    "health": { "colorEffects": [ { "progressColor": "#06d170" } ] },
+    "armor": { "colorEffects": [ { "progressColor": "#0764ce" } ] }
+  }
+}

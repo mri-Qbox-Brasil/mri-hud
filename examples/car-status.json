@@ -1,0 +1,13 @@
+{
+  "show": true,
+  "isPaused": false,
+  "seatbelt": false,
+  "speed": 62,
+  "fuel": 48,
+  "altitude": 0,
+  "showAltitude": false,
+  "showSeatbelt": true,
+  "showSquareB": false,
+  "showCircleB": true,
+  "useMPH": true
+}
