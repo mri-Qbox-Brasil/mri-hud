@@ -23,6 +23,7 @@ local Translations = {
         ["check_cash_balance"] = "Check Cash Balance",
         ["check_bank_balance"] = "Check Bank Balance",
         ["toggle_dev_mode"] = "Enable/Disable developer Mode",
+        ["positioning_mode"] = "Toggle HUD Positioning Mode",
     }
 }
 

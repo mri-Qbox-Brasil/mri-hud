@@ -1,6 +1,7 @@
 Config = {}
 
 Config.OpenMenu = 'I' -- https://docs.fivem.net/docs/game-references/input-mapper-parameter-ids/keyboard/
+Config.PositioningKey = 'F10' -- Key to open the HUD positioning mode
 Config.StressChance = 0.1 -- Default: 10% -- Percentage Stress Chance When Shooting (0-1)
 Config.UseMPH = true -- If true speed math will be done as MPH, if false KPH will be used (YOU HAVE TO CHANGE CONTENT IN STYLES.CSS TO DISPLAY THE CORRECT TEXT)
 Config.MinimumStress = 50 -- Minimum Stress Level For Screen Shaking
@@ -138,6 +139,67 @@ Config.FuelBlacklist = {
 	"dilettante",
 	"khamelion",
 	"wheelchair",
+}
+
+-- ─────────────────────────────────────────────────────────────────
+-- Status Icons — define quais painéis aparecem e em que ordem.
+-- Remova uma entrada ou defina enabled = false para ocultar o ícone.
+-- A ordem da tabela determina a ordem de exibição.
+-- ─────────────────────────────────────────────────────────────────
+Config.StatusIcons = {
+    { id = "voice",     enabled = true  },
+    { id = "health",    enabled = true  },
+    { id = "armor",     enabled = true  },
+    { id = "hunger",    enabled = true  },
+    { id = "thirst",    enabled = true  },
+    { id = "stress",    enabled = true  },
+    { id = "oxygen",    enabled = true  },
+    { id = "armed",     enabled = true  },
+    { id = "parachute", enabled = true  },
+    { id = "harness",   enabled = true  },
+    { id = "cruise",    enabled = true  },
+    { id = "nitro",     enabled = true  },
+    { id = "dev",       enabled = true  },
+}
+
+-- ─────────────────────────────────────────────────────────────────
+-- Server Logo — exibe uma imagem PNG na HUD.
+-- Coloque o arquivo na pasta html/ do recurso.
+-- x/y são percentuais do viewport (vw / vh).
+-- ─────────────────────────────────────────────────────────────────
+Config.ServerLogo = {
+    enabled = true,
+    src    = "https://assets.mriqbox.com.br/branding/logo96.webp", -- nome do arquivo em html/
+    width  = 80,         -- largura em px
+    x      = 50,         -- posição horizontal (vw %)
+    y      = 3,          -- posição vertical   (vh %)
+}
+
+-- ─────────────────────────────────────────────────────────────────
+-- Demo Panels — ativa painéis de demonstração ao carregar.
+-- Útil para testes; desative em produção.
+-- ─────────────────────────────────────────────────────────────────
+Config.EnableDemoPanels = true
+
+-- ─────────────────────────────────────────────────────────────────
+-- Positioning Mode — controla quais elementos podem ser reposicionados.
+-- enabled: false desativa completamente o modo de posicionamento (F10).
+-- Por elemento: canMove = arrastar, canHide = ocultar/mostrar, canResize = redimensionar.
+-- ─────────────────────────────────────────────────────────────────
+Config.Positioning = {
+    enabled = true,
+    elements = {
+        statusBar     = { canMove = true,  canHide = true,  canResize = false },
+        compassHud    = { canMove = true,  canHide = true,  canResize = false },
+        moneyHud      = { canMove = true,  canHide = true,  canResize = false },
+        minimap       = { canMove = true,  canHide = false, canResize = false }, -- ocultar minimapa requer chamada nativa separada
+        speedometer   = { canMove = true,  canHide = true,  canResize = true  },
+        fuelgauge     = { canMove = true,  canHide = true,  canResize = true  },
+        altitudegauge = { canMove = true,  canHide = true,  canResize = true  },
+        seatbelt      = { canMove = true,  canHide = true,  canResize = false },
+        serverLogo    = { canMove = true,  canHide = true,  canResize = false },
+        dynamicGauges = { canMove = true,  canHide = true,  canResize = true  }, -- afeta todos os custom gauges
+    },
 }
 
 Config.VehClassStress = { -- Enable/Disable gaining stress from vehicle classes in this table

@@ -23,6 +23,7 @@ local Translations = {
         ["check_cash_balance"] = "Checar dinheiro na carteira",
         ["check_bank_balance"] = "Checar conta bancária",
         ["toggle_dev_mode"] = "Ativar/Desativar modo desenvolvedor",
+        ["positioning_mode"] = "Ativar/Desativar modo de posicionamento",
     }
 }
 
