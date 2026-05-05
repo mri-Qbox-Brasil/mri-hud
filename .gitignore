@@ -13,6 +13,9 @@ dist
 dist-ssr
 *.local
 
+# Release artifact
+ps-hud.zip
+
 # Editor directories and files
 .vscode/*
 .idea
