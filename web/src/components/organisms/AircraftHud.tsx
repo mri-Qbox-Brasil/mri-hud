@@ -101,7 +101,7 @@ export default function AircraftHud() {
             </DraggableHudElement>
 
             <DraggableHudElement id="aircraftFuel" label="Combustível" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "59vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "58vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={88}
                         value={fuel}
