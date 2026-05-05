@@ -26,6 +26,7 @@ local dev = false
 local admin = false
 local playerDead = false
 local showMenu = false
+local positioningMode = false
 local showCircleB = false
 local showSquareB = false
 local CinematicHeight = 0.2
@@ -50,7 +51,7 @@ local Menu = {
     isShowStreetsChecked = true,        -- isShowStreetsChecked
     isPointerShowChecked = true,        -- isPointerShowChecked
     isDegreesShowChecked = true,        -- isDegreesShowChecked
-    isCineamticModeChecked = false,     -- isCineamticModeChecked
+    isCinematicModeChecked = false,     -- isCinematicModeChecked
     isToggleMapShapeChecked = 'square', -- isToggleMapShapeChecked
 }
 
@@ -131,6 +132,69 @@ local function sendUILang()
     })
 end
 
+local function sendHudConfig()
+    SendNUIMessage({
+        action      = 'hudconfig',
+        statusIcons = Config.StatusIcons,
+        serverLogo  = Config.ServerLogo,
+        positioning = Config.Positioning,
+    })
+end
+
+-- Dynamic panel helpers: other scripts can TriggerEvent to add/remove/update panels
+local function sendAddPanel(panel)
+    SendNUIMessage({
+        action = 'panel',
+        topic = 'add',
+        panel = panel,
+    })
+    print("PS-HUD: sendAddPanel -> sent panel id=", panel and panel.id or "(nil)")
+end
+
+local function sendRemovePanel(id)
+    SendNUIMessage({
+        action = 'panel',
+        topic = 'remove',
+        id = id,
+    })
+    print("PS-HUD: sendRemovePanel -> id=", id)
+end
+
+local function sendUpdatePanel(id, patch)
+    SendNUIMessage({
+        action = 'panel',
+        topic = 'update',
+        id = id,
+        patch = patch,
+    })
+    print("PS-HUD: sendUpdatePanel -> id=", id, "patch=", patch and json.encode(patch) or "(nil)")
+end
+
+RegisterNetEvent('hud:client:AddPanel', function(panel)
+    sendAddPanel(panel)
+end)
+
+RegisterNetEvent('hud:client:RemovePanel', function(id)
+    sendRemovePanel(id)
+end)
+
+RegisterNetEvent('hud:client:UpdatePanel', function(id, patch)
+    sendUpdatePanel(id, patch)
+end)
+
+-- Also export simple functions for other resources
+exports('AddHudPanel', function(panel)
+    sendAddPanel(panel)
+end)
+
+exports('RemoveHudPanel', function(id)
+    sendRemovePanel(id)
+end)
+
+exports('UpdateHudPanel', function(id, patch)
+    sendUpdatePanel(id, patch)
+end)
+
 local function HandleSetupResource()
     QBCore.Functions.TriggerCallback('hud:server:getRank', function(isAdminOrGreater)
         if isAdminOrGreater then
@@ -147,6 +211,7 @@ local function HandleSetupResource()
         end
     end
     sendUILang()
+    sendHudConfig()
 end
 
 RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
@@ -156,7 +221,48 @@ RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
     -- if hudSettings then loadSettings(json.decode(hudSettings)) end
     loadSettings()
     PlayerData = QBCore.Functions.GetPlayerData()
+    -- start demo panels after player and NUI are likely ready
+    StartDemoPanels()
 end)
+
+-- Demo panels: only runs when Config.EnableDemoPanels = true
+local demoRunning = false
+local function StartDemoPanels()
+    if not Config.EnableDemoPanels then return end
+    if demoRunning then return end
+    demoRunning = true
+    -- initial panel
+    sendAddPanel({
+        id = 'demo_fuel',
+        title = 'Fuel',
+        icon = 'fuel.svg', -- place a fuel.png in html/assets/panels/ to see image
+        value = '100 %',
+        isShowing = true,
+    })
+
+    CreateThread(function()
+        local fuel = 100
+        while demoRunning do
+            Wait(5000)
+            fuel = math.max(0, fuel - math.random(1, 6))
+            sendUpdatePanel('demo_fuel', { value = tostring(fuel) .. ' %' })
+            if fuel <= 0 then
+                demoRunning = false
+                Wait(2000)
+                sendRemovePanel('demo_fuel')
+                break
+            end
+        end
+    end)
+end
+
+AddEventHandler('onResourceStop', function(resourceName)
+    if resourceName ~= GetCurrentResourceName() then return end
+    demoRunning = false
+    sendRemovePanel('demo_fuel')
+end)
+
+
 
 RegisterNetEvent("QBCore:Client:OnPlayerUnload", function()
     PlayerData = {}
@@ -177,6 +283,7 @@ AddEventHandler('onResourceStart', function(resourceName)
     -- local hudSettings = GetResourceKvpString('hudSettings')
     -- if hudSettings then loadSettings(json.decode(hudSettings)) end
     loadSettings()
+    StartDemoPanels()
 end)
 
 AddEventHandler("pma-voice:radioActive", function(isRadioTalking)
@@ -185,12 +292,22 @@ end)
 
 -- Callbacks & Events
 RegisterCommand('menu', function()
-    Wait(50)
     if showMenu then return end
+    showMenu = true
+    Wait(50)
     TriggerEvent("hud:client:playOpenMenuSounds")
     SetNuiFocus(true, true)
     SendNUIMessage({ action = "open" })
-    showMenu = true
+end)
+
+RegisterCommand('positioningMode', function()
+    if positioningMode then return end
+    if not Config.Positioning.enabled then return end
+    positioningMode = true
+    Wait(50)
+    TriggerEvent("hud:client:playOpenMenuSounds")
+    SetNuiFocus(true, true)
+    SendNUIMessage({ action = "positioning", topic = "open" })
 end)
 
 RegisterNUICallback('closeMenu', function(_, cb)
@@ -201,7 +318,25 @@ RegisterNUICallback('closeMenu', function(_, cb)
     SetNuiFocus(false, false)
 end)
 
+-- Transitions directly from the settings menu into positioning mode without
+-- releasing NUI focus, so the positioning overlay renders immediately.
+RegisterNUICallback('switchToPositioningMode', function(_, cb)
+    cb({})
+    showMenu = false
+    positioningMode = true
+    TriggerEvent("hud:client:playOpenMenuSounds")
+end)
+
+RegisterNUICallback('closePositioningMode', function(_, cb)
+    cb({})
+    Wait(50)
+    TriggerEvent("hud:client:playCloseMenuSounds")
+    positioningMode = false
+    SetNuiFocus(false, false)
+end)
+
 RegisterKeyMapping('menu', Lang:t('info.open_menu'), 'keyboard', Config.OpenMenu)
+RegisterKeyMapping('positioningMode', Lang:t('info.positioning_mode'), 'keyboard', Config.PositioningKey)
 
 -- Reset hud
 local function restartHud()
@@ -541,6 +676,33 @@ RegisterNUICallback('ToggleMapBorders', function(data, cb)
     TriggerEvent("hud:client:playHudChecklistSound")
 end)
 
+-- Repositions the native GTA minimap when the player drags it in positioning mode.
+-- data.x = dx / screenWidth  (rightward positive)
+-- data.y = dy / screenHeight (downward positive in browser → negate for GTA bottom anchor)
+RegisterNUICallback('minimapPosition', function(data, cb)
+    cb({})
+    local offsetX = tonumber(data.x) or 0.0
+    local offsetY = tonumber(data.y) or 0.0
+
+    local defaultAspectRatio = 1920 / 1080
+    local resolutionX, resolutionY = GetActiveScreenResolution()
+    local aspectRatio = resolutionX / resolutionY
+    local minimapOffset = 0.0
+    if aspectRatio > defaultAspectRatio then
+        minimapOffset = ((defaultAspectRatio - aspectRatio) / 3.6) - 0.008
+    end
+
+    if Menu.isToggleMapShapeChecked == "square" then
+        SetMinimapComponentPosition("minimap",      "L", "B",  0.0   + minimapOffset + offsetX, -0.047 - offsetY, 0.1638, 0.183)
+        SetMinimapComponentPosition("minimap_mask", "L", "B",  0.0   + minimapOffset + offsetX,  0.0   - offsetY, 0.128,  0.20)
+        SetMinimapComponentPosition("minimap_blur", "L", "B", -0.01  + minimapOffset + offsetX,  0.025 - offsetY, 0.262,  0.300)
+    else
+        SetMinimapComponentPosition("minimap",      "L", "B", -0.010 + minimapOffset + offsetX, -0.030 - offsetY, 0.180,  0.258)
+        SetMinimapComponentPosition("minimap_mask", "L", "B",  0.200 + minimapOffset + offsetX,  0.0   - offsetY, 0.065,  0.20)
+        SetMinimapComponentPosition("minimap_blur", "L", "B",  0.0   + minimapOffset + offsetX,  0.015 - offsetY, 0.252,  0.338)
+    end
+end)
+
 -- Compass
 RegisterNUICallback('showCompassBase', function(data, cb)
     cb({})
@@ -635,7 +797,7 @@ RegisterNUICallback('updateMenuSettingsToClient', function(data, cb)
     Menu.isCompassShowChecked = data.isShowCompassChecked
     Menu.isShowStreetsChecked = data.isShowStreetsChecked
     Menu.isPointerShowChecked = data.isPointerShowChecked
-    CinematicShow(data.isCineamticModeChecked)
+    CinematicShow(data.isCinematicModeChecked)
     cb({})
 end)
 
@@ -691,6 +853,16 @@ end)
 
 RegisterNetEvent("qb-admin:client:ToggleDevmode", function()
     dev = not dev
+end)
+
+-- Odometer: external scripts send distance (km or mi, same unit as Config.UseMPH)
+-- From client script: TriggerEvent("ps-hud:client:setOdometer", distance)
+-- From server script: TriggerClientEvent("ps-hud:client:setOdometer", source, distance)
+RegisterNetEvent("ps-hud:client:setOdometer", function(distance)
+    SendNUIMessage({
+        action = "odometer",
+        value = distance,
+    })
 end)
 
 RegisterNetEvent('hud:client:UpdateUISettings', function(data)
@@ -837,6 +1009,52 @@ local function updatePlayerHud(data)
     end
 end
 
+local prevAircraftStats = { nil, nil, nil, nil, nil }
+local prevMarineStats   = { nil, nil, nil, nil }
+
+local function updateAircraftHud(data)
+    local shouldUpdate = false
+    for k, v in pairs(data) do
+        if prevAircraftStats[k] ~= v then
+            shouldUpdate = true
+            break
+        end
+    end
+    if shouldUpdate then
+        prevAircraftStats = data
+        SendNUIMessage({
+            action       = 'aircraft',
+            topic        = 'status',
+            airspeed     = data[1],
+            altitude     = data[2],
+            verticalSpeed = data[3],
+            pitch        = data[4],
+            roll         = data[5],
+        })
+    end
+end
+
+local function updateMarineHud(data)
+    local shouldUpdate = false
+    for k, v in pairs(data) do
+        if prevMarineStats[k] ~= v then
+            shouldUpdate = true
+            break
+        end
+    end
+    if shouldUpdate then
+        prevMarineStats = data
+        SendNUIMessage({
+            action      = 'marine',
+            topic       = 'status',
+            speedKnots  = data[1],
+            rpm         = data[2],
+            pitch       = data[3],
+            roll        = data[4],
+        })
+    end
+end
+
 local prevVehicleStats = {
     nil, --[1] show,
     nil, --[2] isPaused,
@@ -886,7 +1104,7 @@ local function updateVehicleHud(data)
             showSeatbelt = data[8],
             showSquareB = data[9],
             showCircleB = data[10],
-            useMPH = Config.useMPH,
+            useMPH = Config.UseMPH,
         })
     end
 end
@@ -906,7 +1124,9 @@ end
 -- HUD Update loop
 
 CreateThread(function()
-    local wasInVehicle = false
+    local wasInVehicle  = false
+    local wasInAircraft = false
+    local wasInBoat     = false
     while true do
         if LocalPlayer.state.isLoggedIn then
             Wait(500)
@@ -980,7 +1200,7 @@ CreateThread(function()
                     hp,
                     math.ceil(GetEntitySpeed(vehicle) * speedMultiplier),
                     -1,
-                    Menu.isCineamticModeChecked,
+                    Menu.isCinematicModeChecked,
                     dev,
                 })
             end
@@ -1021,7 +1241,7 @@ CreateThread(function()
                     hp,
                     math.ceil(GetEntitySpeed(vehicle) * speedMultiplier),
                     (GetVehicleEngineHealth(vehicle) / 10),
-                    Menu.isCineamticModeChecked,
+                    Menu.isCinematicModeChecked,
                     dev,
                 })
 
@@ -1039,6 +1259,46 @@ CreateThread(function()
                 })
                 showAltitude = false
                 showSeatbelt = true
+
+                -- Aircraft telemetry (heli or plane only)
+                if IsPedInAnyHeli(player) or IsPedInAnyPlane(player) then
+                    if not wasInAircraft then
+                        wasInAircraft = true
+                        SendNUIMessage({ action = 'aircraft', topic = 'display', isShowing = true })
+                    end
+                    local rot = GetEntityRotation(vehicle, 2)
+                    local vel = GetEntityVelocity(vehicle)
+                    updateAircraftHud({
+                        math.floor(GetEntitySpeed(vehicle) * 3.6),
+                        math.floor(GetEntityCoords(player).z),
+                        math.floor(vel.z * 10) / 10,
+                        math.floor(rot.x * 10) / 10,
+                        math.floor(rot.y * 10) / 10,
+                    })
+                elseif wasInAircraft then
+                    wasInAircraft = false
+                    prevAircraftStats = { nil, nil, nil, nil, nil }
+                    SendNUIMessage({ action = 'aircraft', topic = 'display', isShowing = false })
+                end
+
+                -- Marine telemetry (barcos)
+                if IsPedInAnyBoat(player) then
+                    if not wasInBoat then
+                        wasInBoat = true
+                        SendNUIMessage({ action = 'marine', topic = 'display', isShowing = true })
+                    end
+                    local rot = GetEntityRotation(vehicle, 2)
+                    updateMarineHud({
+                        math.floor(GetEntitySpeed(vehicle) * 1.944),
+                        math.floor(GetVehicleCurrentRpm(vehicle) * 100),
+                        math.floor(rot.x * 10) / 10,
+                        math.floor(rot.y * 10) / 10,
+                    })
+                elseif wasInBoat then
+                    wasInBoat = false
+                    prevMarineStats = { nil, nil, nil, nil }
+                    SendNUIMessage({ action = 'marine', topic = 'display', isShowing = false })
+                end
             else
                 if wasInVehicle then
                     wasInVehicle = false
@@ -1048,6 +1308,16 @@ CreateThread(function()
                     seatbeltOn = false
                     cruiseOn = false
                     harness = false
+                    if wasInAircraft then
+                        wasInAircraft = false
+                        prevAircraftStats = { nil, nil, nil, nil, nil }
+                        SendNUIMessage({ action = 'aircraft', topic = 'display', isShowing = false })
+                    end
+                    if wasInBoat then
+                        wasInBoat = false
+                        prevMarineStats = { nil, nil, nil, nil }
+                        SendNUIMessage({ action = 'marine', topic = 'display', isShowing = false })
+                    end
                 end
                 DisplayRadar(not Menu.isOutMapChecked)
             end
