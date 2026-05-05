@@ -18,13 +18,13 @@ export default function MarineHud() {
     return (
         <>
             <DraggableHudElement id="marineHeel" label="Escora" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "4vh", right: "28vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "4.5vh", right: "21vw", pointerEvents: "none" }}>
                     <Clinometer size={130} roll={roll} />
                 </ScaledHudContent>
             </DraggableHudElement>
 
             <DraggableHudElement id="marineSpeed" label="Velocidade" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "4vh", right: "18vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "4.5vh", right: "14vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={120}
                         value={speedKnots}
@@ -47,7 +47,7 @@ export default function MarineHud() {
             </DraggableHudElement>
 
             <DraggableHudElement id="marineRpm" label="RPM" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "4.5vh", right: "9.5vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "4.5vh", right: "8vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={110}
                         value={rpm}

@@ -23,13 +23,13 @@ export default function AircraftHud() {
     return (
         <>
             <DraggableHudElement id="aircraftHorizon" label="Horizonte" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "44vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "43vw", pointerEvents: "none" }}>
                     <ArtificialHorizon size={160} pitch={pitch} roll={roll} />
                 </ScaledHudContent>
             </DraggableHudElement>
 
             <DraggableHudElement id="aircraftAsi" label="Velocidade" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "53vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "52vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={120}
                         value={airspeed}
@@ -52,7 +52,7 @@ export default function AircraftHud() {
             </DraggableHudElement>
 
             <DraggableHudElement id="aircraftAlt" label="Altímetro" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "38vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "37vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={120}
                         value={altMod}
@@ -75,7 +75,7 @@ export default function AircraftHud() {
             </DraggableHudElement>
 
             <DraggableHudElement id="aircraftVsi" label="Vel.Vertical" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "33vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "32vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={100}
                         value={verticalSpeed}
