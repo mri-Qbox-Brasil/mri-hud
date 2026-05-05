@@ -1,4 +1,5 @@
 import { useAircraftHudStore } from "../../stores/aircraftHudStore";
+import { useVehicleHudStore } from "../../stores/vehicleHudStore";
 import { usePositioningStore } from "../../stores/positioningStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
@@ -12,6 +13,8 @@ export default function AircraftHud() {
     const verticalSpeed     = useAircraftHudStore((s) => s.verticalSpeed);
     const pitch             = useAircraftHudStore((s) => s.pitch);
     const roll              = useAircraftHudStore((s) => s.roll);
+    const fuel              = useVehicleHudStore((s) => s.fuel);
+    const fuelColor         = useVehicleHudStore((s) => s.fuelColor);
     const positioningActive = usePositioningStore((s) => s.active);
 
     if (!show && !positioningActive) return null;
@@ -93,6 +96,29 @@ export default function AircraftHud() {
                         showValue
                         unit="m/s"
                         label="VSI"
+                    />
+                </ScaledHudContent>
+            </DraggableHudElement>
+
+            <DraggableHudElement id="aircraftFuel" label="Combustível" zIndex={15}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "59vw", pointerEvents: "none" }}>
+                    <AnalogGauge
+                        size={88}
+                        value={fuel}
+                        minValue={0}
+                        maxValue={100}
+                        arcLength={75}
+                        rotation={225}
+                        majorTickInterval={25}
+                        minorTickCount={1}
+                        ringSize={4}
+                        color={fuelColor}
+                        outlineColor={fuelColor}
+                        outlineOpacity={0.28}
+                        needleStyle="needle"
+                        showValue
+                        unit="%"
+                        label="FUEL"
                     />
                 </ScaledHudContent>
             </DraggableHudElement>

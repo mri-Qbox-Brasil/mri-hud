@@ -197,6 +197,7 @@ Config.Positioning = {
         fuelgauge     = { canMove = true,  canHide = true,  canResize = true  },
         seatbelt      = { canMove = true,  canHide = true,  canResize = false },
         serverLogo    = { canMove = true,  canHide = true,  canResize = false },
+        aircraftFuel  = { canMove = true,  canHide = true,  canResize = true  },
         dynamicGauges = { canMove = true,  canHide = true,  canResize = true  }, -- afeta todos os custom gauges
     },
 }

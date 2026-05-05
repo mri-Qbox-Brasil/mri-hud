@@ -1,6 +1,7 @@
 import { faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { useVehicleHudStore } from "../../stores/vehicleHudStore";
 import { useMarineHudStore } from "../../stores/marineHudStore";
+import { useAircraftHudStore } from "../../stores/aircraftHudStore";
 import { usePositioningStore } from "../../stores/positioningStore";
 import debugMode from "../../stores/debugStore";
 import AnalogGauge from "../molecules/hud-shapes/AnalogGauge";
@@ -17,6 +18,7 @@ export default function VehicleHud() {
   const seatbeltColor = useVehicleHudStore((s) => s.seatbeltColor);
   const useMPH      = useVehicleHudStore((s) => s.useMPH);
   const marineActive      = useMarineHudStore((s) => s.show);
+  const aircraftActive    = useAircraftHudStore((s) => s.show);
   const positioningActive = usePositioningStore((s) => s.active);
 
   if (!show && !debugMode && !positioningActive) return null;
@@ -54,7 +56,7 @@ export default function VehicleHud() {
         </ScaledHudContent>
       </DraggableHudElement>
 
-      {(!marineActive || positioningActive) && (
+      {(!marineActive && !aircraftActive || positioningActive || debugMode) && (
         <DraggableHudElement id="fuelgauge" label="Combustível" zIndex={10}>
           <ScaledHudContent style={{ position: "fixed", bottom: "7vh", left: "23vw", pointerEvents: "none" }}>
             <AnalogGauge
