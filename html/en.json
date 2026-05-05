@@ -94,5 +94,15 @@
   "deleteProfile": "Delete Profile",
   "metricsTypeMiles": "MPH",
   "metricsTypeKmh": "KPH",
-  "metricsTypeDescription": "Choose your preferred unit of measurement"
+  "metricsTypeDescription": "Choose your preferred unit of measurement",
+  "generalTab": "General",
+  "customizationTab": "Customization",
+  "positioningMenu": "Positioning",
+  "openPositioningMode": "Open Positioning Mode",
+  "openPositioningModeDescription": "Drag, resize and hide HUD elements freely",
+  "resetAllPositions": "Reset All Positions",
+  "resetAllPositionsDescription": "Resets every element back to its default position and size",
+  "positioningModeTitle": "Positioning Mode — Drag elements to reposition them",
+  "positioningResetAll": "Reset All",
+  "positioningClose": "Done [F10]"
 }

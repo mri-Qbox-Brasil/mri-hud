@@ -1,7 +1,7 @@
 {
   "name": "ps-hud-react",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "dev": "node ./scripts/toggleDebug.js true && vite --host",

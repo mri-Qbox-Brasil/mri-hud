@@ -3,7 +3,7 @@ game 'gta5'
 
 description 'Ultra customizable hud featuring a unique and robust settings menu. Change eveything about your experience!'
 author 'Project-Sloth & GFive'
-version "2.1.8"
+version "2.2.0"
 
 shared_scripts {
     '@qb-core/shared/locale.lua',
