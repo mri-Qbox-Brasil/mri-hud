@@ -1,28 +1,30 @@
 import { useMarineHudStore } from "../../stores/marineHudStore";
+import { usePositioningStore } from "../../stores/positioningStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
 import Clinometer from "../molecules/hud-shapes/Clinometer";
 import AnalogGauge from "../molecules/hud-shapes/AnalogGauge";
 
 export default function MarineHud() {
-    const show       = useMarineHudStore((s) => s.show);
-    const speedKnots = useMarineHudStore((s) => s.speedKnots);
-    const rpm        = useMarineHudStore((s) => s.rpm);
-    const pitch      = useMarineHudStore((s) => s.pitch);
-    const roll       = useMarineHudStore((s) => s.roll);
+    const show              = useMarineHudStore((s) => s.show);
+    const speedKnots        = useMarineHudStore((s) => s.speedKnots);
+    const rpm               = useMarineHudStore((s) => s.rpm);
+    const pitch             = useMarineHudStore((s) => s.pitch);
+    const roll              = useMarineHudStore((s) => s.roll);
+    const positioningActive = usePositioningStore((s) => s.active);
 
-    if (!show) return null;
+    if (!show && !positioningActive) return null;
 
     return (
         <>
             <DraggableHudElement id="marineHeel" label="Escora" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", top: "5vh", left: "2vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "4vh", right: "28vw", pointerEvents: "none" }}>
                     <Clinometer size={130} roll={roll} />
                 </ScaledHudContent>
             </DraggableHudElement>
 
             <DraggableHudElement id="marineSpeed" label="Velocidade" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", top: "5vh", left: "12vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "4vh", right: "18vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={120}
                         value={speedKnots}
@@ -45,7 +47,7 @@ export default function MarineHud() {
             </DraggableHudElement>
 
             <DraggableHudElement id="marineRpm" label="RPM" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", top: "5vh", left: "21vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "4.5vh", right: "9.5vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={110}
                         value={rpm}
@@ -68,7 +70,7 @@ export default function MarineHud() {
             </DraggableHudElement>
 
             <DraggableHudElement id="marineTrim" label="Trim" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", top: "5vh", left: "29vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "4.5vh", right: "2vw", pointerEvents: "none" }}>
                     <AnalogGauge
                         size={100}
                         value={pitch}

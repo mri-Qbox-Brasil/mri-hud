@@ -198,12 +198,12 @@ export default function AnalogGauge({
                                 </text>
                             )}
                             {odometer && (() => {
-                                const panelW = outerR * 0.82;
-                                const panelH = outerR * 0.19;
+                                const panelW = outerR * 0.92;
+                                const panelH = outerR * 0.26;
                                 const panelX = cx - panelW / 2;
-                                const panelY = cy + outerR * 0.50;
+                                const panelY = cy + outerR * 0.52;
                                 const textY  = panelY + panelH / 2;
-                                const fs     = (outerR * 0.105).toFixed(1);
+                                const fs     = (outerR * 0.148).toFixed(1);
                                 const ghost  = odometer.replace(/\d/g, "8");
                                 return (
                                     <>
@@ -276,9 +276,9 @@ export default function AnalogGauge({
                 </text>
             )}
 
-            {/* Bottom label */}
-            {label && (
-                <text x={cx} y={cy + outerR * (needleStyle === "needle" ? (odometer ? 0.78 : 0.60) : 0.55)}
+            {/* Bottom label — hidden when odometer occupies that space */}
+            {label && !(needleStyle === "needle" && odometer) && (
+                <text x={cx} y={cy + outerR * (needleStyle === "needle" ? 0.60 : 0.55)}
                     textAnchor="middle" dominantBaseline="middle"
                     fill="rgba(255,255,255,0.38)"
                     fontSize={(outerR * 0.095).toFixed(1)}

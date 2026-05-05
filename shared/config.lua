@@ -192,10 +192,9 @@ Config.Positioning = {
         statusBar     = { canMove = true,  canHide = true,  canResize = false },
         compassHud    = { canMove = true,  canHide = true,  canResize = false },
         moneyHud      = { canMove = true,  canHide = true,  canResize = false },
-        minimap       = { canMove = true,  canHide = false, canResize = false }, -- ocultar minimapa requer chamada nativa separada
+        minimap       = { canMove = false, canHide = false, canResize = false }, -- reposicionamento desativado temporariamente (bugs pendentes)
         speedometer   = { canMove = true,  canHide = true,  canResize = true  },
         fuelgauge     = { canMove = true,  canHide = true,  canResize = true  },
-        altitudegauge = { canMove = true,  canHide = true,  canResize = true  },
         seatbelt      = { canMove = true,  canHide = true,  canResize = false },
         serverLogo    = { canMove = true,  canHide = true,  canResize = false },
         dynamicGauges = { canMove = true,  canHide = true,  canResize = true  }, -- afeta todos os custom gauges

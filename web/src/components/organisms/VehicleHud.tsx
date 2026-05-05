@@ -1,5 +1,7 @@
 import { faUserSlash } from "@fortawesome/free-solid-svg-icons";
 import { useVehicleHudStore } from "../../stores/vehicleHudStore";
+import { useMarineHudStore } from "../../stores/marineHudStore";
+import { usePositioningStore } from "../../stores/positioningStore";
 import debugMode from "../../stores/debugStore";
 import AnalogGauge from "../molecules/hud-shapes/AnalogGauge";
 import DraggableHudElement from "../atoms/DraggableHudElement";
@@ -9,19 +11,19 @@ export default function VehicleHud() {
   const show        = useVehicleHudStore((s) => s.show);
   const speed       = useVehicleHudStore((s) => s.speed);
   const fuel        = useVehicleHudStore((s) => s.fuel);
-  const altitude    = useVehicleHudStore((s) => s.altitude);
   const odometer    = useVehicleHudStore((s) => s.odometer);
   const fuelColor   = useVehicleHudStore((s) => s.fuelColor);
-  const showAltitude  = useVehicleHudStore((s) => s.showAltitude);
   const showSeatBelt  = useVehicleHudStore((s) => s.showSeatBelt);
   const seatbeltColor = useVehicleHudStore((s) => s.seatbeltColor);
   const useMPH      = useVehicleHudStore((s) => s.useMPH);
+  const marineActive      = useMarineHudStore((s) => s.show);
+  const positioningActive = usePositioningStore((s) => s.active);
 
-  if (!show && !debugMode) return null;
+  if (!show && !debugMode && !positioningActive) return null;
 
-  const speedMax   = useMPH ? 120 : 200;
-  const speedUnit  = useMPH ? "mph" : "km/h";
-  const speedTick  = useMPH ? 20 : 20;
+  const speedMax    = useMPH ? 120 : 200;
+  const speedUnit   = useMPH ? "mph" : "km/h";
+  const speedTick   = useMPH ? 20 : 20;
   const odometerStr = odometer > 0
     ? `${odometer.toLocaleString("pt-BR")} ${useMPH ? "mi" : "km"}`
     : undefined;
@@ -29,7 +31,7 @@ export default function VehicleHud() {
   return (
     <>
       <DraggableHudElement id="speedometer" label="Velocímetro" zIndex={10}>
-        <ScaledHudContent style={{ position: "fixed", bottom: "5vh", left: "5vw", pointerEvents: "none" }}>
+        <ScaledHudContent style={{ position: "fixed", bottom: "4vh", left: "3vw", pointerEvents: "none" }}>
           <AnalogGauge
             size={140}
             value={speed}
@@ -52,49 +54,26 @@ export default function VehicleHud() {
         </ScaledHudContent>
       </DraggableHudElement>
 
-      <DraggableHudElement id="fuelgauge" label="Combustível" zIndex={10}>
-        <ScaledHudContent style={{ position: "fixed", bottom: "4vh", left: "15vw", pointerEvents: "none" }}>
-          <AnalogGauge
-            size={110}
-            value={fuel}
-            minValue={0}
-            maxValue={100}
-            arcLength={75}
-            rotation={225}
-            majorTickInterval={25}
-            minorTickCount={1}
-            ringSize={5}
-            color={fuelColor}
-            outlineColor={fuelColor}
-            outlineOpacity={0.28}
-            needleStyle="needle"
-            showValue
-            unit="%"
-            label="FUEL"
-          />
-        </ScaledHudContent>
-      </DraggableHudElement>
-
-      {(showAltitude || debugMode) && (
-        <DraggableHudElement id="altitudegauge" label="Altitude" zIndex={10}>
-          <ScaledHudContent style={{ position: "fixed", bottom: "5vh", left: "24vw", pointerEvents: "none" }}>
+      {(!marineActive || positioningActive) && (
+        <DraggableHudElement id="fuelgauge" label="Combustível" zIndex={10}>
+          <ScaledHudContent style={{ position: "fixed", bottom: "4.5vh", left: "13.5vw", pointerEvents: "none" }}>
             <AnalogGauge
-              size={120}
-              value={altitude}
+              size={88}
+              value={fuel}
               minValue={0}
-              maxValue={750}
+              maxValue={100}
               arcLength={75}
               rotation={225}
-              majorTickInterval={150}
+              majorTickInterval={25}
               minorTickCount={1}
-              ringSize={5}
-              color="#ffffff"
-              outlineColor="#ffffff"
-              outlineOpacity={0.22}
+              ringSize={4}
+              color={fuelColor}
+              outlineColor={fuelColor}
+              outlineOpacity={0.28}
               needleStyle="needle"
               showValue
-              unit="m"
-              label="ALT"
+              unit="%"
+              label="FUEL"
             />
           </ScaledHudContent>
         </DraggableHudElement>
@@ -102,7 +81,7 @@ export default function VehicleHud() {
 
       {showSeatBelt && (
         <DraggableHudElement id="seatbelt" label="Cinto" zIndex={10} canResize={false}>
-          <div style={{ position: "fixed", bottom: "16vh", left: "17vw", pointerEvents: "none" }}>
+          <div style={{ position: "fixed", bottom: "3vh", left: "15vw", pointerEvents: "none" }}>
             <SeatbeltIcon color={seatbeltColor} />
           </div>
         </DraggableHudElement>

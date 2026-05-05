@@ -1,18 +1,20 @@
 import { useAircraftHudStore } from "../../stores/aircraftHudStore";
+import { usePositioningStore } from "../../stores/positioningStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
 import ArtificialHorizon from "../molecules/hud-shapes/ArtificialHorizon";
 import AnalogGauge from "../molecules/hud-shapes/AnalogGauge";
 
 export default function AircraftHud() {
-    const show = useAircraftHudStore((s) => s.show);
-    const airspeed = useAircraftHudStore((s) => s.airspeed);
-    const altitude = useAircraftHudStore((s) => s.altitude);
-    const verticalSpeed = useAircraftHudStore((s) => s.verticalSpeed);
-    const pitch = useAircraftHudStore((s) => s.pitch);
-    const roll = useAircraftHudStore((s) => s.roll);
+    const show              = useAircraftHudStore((s) => s.show);
+    const airspeed          = useAircraftHudStore((s) => s.airspeed);
+    const altitude          = useAircraftHudStore((s) => s.altitude);
+    const verticalSpeed     = useAircraftHudStore((s) => s.verticalSpeed);
+    const pitch             = useAircraftHudStore((s) => s.pitch);
+    const roll              = useAircraftHudStore((s) => s.roll);
+    const positioningActive = usePositioningStore((s) => s.active);
 
-    if (!show) return null;
+    if (!show && !positioningActive) return null;
 
     // Altimeter: needle completes one turn per 1000 m; label shows thousands
     const altMod = ((altitude % 1000) + 1000) % 1000;

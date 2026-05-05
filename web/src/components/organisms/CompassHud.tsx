@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import { useCompassHudStore } from "../../stores/compassHudStore";
 import { useMenuStore } from "../../stores/menuStore";
+import { usePositioningStore } from "../../stores/positioningStore";
 import debugMode from "../../stores/debugStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 
@@ -13,6 +14,7 @@ export default function CompassHud() {
   const isShowCompassChecked = useMenuStore((s) => s.isShowCompassChecked);
   const isShowStreetsChecked = useMenuStore((s) => s.isShowStreetsChecked);
   const isPointerShowChecked = useMenuStore((s) => s.isPointerShowChecked);
+  const positioningActive    = usePositioningStore((s) => s.active);
 
   // Smoothly tween the viewBox heading, with instant-jump for wraparound
   const [tweened, setTweened] = useState(heading);
@@ -55,7 +57,7 @@ export default function CompassHud() {
     return () => cancelAnimationFrame(rafRef.current);
   }, [heading]);
 
-  if (!show && !debugMode) return null;
+  if (!show && !debugMode && !positioningActive) return null;
 
   return (
     <DraggableHudElement
