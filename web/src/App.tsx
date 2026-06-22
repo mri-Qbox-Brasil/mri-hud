@@ -3,6 +3,8 @@ import { useEventHandler, fetchNui } from "./utils/eventHandler";
 import { useMenuStore } from "./stores/menuStore";
 import { usePlayerStatusHudStore } from "./stores/playerStatusHudStore";
 import { usePositioningStore } from "./stores/positioningStore";
+import { useThemeStore } from "./stores/themeStore";
+import { useAccentColor } from "./hooks/useAccentColor";
 import debugMode from "./stores/debugStore";
 import "./debugMocks";
 import MetaLayout from "./components/templates/MetaLayout";
@@ -20,6 +22,11 @@ import ServerLogoHud from "./components/organisms/ServerLogoHud";
 
 export default function App() {
     useEventHandler();
+
+    // Suite MRI accent — Lua manda em updateUISettings; themeStore guarda;
+    // useAccentColor aplica nas CSS vars --primary/--ring em runtime.
+    const accentColor = useThemeStore((s) => s.accentColor);
+    useAccentColor(accentColor);
 
     const handleKeyUp = useMenuStore((s) => s.handleKeyUp);
     const isCinematicModeChecked = useMenuStore((s) => s.isCinematicModeChecked);

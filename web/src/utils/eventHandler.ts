@@ -11,6 +11,7 @@ import { usePositioningStore } from "../stores/positioningStore";
 import { useServerLogoStore } from "../stores/serverLogoStore";
 import { useCompassHudStore } from "../stores/compassHudStore";
 import { useMoneyHudStore } from "../stores/moneyHudStore";
+import { useThemeStore } from "../stores/themeStore";
 import { useAircraftHudStore } from "../stores/aircraftHudStore";
 import { useMarineHudStore } from "../stores/marineHudStore";
 import { initI18n } from "./i18n";
@@ -121,6 +122,12 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
             break;
 
         case "updateUISettings":
+            // accentColor pode vir sozinho (broadcast da convar mri:color) OU
+            // junto com icons/layout/colors (init/save). Atualiza o themeStore
+            // independente das outras keys estarem presentes.
+            if (typeof data.accentColor === "string") {
+                useThemeStore.getState().setAccentColor(data.accentColor);
+            }
             if (!data.icons || !data.layout || !data.colors) return;
             usePlayerHudStore.getState().receiveUIUpdateMessage(data.icons);
             useLayoutStore.getState().receiveUIUpdateMessage(data.layout);

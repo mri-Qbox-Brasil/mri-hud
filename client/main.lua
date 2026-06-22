@@ -116,12 +116,22 @@ local function SendAdminStatus()
     })
 end
 
+-- Hex valido (#RRGGBB ou #RRGGBBAA). Convar `mri:color` e a fonte de verdade
+-- do accent da suite MRI; cai no default verde-cian (#00E699) se ausente.
+local HEX_PATTERN = '^#%x%x%x%x%x%x%x?%x?$'
+local function getMriAccent()
+    local c = GetConvar('mri:color', '#00E699')
+    if type(c) == 'string' and c:match(HEX_PATTERN) then return c end
+    return '#00E699'
+end
+
 local function sendUIUpdateMessage(data)
     SendNUIMessage({
         action = 'updateUISettings',
         icons = data.icons,
         layout = data.layout,
         colors = data.colors,
+        accentColor = getMriAccent(),
     })
 end
 
@@ -131,6 +141,17 @@ local function sendUILang()
         lang = GetConvar('qb_locale', 'en')
     })
 end
+
+-- Convar `mri:color` mudou em runtime — propaga pra NUI sem precisar restart.
+-- O eventHandler.ts da NUI escuta 'updateUISettings' e atualiza o themeStore;
+-- useAccentColor reage e aplica nas CSS vars --primary/--ring.
+AddEventHandler('mri:color:changed', function()
+    SendNUIMessage({ action = 'updateUISettings', accentColor = getMriAccent() })
+end)
+AddConvarChangeListener('mri:color', function(name)
+    if name ~= 'mri:color' then return end
+    SendNUIMessage({ action = 'updateUISettings', accentColor = getMriAccent() })
+end)
 
 local function sendHudConfig()
     SendNUIMessage({

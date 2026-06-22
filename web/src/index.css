@@ -1,17 +1,47 @@
+@import '@mriqbox/ui-kit/dist/style.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Tokens shadcn alinhados com @mriqbox/ui-kit. --primary e --ring sao
+ * sobrescritos em runtime pelo useAccentColor (reage a convar mri:color
+ * da suite MRI). Default = #00E699 (suite accent canonico) em HSL.
+ *
+ * --ps-hud-* sao legados internos da HUD (botoes do menu antigo). Migrar
+ * pra --primary quando os componentes forem trocados pelo ui-kit.
+ */
 :root {
+  /* Suite MRI accent — sobrescrito por useAccentColor */
+  --primary: 160 100% 45%;
+  --primary-foreground: 240 10% 4%;
+  --ring: 160 100% 45%;
+
+  /* Tokens shadcn base (dark UI, transparente sobre o jogo) */
+  --background: 240 10% 4%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 6%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 6%;
+  --popover-foreground: 0 0% 98%;
+  --secondary: 240 5% 15%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 5% 15%;
+  --muted-foreground: 240 5% 60%;
+  --accent: 240 5% 15%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5% 15%;
+  --input: 240 5% 15%;
+  --radius: 0.5rem;
+
+  /* Legados ps-hud (botoes/scrollbar do menu antigo) — manter ate
+   * migracao pra ui-kit estar completa. */
   --ps-hud-primary: #3b82f6;
   --ps-hud-secondary: #2563eb;
   --ps-hud-primary-hover: #60a5fa;
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
-  --radius: 0.5rem;
 }
 
 * {
