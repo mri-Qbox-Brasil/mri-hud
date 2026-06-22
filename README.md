@@ -2,7 +2,7 @@
 
 HUD ultra-customizável para FiveM (QBCore) com menu de configurações completo. Permite alterar ícones, posição, tamanho, cor, forma e comportamento de todos os elementos diretamente in-game, com suporte a configuração por jogador ou centralizada pelo admin.
 
-Desenvolvido por [Project Sloth](https://www.discord.gg/projectsloth). Código-fonte Svelte disponível em [svelte-source](https://github.com/Project-Sloth/ps-hud/tree/main/svelte-source).
+Desenvolvido originalmente por [Project Sloth](https://www.discord.gg/projectsloth). Fork mantido pela MRI Qbox Brasil com migração da NUI de Svelte para React.
 
 ---
 
@@ -86,7 +86,6 @@ Cada jogador pode personalizar seu próprio HUD via menu in-game, sem afetar os 
 
 ## Créditos
 
-- Inspiração e trechos de código de [Svelte & Lua Boilerplate](https://github.com/project-error/svelte-lua-boilerplate) by [Project Error](https://github.com/project-error)
 - Versão não suportada para ESX: [reyyghi/ps-hud](https://github.com/reyyghi/ps-hud)
 
-Copyright © 2022 Project Sloth.
+Copyright © 2022 Project Sloth. Migração React e manutenção mantida pela MRI Qbox Brasil.
