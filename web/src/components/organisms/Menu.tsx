@@ -59,7 +59,7 @@ export default function Menu() {
     return (
         <section
             className="w-[60vw] h-[60vh] flex flex-col rounded-t-2xl text-foreground bg-background/95 border border-primary/25 shadow-[0_8px_32px_rgba(0,0,0,0.7)]"
-            style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 200 }}
+            style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 90 }}
         >
             {/* Drag handle */}
             <div
