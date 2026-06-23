@@ -37,11 +37,12 @@
   --input: 240 5% 15%;
   --radius: 0.5rem;
 
-  /* Legados ps-hud (botoes/scrollbar do menu antigo) — manter ate
-   * migracao pra ui-kit estar completa. */
-  --ps-hud-primary: #3b82f6;
-  --ps-hud-secondary: #2563eb;
-  --ps-hud-primary-hover: #60a5fa;
+  /* Legados ps-hud (botoes/scrollbar do menu antigo) — agora apontam
+   * pro --primary da suite MRI. Qualquer componente que ainda use
+   * essas vars reage automatico ao accent (convar mri:color). */
+  --ps-hud-primary: hsl(var(--primary));
+  --ps-hud-secondary: hsl(var(--primary) / 0.85);
+  --ps-hud-primary-hover: hsl(var(--primary) / 1);
 }
 
 * {
@@ -149,9 +150,10 @@ body {
   #seatbeltAltitude { position: relative; left: 5.9vw !important; bottom: 13vh !important; }
 }
 
-/* Custom scrollbar for menu */
+/* Custom scrollbar for menu — neutro (border/muted), accent reservado pra
+ * estado ativo/seleção. */
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: rgba(10,15,28,0.6); }
-::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.5); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,0.8); }
+::-webkit-scrollbar-track { background: hsl(var(--card)); }
+::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
 

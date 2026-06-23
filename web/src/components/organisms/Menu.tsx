@@ -58,38 +58,23 @@ export default function Menu() {
 
     return (
         <section
-            className="w-[60vw] h-[60vh] flex flex-col rounded-t-2xl shadow-lg text-white"
-            style={{
-                position: "fixed", left: pos.x, top: pos.y, zIndex: 200,
-                background: "rgba(10,15,28,0.97)",
-                border: "1px solid rgba(59,130,246,0.25)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.7), 0 0 0 1px rgba(59,130,246,0.1)",
-            }}
+            className="w-[60vw] h-[60vh] flex flex-col rounded-t-2xl text-foreground bg-background/95 border border-primary/25 shadow-[0_8px_32px_rgba(0,0,0,0.7)]"
+            style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 200 }}
         >
             {/* Drag handle */}
             <div
-                className="drag-bar rounded-t-2xl select-none"
+                className="drag-bar rounded-t-2xl select-none bg-card/80 border-b border-primary/20"
                 onMouseDown={onDragMouseDown}
-                style={{
-                    cursor: "grab",
-                    background: "rgba(15,23,42,0.8)",
-                    borderBottom: "1px solid rgba(59,130,246,0.18)",
-                }}
+                style={{ cursor: "grab" }}
             >
-                <svg role="img" aria-label="drag handle" viewBox="0 0 24 24" height={24} width={24} className="mx-auto transition-opacity" style={{ opacity: 0.3 }}>
-                    <path fill="rgba(147,197,253,0.8)" d="M3,15V13H5V15H3M3,11V9H5V11H3M7,15V13H9V15H7M7,11V9H9V11H7M11,15V13H13V15H11M11,11V9H13V11H11M15,15V13H17V15H15M15,11V9H17V11H15M19,15V13H21V15H19M19,11V9H21V11H19Z" />
+                <svg role="img" aria-label="drag handle" viewBox="0 0 24 24" height={24} width={24} className="mx-auto text-primary/60" style={{ opacity: 0.4 }}>
+                    <path fill="currentColor" d="M3,15V13H5V15H3M3,11V9H5V11H3M7,15V13H9V15H7M7,11V9H9V11H7M11,15V13H13V15H11M11,11V9H13V11H11M15,15V13H17V15H15M15,11V9H17V11H15M19,15V13H21V15H19M19,11V9H21V11H19Z" />
                 </svg>
             </div>
 
             <div className="flex font-semibold" style={{ height: "calc(100% - 24px)" }}>
                 {/* Sidebar tabs */}
-                <div
-                    className="flex flex-col w-1/6"
-                    style={{
-                        background: "rgba(15,23,42,0.9)",
-                        borderRight: "1px solid rgba(59,130,246,0.18)",
-                    }}
-                >
+                <div className="flex flex-col w-1/6 bg-card/90 border-r border-primary/20">
                     {visibleTabs.map((tab) => {
                         const vbW = tab.icon.icon[0];
                         const vbH = tab.icon.icon[1];
@@ -98,12 +83,11 @@ export default function Menu() {
                         return (
                             <div
                                 key={tab.key}
-                                className="px-4 py-4 flex flex-row gap-3 cursor-pointer select-none transition-colors"
-                                style={{
-                                    background: isActive ? "rgba(30,58,138,0.5)" : "transparent",
-                                    borderLeft: isActive ? "2px solid rgba(96,165,250,0.8)" : "2px solid transparent",
-                                    color: isActive ? "rgba(147,197,253,1)" : "rgba(147,197,253,0.6)",
-                                }}
+                                className={`px-4 py-4 flex flex-row gap-3 cursor-pointer select-none transition-colors border-l-2 ${
+                                    isActive
+                                        ? "bg-primary/15 border-primary text-primary"
+                                        : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                }`}
                                 onClick={() => setActiveKey(tab.key)}
                             >
                                 <svg width="16" height="16" viewBox={`0 0 ${vbW} ${vbH}`} className="shrink-0 mt-0.5">
@@ -119,11 +103,8 @@ export default function Menu() {
                 {visibleTabs.map((tab) => (
                     <div
                         key={tab.key}
-                        className="flex-col w-5/6 px-5 overflow-y-scroll"
-                        style={{
-                            display: activeTab.key === tab.key ? "flex" : "none",
-                            background: "rgba(10,15,28,0.6)",
-                        }}
+                        className="flex-col w-5/6 px-5 overflow-y-scroll bg-background/60"
+                        style={{ display: activeTab.key === tab.key ? "flex" : "none" }}
                     >
                         <tab.content />
                     </div>

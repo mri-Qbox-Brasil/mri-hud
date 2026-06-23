@@ -17,7 +17,7 @@ export default function GlobalLayoutPanel() {
 
   return (
     <Panel name={t.globalStatusIconLayoutSettings} icon={faTableColumns} color="white">
-      <div className="text-sm flex flex-col" style={{ color: "rgba(200,220,255,0.85)" }}>
+      <div className="text-sm flex flex-col" style={{ color: "hsl(var(--muted-foreground))" }}>
         <div className="flex justify-center mb-4">
           <div className="w-55">
             <p className="text-lg text-center mb-2">{t.iconLayout}</p>

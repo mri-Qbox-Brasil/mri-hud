@@ -100,8 +100,8 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
                         position: "absolute",
                         inset: -6,
                         borderRadius: "50%",
-                        border: "2px solid rgba(59,130,246,0.9)",
-                        boxShadow: "0 0 12px rgba(59,130,246,0.5), inset 0 0 8px rgba(59,130,246,0.15)",
+                        border: "2px solid hsl(var(--primary))",
+                        boxShadow: "0 0 12px hsl(var(--primary) / 0.5), inset 0 0 8px hsl(var(--primary) / 0.15)",
                         pointerEvents: "none",
                     }}
                 />
@@ -118,8 +118,8 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
                     majorTickInterval={cfg.majorTickInterval ?? Math.ceil(cfg.maxValue / 5)}
                     minorTickCount={cfg.minorTickCount ?? 4}
                     ringSize={cfg.ringSize}
-                    color={dragging ? "#3b82f6" : cfg.color}
-                    outlineColor={dragging ? "#3b82f6" : cfg.outlineColor}
+                    color={dragging ? "hsl(var(--primary))" : cfg.color}
+                    outlineColor={dragging ? "hsl(var(--primary))" : cfg.outlineColor}
                     outlineOpacity={cfg.outlineOpacity}
                     needleStyle={cfg.needleStyle ?? "needle"}
                     showValue={cfg.showValue}
@@ -135,12 +135,12 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
                     maxLengthDisplay={cfg.arcLength}
                     rotateDegree={cfg.rotation}
                     ringSize={cfg.ringSize}
-                    progressColor={dragging ? "#3b82f6" : cfg.color}
-                    outlineColor={dragging ? "#3b82f6" : cfg.outlineColor}
+                    progressColor={dragging ? "hsl(var(--primary))" : cfg.color}
+                    outlineColor={dragging ? "hsl(var(--primary))" : cfg.outlineColor}
                     outlineColorOpacity={cfg.outlineOpacity}
                     displayOutline
                     icon={icon}
-                    iconColor={dragging ? "#93c5fd" : cfg.color}
+                    iconColor={dragging ? "hsl(var(--primary))" : cfg.color}
                     iconScaling={0.38}
                     text={cfg.showValue ? (cfg.label ?? "") : ""}
                     displayNumber={cfg.showValue ? Math.round(value) : 0}
@@ -176,8 +176,8 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
                         display: "flex",
                         alignItems: "center",
                         gap: 5,
-                        background: dragging ? "rgba(30,58,138,0.95)" : "rgba(15,23,42,0.88)",
-                        border: `1px solid ${dragging ? "rgba(96,165,250,0.9)" : "rgba(59,130,246,0.7)"}`,
+                        background: dragging ? "hsl(var(--primary) / 0.22)" : "hsl(var(--card))",
+                        border: `1px solid ${dragging ? "hsl(var(--primary))" : "hsl(var(--border))"}`,
                         borderRadius: 7,
                         padding: "3px 8px",
                         color: "white",
@@ -185,7 +185,7 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
                         fontWeight: 600,
                         whiteSpace: "nowrap",
                         boxShadow: dragging
-                            ? "0 0 10px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.5)"
+                            ? "0 0 10px hsl(var(--primary) / 0.4), 0 2px 8px rgba(0,0,0,0.5)"
                             : "0 2px 8px rgba(0,0,0,0.5)",
                         pointerEvents: "auto",
                         cursor: "default",
@@ -197,10 +197,10 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
                     {canMove && (
                         <FontAwesomeIcon
                             icon={faArrowsUpDownLeftRight}
-                            style={{ color: dragging ? "rgba(147,197,253,1)" : "rgba(147,197,253,0.85)", fontSize: 10 }}
+                            style={{ color: dragging ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))", fontSize: 10 }}
                         />
                     )}
-                    <span style={{ color: dragging ? "#93c5fd" : "rgba(147,197,253,0.9)" }}>
+                    <span style={{ color: dragging ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}>
                         {cfg.label ?? cfg.id}
                     </span>
 
@@ -226,7 +226,7 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
                                 <FontAwesomeIcon icon={faMinus} style={{ fontSize: 10 }} />
                             </button>
                             <span style={{
-                                color: hasCustomScale ? "rgba(200,230,255,0.95)" : "rgba(147,197,253,0.45)",
+                                color: hasCustomScale ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground) / 0.5)",
                                 fontSize: 10,
                                 minWidth: 28,
                                 textAlign: "center",
@@ -247,7 +247,7 @@ export default function DraggableGauge({ cfg, value, icon }: Props) {
 
                     {canMove && (hasOverride || hasCustomScale) && (
                         <button
-                            style={{ background: "none", border: "none", color: "rgba(252,165,165,0.85)", cursor: "pointer", padding: "0 2px", lineHeight: 1 }}
+                            style={{ background: "none", border: "none", color: "hsl(var(--destructive))", cursor: "pointer", padding: "0 2px", lineHeight: 1 }}
                             title="Resetar posição"
                             onMouseDown={(e) => e.stopPropagation()}
                             onClick={() => resetGauge(cfg.id)}

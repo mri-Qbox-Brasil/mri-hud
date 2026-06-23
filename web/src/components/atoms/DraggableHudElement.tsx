@@ -184,8 +184,8 @@ export default function DraggableHudElement({
                         top: naturalBounds.t - 6,
                         width: naturalBounds.r - naturalBounds.l + 12,
                         height: naturalBounds.b - naturalBounds.t + 12,
-                        border: "2px solid rgba(59,130,246,0.9)",
-                        boxShadow: "0 0 12px rgba(59,130,246,0.5), inset 0 0 8px rgba(59,130,246,0.15)",
+                        border: "2px solid hsl(var(--primary))",
+                        boxShadow: "0 0 12px hsl(var(--primary) / 0.5), inset 0 0 8px hsl(var(--primary) / 0.15)",
                         borderRadius: 6,
                         pointerEvents: "none",
                         zIndex: 9998,
@@ -205,8 +205,8 @@ export default function DraggableHudElement({
                         display: "flex",
                         alignItems: "center",
                         gap: 6,
-                        background: dragging ? "rgba(30,58,138,0.95)" : "rgba(15,23,42,0.88)",
-                        border: `1px solid ${dragging ? "rgba(96,165,250,0.9)" : "rgba(59,130,246,0.7)"}`,
+                        background: dragging ? "hsl(var(--primary) / 0.22)" : "hsl(var(--card))",
+                        border: `1px solid ${dragging ? "hsl(var(--primary))" : "hsl(var(--border))"}`,
                         borderRadius: 8,
                         padding: "4px 8px",
                         color: "white",
@@ -214,7 +214,7 @@ export default function DraggableHudElement({
                         fontWeight: 600,
                         userSelect: "none",
                         boxShadow: dragging
-                            ? "0 0 10px rgba(59,130,246,0.4), 0 2px 8px rgba(0,0,0,0.5)"
+                            ? "0 0 10px hsl(var(--primary) / 0.4), 0 2px 8px rgba(0,0,0,0.5)"
                             : "0 2px 8px rgba(0,0,0,0.5)",
                         cursor: canMove ? (dragging ? "grabbing" : "grab") : "default",
                         zIndex: 9999,
@@ -228,13 +228,13 @@ export default function DraggableHudElement({
                         <FontAwesomeIcon
                             icon={faArrowsUpDownLeftRight}
                             style={{
-                                color: dragging ? "rgba(147,197,253,1)" : "rgba(147,197,253,0.9)",
+                                color: dragging ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
                                 fontSize: 11,
                                 flexShrink: 0,
                             }}
                         />
                     )}
-                    <span style={{ color: dragging ? "#93c5fd" : "rgba(147,197,253,0.9)", letterSpacing: "0.04em" }}>
+                    <span style={{ color: dragging ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))", letterSpacing: "0.04em" }}>
                         {label}
                     </span>
 
@@ -264,7 +264,7 @@ export default function DraggableHudElement({
                                 color="rgba(255,255,255,0.7)"
                             />
                             <span style={{
-                                color: hasCustomScale ? "rgba(200,230,255,0.95)" : "rgba(147,197,253,0.45)",
+                                color: hasCustomScale ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground) / 0.5)",
                                 fontSize: 10,
                                 minWidth: 28,
                                 textAlign: "center",
@@ -286,7 +286,7 @@ export default function DraggableHudElement({
                             title="Resetar posição"
                             onClick={() => reset(id)}
                             icon={faRotateLeft}
-                            color="rgba(252,165,165,0.85)"
+                            color="hsl(var(--destructive))"
                         />
                     )}
                 </div>

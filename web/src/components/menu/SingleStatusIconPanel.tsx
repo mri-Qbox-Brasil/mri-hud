@@ -69,8 +69,8 @@ export default function SingleStatusIconPanel() {
       </div>
 
       <div className="mx-8">
-        <p className="text-sm font-semibold uppercase" style={{ color: "rgba(147,197,253,0.75)", letterSpacing: "0.06em" }}>{t.singleIconSizeAndPositionSection}</p>
-        <hr className="mb-6" style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t.singleIconSizeAndPositionSection}</p>
+        <hr className="mb-6" style={{ borderColor: "hsl(var(--border))" }} />
       </div>
 
       <div className="mx-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 items-end">
@@ -133,8 +133,8 @@ export default function SingleStatusIconPanel() {
       </div>
 
       <div className="mx-8 mt-8">
-        <p className="text-sm font-semibold uppercase" style={{ color: "rgba(147,197,253,0.75)", letterSpacing: "0.06em" }}>{t.singleIconColorSection}</p>
-        <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t.singleIconColorSection}</p>
+        <hr style={{ borderColor: "hsl(var(--border))" }} />
       </div>
 
       {colorStatesArray.length > 1 && (

@@ -17,7 +17,7 @@ export default function ProfilePanel() {
     <Panel name={t.customizationProfiles} icon={faUser} color="white">
       <div className="mx-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
         {profiles.map((profile, i) => (
-          <div key={i} className="flex flex-col justify-end items-center border-2 p-3 border-[#029772] my-3">
+          <div key={i} className="flex flex-col justify-end items-center border-2 p-3 border-border rounded-lg my-3">
             {editingIndex === i ? (
               <TextInput
                 value={profile.name}

@@ -20,8 +20,8 @@ export default function StatusIconsPanel() {
   const isAdmin = useMenuStore((s) => s.isAdmin);
 
   return (
-    <div className="text-sm flex flex-col select-none" style={{ color: "rgba(200,220,255,0.85)" }}>
-      <div className="my-3 flex flex-row items-center" style={{ color: "rgba(147,197,253,0.9)" }}>
+    <div className="text-sm flex flex-col select-none" style={{ color: "hsl(var(--muted-foreground))" }}>
+      <div className="my-3 flex flex-row items-center" style={{ color: "hsl(var(--foreground))" }}>
         <div className="flex-1 flex flex-col justify-center min-w-min">
           <p className="ml-3 p-0">{t.statusIconsSettings}</p>
         </div>
@@ -56,15 +56,15 @@ export default function StatusIconsPanel() {
         </div>
       </div>
 
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
       <GlobalStatusIconPanel />
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
       <SingleStatusIconPanel />
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
       <GlobalLayoutPanel />
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
       <UtilityFunctionPanel />
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
       <ProfilePanel />
     </div>
   );

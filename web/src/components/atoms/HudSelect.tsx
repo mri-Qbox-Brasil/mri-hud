@@ -1,3 +1,5 @@
+import { MriSelect } from "@mriqbox/ui-kit";
+
 interface Props {
   values: ReadonlyArray<string>;
   value: string;
@@ -8,22 +10,17 @@ function toLabel(str: string) {
   return str.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
+// Wrapper sobre MriSelect do @mriqbox/ui-kit. Mantem a API local (array de
+// strings) — converte pra {label,value}[] aplicando toLabel pra exibicao.
+// Visual e tema do kit (reage ao accent).
 export default function HudSelect({ values, value, onChange }: Props) {
+  const options = values.map((v) => ({ label: toLabel(v), value: v }));
   return (
-    <select
+    <MriSelect
+      options={options}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full text-white px-2 py-2 text-base cursor-pointer focus:outline-none"
-      style={{
-        background: "rgba(15,23,42,0.9)",
-        border: "1px solid rgba(59,130,246,0.3)",
-        borderRadius: 4,
-        color: "rgba(147,197,253,0.9)",
-      }}
-    >
-      {values.map((v) => (
-        <option key={v} value={v}>{toLabel(v)}</option>
-      ))}
-    </select>
+      onChange={onChange}
+      className="w-full"
+    />
   );
 }

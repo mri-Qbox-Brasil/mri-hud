@@ -46,10 +46,13 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
 
-        // Legados ps-hud (componentes antigos do menu) — manter ate migracao.
-        "ps-primary": "#03f0b5",
-        "ps-secondary": "#02c49a",
-        "ps-primary-hover": "#01d4a0",
+        // Legados ps-hud (componentes antigos do menu) — agora referenciam
+        // --primary da suite MRI. Componentes que usam bg-ps-primary etc
+        // reagem automatico ao accent (convar mri:color) sem precisar
+        // refactor pra usar bg-primary direto.
+        "ps-primary": "hsl(var(--primary))",
+        "ps-secondary": "hsl(var(--primary) / 0.85)",
+        "ps-primary-hover": "hsl(var(--primary) / 1)",
       },
       borderRadius: {
         lg: "var(--radius)",

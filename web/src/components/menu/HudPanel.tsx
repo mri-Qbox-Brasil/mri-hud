@@ -36,12 +36,12 @@ export default function HudPanel() {
   const setPlayer = usePlayerStatusHudStore.getState;
 
   return (
-    <div className="text-sm flex flex-col" style={{ color: "rgba(200,220,255,0.85)" }}>
+    <div className="text-sm flex flex-col" style={{ color: "hsl(var(--muted-foreground))" }}>
       <div className="mx-4 mb-5 mt-3">
         <div className="float-right w-[25%]">
           <PsLogo />
         </div>
-        <div className="-mx-4 mb-4 text-xl" style={{ color: "rgba(147,197,253,0.9)" }}>
+        <div className="-mx-4 mb-4 text-xl" style={{ color: "hsl(var(--foreground))" }}>
           <p>{t.resetHud}</p>
         </div>
 
@@ -68,9 +68,9 @@ export default function HudPanel() {
 
       {positioningEnabled && (
         <>
-          <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+          <hr style={{ borderColor: "hsl(var(--border))" }} />
 
-          <div className="my-3 text-base font-semibold" style={{ color: "rgba(147,197,253,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}>
             <p>{t.positioningMenu}</p>
           </div>
           <div className="mx-4 mb-4 flex flex-col gap-3">
@@ -97,9 +97,9 @@ export default function HudPanel() {
         </>
       )}
 
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
 
-      <div className="my-3 text-base font-semibold" style={{ color: "rgba(147,197,253,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.optionsMenu}</p></div>
+      <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.optionsMenu}</p></div>
       <div className="mx-4 mb-4 flex flex-col">
         <Checkbox checked={isOutMapChecked} primaryText={t.minimapVehicleCheckBoxPrimary} secondaryText={t.minimapVehicleCheckBoxSecondary}
           onChange={(v) => { set({ isOutMapChecked: v }); fetchNui("showOutMap", { checked: v }); }} />
@@ -109,9 +109,9 @@ export default function HudPanel() {
           onChange={(v) => { set({ isCompassFollowChecked: v }); fetchNui("showFollowCompass", { checked: v }); }} />
       </div>
 
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
 
-      <div className="my-3 text-base font-semibold" style={{ color: "rgba(147,197,253,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.notificationsMenu}</p></div>
+      <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.notificationsMenu}</p></div>
       <div className="mx-4 mb-4 flex flex-col">
         <Checkbox checked={isOpenMenuSoundsChecked} primaryText={t.menuSoundEffectsEnabled}
           onChange={(v) => { set({ isOpenMenuSoundsChecked: v }); fetchNui("openMenuSounds", { checked: v }); }} />
@@ -127,9 +127,9 @@ export default function HudPanel() {
           onChange={(v) => { set({ isCinematicNotifyChecked: v }); fetchNui("showCinematicNotif", { checked: v }); }} />
       </div>
 
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
 
-      <div className="my-3 text-base font-semibold" style={{ color: "rgba(147,197,253,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.statusMenu}</p></div>
+      <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.statusMenu}</p></div>
       <div className="mx-4 mb-4 flex flex-col">
         {(["health", "armor", "hunger", "thirst", "stress", "oxygen"] as const).map((icon) => (
           <Checkbox key={icon} checked={dynamicIcons[icon]}
@@ -138,9 +138,9 @@ export default function HudPanel() {
         ))}
       </div>
 
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
 
-      <div className="my-3 text-base font-semibold" style={{ color: "rgba(147,197,253,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.vehicleMenu}</p></div>
+      <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.vehicleMenu}</p></div>
       <div className="mx-4 mb-4 flex flex-col">
         <Switch
           checked={isToggleMapShapeChecked === "circle"}
@@ -164,9 +164,9 @@ export default function HudPanel() {
           onChange={(v) => { setPlayer().updateShowingDynamicIcon("nitro", v); fetchNui("dynamicChange"); }} />
       </div>
 
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
 
-      <div className="my-3 text-base font-semibold" style={{ color: "rgba(147,197,253,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.compassMenu}</p></div>
+      <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.compassMenu}</p></div>
       <div className="mx-4 mb-4 flex flex-col">
         <Checkbox checked={isShowCompassChecked} primaryText={t.compassEnabled} secondaryText={t.compassEnabledDescription}
           onChange={(v) => { set({ isShowCompassChecked: v }); fetchNui("showCompassBase", { checked: v }); }} />
@@ -176,9 +176,9 @@ export default function HudPanel() {
           onChange={(v) => { set({ isPointerShowChecked: v }); fetchNui("showPointerIndex", { checked: v }); }} />
       </div>
 
-      <hr style={{ borderColor: "rgba(59,130,246,0.18)" }} />
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
 
-      <div className="my-3 text-base font-semibold" style={{ color: "rgba(147,197,253,0.75)", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.cinematicMenu}</p></div>
+      <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.cinematicMenu}</p></div>
       <div className="mx-4 mb-4 flex flex-row gap-5">
         <Checkbox checked={isCinematicModeChecked} primaryText={t.showCinematicBarsEnabled}
           onChange={(v) => { set({ isCinematicModeChecked: v }); fetchNui("cinematicMode", { checked: v }); }} />
