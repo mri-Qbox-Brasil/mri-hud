@@ -51,7 +51,6 @@ const defaultTranslations: Translation = {
   minimapTypeDescription:
     "Whether it's square or circle you desire, you have the ability to choose!",
   minimapEnabled: "Minimap Enabled",
-  minimapBordersEnabled: "Minimap Borders Enabled",
   showEngineAlways: "Show Engine Always",
   showNitroAlways: "Show Nitro Always",
   compassMenu: "Compass",

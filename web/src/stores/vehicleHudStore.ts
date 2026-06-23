@@ -11,9 +11,7 @@ type VehicleStatusType = {
   showAltitude: boolean;
   showSeatBelt: boolean;
   showSquare: boolean;
-  showSquareBorder: boolean;
   showCircle: boolean;
-  showCircleBorder: boolean;
   seatbeltColor: string;
   useMPH: boolean;
 };
@@ -30,8 +28,6 @@ interface VehicleHudState extends VehicleStatusType {
     altitude: number;
     showAltitude: boolean;
     showSeatbelt: boolean;
-    showSquareB: boolean;
-    showCircleB: boolean;
     useMPH: boolean;
   }) => void;
 }
@@ -46,9 +42,7 @@ export const useVehicleHudStore = create<VehicleHudState>((set) => ({
   showAltitude: false,
   showSeatBelt: false,
   showSquare: false,
-  showSquareBorder: false,
   showCircle: false,
-  showCircleBorder: false,
   seatbeltColor: "#e85b14",
   useMPH: true,
 
@@ -71,8 +65,6 @@ export const useVehicleHudStore = create<VehicleHudState>((set) => ({
         fuel: capAmountToHundred(data.fuel),
         showSeatBelt: !data.seatbelt,
         showAltitude: data.showAltitude,
-        showSquareBorder: data.showSquareB,
-        showCircleBorder: data.showCircleB,
         fuelColor,
         useMPH: data.useMPH,
       };

@@ -60,6 +60,20 @@ export default function App() {
                 togglePositioning();
                 return;
             }
+            // ESC no modo de posicionamento: fecha o modo (libera foco NUI no
+            // Lua + reseta o estado). Sem isso, o ESC nativo do FiveM tira o
+            // foco mas deixa active=true no React e positioningMode=true no
+            // Lua, travando a HUD em modo edicao sem poder interagir nem
+            // re-abrir. So intercepta se positioning estiver ativo — senao
+            // passa pro handleKeyUp (que fecha o menu de settings).
+            if (e.key === "Escape") {
+                const store = usePositioningStore.getState();
+                if (store.active) {
+                    fetchNui("closePositioningMode");
+                    togglePositioning();
+                    return;
+                }
+            }
             handleKeyUp(e);
         };
         document.addEventListener("keyup", handler);

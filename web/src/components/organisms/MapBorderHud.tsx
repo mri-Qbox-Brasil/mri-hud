@@ -8,8 +8,6 @@ import DraggableHudElement from "../atoms/DraggableHudElement";
 
 export default function MapBorderHud() {
   const show = useVehicleHudStore((s) => s.show);
-  const showSquareBorder = useVehicleHudStore((s) => s.showSquareBorder);
-  const showCircleBorder = useVehicleHudStore((s) => s.showCircleBorder);
   const el = usePositioningStore((s) => s.elements["minimap"]);
 
   // Notify Lua whenever the minimap drag offset changes so it can call
@@ -28,6 +26,10 @@ export default function MapBorderHud() {
       label="Minimapa"
       zIndex={8}
     >
+      {/* Sem moldura custom — o minimap usa a borda nativa do GTA. Este
+          placeholder e invisivel (sem borda/fundo) e existe so pra dar bounds
+          ao DraggableHudElement no modo posicionamento, que mede o selection
+          box e a area de arraste a partir dos filhos. */}
       <div
         style={{
           position: "absolute",
@@ -37,32 +39,17 @@ export default function MapBorderHud() {
           textAlign: "center",
         }}
       >
-        {(showSquareBorder || debugMode) && (
-          <div
-            className="map-square"
-            style={{
-              bottom: "6.30%",
-              width: "29vh",
-              height: "18.5vh",
-              border: "4px solid #bababa",
-              position: "absolute",
-              display: "inline-block",
-            }}
-          />
-        )}
-        {showCircleBorder && (
-          <div
-            style={{
-              bottom: "6.9%",
-              width: "27vh",
-              height: "22.9vh",
-              border: "4px solid #bababa",
-              position: "absolute",
-              display: "inline-block",
-              borderRadius: "50%",
-            }}
-          />
-        )}
+        <div
+          aria-hidden
+          style={{
+            bottom: "6.30%",
+            width: "29vh",
+            height: "18.5vh",
+            position: "absolute",
+            display: "inline-block",
+            pointerEvents: "none",
+          }}
+        />
       </div>
     </DraggableHudElement>
   );

@@ -22,7 +22,6 @@ export default function HudPanel() {
   const isLowFuelAlertChecked = useMenuStore((s) => s.isLowFuelAlertChecked);
   const isCinematicNotifyChecked = useMenuStore((s) => s.isCinematicNotifyChecked);
   const isMapEnabledChecked = useMenuStore((s) => s.isMapEnabledChecked);
-  const isToggleMapBordersChecked = useMenuStore((s) => s.isToggleMapBordersChecked);
   const isToggleMapShapeChecked = useMenuStore((s) => s.isToggleMapShapeChecked);
   const isShowCompassChecked = useMenuStore((s) => s.isShowCompassChecked);
   const isShowStreetsChecked = useMenuStore((s) => s.isShowStreetsChecked);
@@ -156,8 +155,6 @@ export default function HudPanel() {
 
         <Checkbox checked={isMapEnabledChecked} primaryText={t.minimapEnabled}
           onChange={(v) => { set({ isMapEnabledChecked: v }); fetchNui("HideMap", { checked: v }); }} />
-        <Checkbox checked={isToggleMapBordersChecked} primaryText={t.minimapBordersEnabled}
-          onChange={(v) => { set({ isToggleMapBordersChecked: v }); fetchNui("ToggleMapBorders", { checked: v }); }} />
         <Checkbox checked={dynamicIcons.engine} primaryText={t.showEngineAlways}
           onChange={(v) => { setPlayer().updateShowingDynamicIcon("engine", v); fetchNui("dynamicChange"); }} />
         <Checkbox checked={dynamicIcons.nitro} primaryText={t.showNitroAlways}

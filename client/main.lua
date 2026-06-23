@@ -27,8 +27,6 @@ local admin = false
 local playerDead = false
 local showMenu = false
 local positioningMode = false
-local showCircleB = false
-local showSquareB = false
 local CinematicHeight = 0.2
 local w = 0
 local radioTalking = false
@@ -43,7 +41,6 @@ local Menu = {
     isLowFuelChecked = true,            -- isLowFuelChecked
     isCinematicNotifChecked = true,     -- isCinematicNotifChecked
     isMapEnabledChecked = false,        -- isMapEnabledChecked
-    isToggleMapBordersChecked = true,   -- isToggleMapBordersChecked
     isDynamicEngineChecked = true,      -- isDynamicEngineChecked
     isDynamicNitroChecked = true,       -- isDynamicNitroChecked
     isChangeCompassFPSChecked = true,   -- isChangeCompassFPSChecked
@@ -616,10 +613,6 @@ RegisterNetEvent("hud:client:LoadMap", function()
         SetMinimapClipType(0)
         Wait(50)
         SetRadarBigmapEnabled(false, false)
-        if Menu.isToggleMapBordersChecked then
-            showCircleB = false
-            showSquareB = true
-        end
         Wait(1200)
         if Menu.isMapNotifChecked then
             QBCore.Functions.Notify(Lang:t("notify.loaded_square_map"))
@@ -653,10 +646,6 @@ RegisterNetEvent("hud:client:LoadMap", function()
         SetRadarBigmapEnabled(true, false)
         Wait(50)
         SetRadarBigmapEnabled(false, false)
-        if Menu.isToggleMapBordersChecked then
-            showSquareB = false
-            showCircleB = true
-        end
         Wait(1200)
         if Menu.isMapNotifChecked then
             QBCore.Functions.Notify(Lang:t("notify.loaded_circle_map"))
@@ -671,28 +660,6 @@ RegisterNUICallback('ToggleMapShape', function(data, cb)
         Menu.isToggleMapShapeChecked = data.shape
         Wait(50)
         TriggerEvent("hud:client:LoadMap")
-    end
-    TriggerEvent("hud:client:playHudChecklistSound")
-end)
-
-RegisterNUICallback('ToggleMapBorders', function(data, cb)
-    cb({})
-    Wait(50)
-    if data.checked then
-        Menu.isToggleMapBordersChecked = true
-    else
-        Menu.isToggleMapBordersChecked = false
-    end
-
-    if Menu.isToggleMapBordersChecked then
-        if Menu.isToggleMapShapeChecked == "square" then
-            showSquareB = true
-        else
-            showCircleB = true
-        end
-    else
-        showSquareB = false
-        showCircleB = false
     end
     TriggerEvent("hud:client:playHudChecklistSound")
 end)
@@ -814,7 +781,6 @@ RegisterNUICallback('updateMenuSettingsToClient', function(data, cb)
     Menu.isCinematicNotifChecked = data.isCinematicNotifyChecked
     Menu.isMapEnabledChecked = data.isMapEnabledChecked
     Menu.isToggleMapShapeChecked = data.isToggleMapShapeChecked
-    Menu.isToggleMapBordersChecked = data.isToggleMapBordersChecked
     Menu.isCompassShowChecked = data.isShowCompassChecked
     Menu.isShowStreetsChecked = data.isShowStreetsChecked
     Menu.isPointerShowChecked = data.isPointerShowChecked
@@ -1084,9 +1050,7 @@ local prevVehicleStats = {
     nil, --[5] fuel
     nil, --[6] altitude
     nil, --[7] showAltitude
-    nil, --[8] showSeatbelt
-    nil, --[9] showSquareBorder
-    nil  --[10] showCircleBorder
+    nil  --[8] showSeatbelt
 }
 
 local function updateShowVehicleHud(show)
@@ -1123,8 +1087,6 @@ local function updateVehicleHud(data)
             altitude = data[6],
             showAltitude = data[7],
             showSeatbelt = data[8],
-            showSquareB = data[9],
-            showCircleB = data[10],
             useMPH = Config.UseMPH,
         })
     end
@@ -1275,8 +1237,6 @@ CreateThread(function()
                     math.ceil(GetEntityCoords(player).z * 0.5),
                     showAltitude,
                     showSeatbelt,
-                    showSquareB,
-                    showCircleB,
                 })
                 showAltitude = false
                 showSeatbelt = true

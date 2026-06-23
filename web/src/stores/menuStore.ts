@@ -23,7 +23,6 @@ type MenuStatus = {
   isResetSoundsChecked: boolean;
   isShowCompassChecked: boolean;
   isShowStreetsChecked: boolean;
-  isToggleMapBordersChecked: boolean;
   isToggleMapShapeChecked: MapShape;
 };
 
@@ -74,7 +73,6 @@ function buildDefaultSettings(stored: Record<string, any>): MenuStatus {
     isResetSoundsChecked: getLS(stored, "isResetSoundsChecked", true),
     isShowCompassChecked: getLS(stored, "isShowCompassChecked", true),
     isShowStreetsChecked: getLS(stored, "isShowStreetsChecked", true),
-    isToggleMapBordersChecked: getLS(stored, "isToggleMapBordersChecked", true),
     isToggleMapShapeChecked: getLS(stored, "isToggleMapShapeChecked", "circle"),
   };
 }
@@ -155,7 +153,6 @@ export const useMenuStore = create<MenuState>((set, get) => ({
         isCinematicNotifyChecked: state.isCinematicNotifyChecked,
         isToggleMapShapeChecked: state.isToggleMapShapeChecked,
         isMapEnabledChecked: state.isMapEnabledChecked,
-        isToggleMapBordersChecked: state.isToggleMapBordersChecked,
         isShowCompassChecked: state.isShowCompassChecked,
         isShowStreetsChecked: state.isShowStreetsChecked,
         isPointerShowChecked: state.isPointerShowChecked,
