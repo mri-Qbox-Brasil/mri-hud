@@ -7,10 +7,12 @@ import debugMode from "../../stores/debugStore";
 import AnalogGauge from "../molecules/hud-shapes/AnalogGauge";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
+import { useSmoothValue } from "../../hooks/useSmoothValue";
 
 export default function VehicleHud() {
   const show        = useVehicleHudStore((s) => s.show);
-  const speed       = useVehicleHudStore((s) => s.speed);
+  const rawSpeed    = useVehicleHudStore((s) => s.speed);
+  const speed       = useSmoothValue(rawSpeed, 70);
   const fuel        = useVehicleHudStore((s) => s.fuel);
   const odometer    = useVehicleHudStore((s) => s.odometer);
   const fuelColor   = useVehicleHudStore((s) => s.fuelColor);

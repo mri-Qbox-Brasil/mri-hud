@@ -1328,6 +1328,28 @@ CreateThread(function()
     end
 end)
 
+CreateThread(function()
+    local lastSpeed = -1
+    while true do
+        local wait = 250
+        if LocalPlayer.state.isLoggedIn then
+            local ped = PlayerPedId()
+            local veh = GetVehiclePedIsIn(ped, false)
+            if veh ~= 0 and not IsThisModelABicycle(GetEntityModel(veh)) and GetPedInVehicleSeat(veh, -1) == ped then
+                wait = 0
+                local spd = math.ceil(GetEntitySpeed(veh) * speedMultiplier)
+                if spd ~= lastSpeed then
+                    lastSpeed = spd
+                    SendNUIMessage({ action = 'car', topic = 'speed', speed = spd })
+                end
+            else
+                lastSpeed = -1
+            end
+        end
+        Wait(wait)
+    end
+end)
+
 function isElectric(vehicle)
     local noBeeps = false
     for k, v in pairs(Config.FuelBlacklist) do

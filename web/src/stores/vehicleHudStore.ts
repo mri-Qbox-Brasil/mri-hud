@@ -19,6 +19,7 @@ type VehicleStatusType = {
 interface VehicleHudState extends VehicleStatusType {
   receiveShowMessage: (data: { show: boolean; seatbelt: boolean }) => void;
   receiveOdometerMessage: (data: { value: number }) => void;
+  receiveSpeedMessage: (data: { speed: number }) => void;
   receiveUpdateMessage: (data: {
     show: boolean;
     isPaused: boolean;
@@ -52,6 +53,9 @@ export const useVehicleHudStore = create<VehicleHudState>((set) => ({
   receiveOdometerMessage: (data) =>
     set({ odometer: Math.max(0, data.value) }),
 
+  receiveSpeedMessage: (data) =>
+    set({ speed: data.speed }),
+
   receiveUpdateMessage: (data) =>
     set((state) => {
       let fuelColor = "#FFFFFF";
@@ -60,7 +64,6 @@ export const useVehicleHudStore = create<VehicleHudState>((set) => ({
 
       return {
         show: data.isPaused ? false : data.show,
-        speed: data.speed,
         altitude: data.altitude,
         fuel: capAmountToHundred(data.fuel),
         showSeatBelt: !data.seatbelt,

@@ -58,6 +58,9 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
                 case "status":
                     useVehicleHudStore.getState().receiveUpdateMessage(data as any);
                     break;
+                case "speed":
+                    useVehicleHudStore.getState().receiveSpeedMessage(data as any);
+                    break;
             }
             break;
 
