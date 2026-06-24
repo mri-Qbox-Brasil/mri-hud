@@ -24,6 +24,7 @@ type MenuStatus = {
   isShowCompassChecked: boolean;
   isShowStreetsChecked: boolean;
   isToggleMapShapeChecked: MapShape;
+  isUseMPHChecked: boolean;
 };
 
 interface MenuState extends MenuStatus {
@@ -74,6 +75,8 @@ function buildDefaultSettings(stored: Record<string, any>): MenuStatus {
     isShowCompassChecked: getLS(stored, "isShowCompassChecked", true),
     isShowStreetsChecked: getLS(stored, "isShowStreetsChecked", true),
     isToggleMapShapeChecked: getLS(stored, "isToggleMapShapeChecked", "circle"),
+    // Default km/h (false) — suite BR. Player troca no menu (seção Veículo).
+    isUseMPHChecked: getLS(stored, "isUseMPHChecked", false),
   };
 }
 
@@ -157,6 +160,7 @@ export const useMenuStore = create<MenuState>((set, get) => ({
         isShowStreetsChecked: state.isShowStreetsChecked,
         isPointerShowChecked: state.isPointerShowChecked,
         isCinematicModeChecked: state.isCinematicModeChecked,
+        isUseMPHChecked: state.isUseMPHChecked,
       });
     });
   },

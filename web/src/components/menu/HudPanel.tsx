@@ -27,6 +27,7 @@ export default function HudPanel() {
   const isShowStreetsChecked = useMenuStore((s) => s.isShowStreetsChecked);
   const isPointerShowChecked = useMenuStore((s) => s.isPointerShowChecked);
   const isCinematicModeChecked = useMenuStore((s) => s.isCinematicModeChecked);
+  const isUseMPHChecked = useMenuStore((s) => s.isUseMPHChecked);
   const positioningEnabled = usePositioningStore((s) => s.enabled);
 
   const dynamicIcons = usePlayerStatusHudStore((s) => s.dynamicIcons);
@@ -152,6 +153,17 @@ export default function HudPanel() {
           }}
         />
         <p className="font-semibold text-base pb-2">{t.minimapTypeDescription}</p>
+
+        <Switch
+          checked={isUseMPHChecked}
+          checkedText={t.metricsTypeMiles}
+          uncheckedText={t.metricsTypeKmh}
+          onChange={(v) => {
+            set({ isUseMPHChecked: v });
+            fetchNui("toggleSpeedUnit", { useMPH: v });
+          }}
+        />
+        <p className="font-semibold text-base pb-2">{t.metricsTypeDescription}</p>
 
         <Checkbox checked={isMapEnabledChecked} primaryText={t.minimapEnabled}
           onChange={(v) => { set({ isMapEnabledChecked: v }); fetchNui("HideMap", { checked: v }); }} />

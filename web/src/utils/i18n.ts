@@ -113,7 +113,7 @@ const defaultTranslations: Translation = {
   applyProfileToHud: "Apply Profile To HUD",
   deleteProfile: "Delete Profile",
   metricsTypeMiles: "MPH",
-  metricsTypeKmh: "KPH",
+  metricsTypeKmh: "KM/H",
   metricsTypeDescription: "Choose your preferred unit of measurement",
   positioningMenu: "Positioning",
   openPositioningMode: "Open Positioning Mode",

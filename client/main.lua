@@ -3,6 +3,8 @@ local serverId = GetPlayerServerId(PlayerId())
 local PlayerData = QBCore.Functions.GetPlayerData()
 local config = Config
 local UIConfig = UIConfig
+-- Valor inicial; recalculado em runtime quando o player troca a unidade no
+-- menu (ver callbacks toggleSpeedUnit / updateMenuSettingsToClient).
 local speedMultiplier = config.UseMPH and 2.23694 or 3.6
 local seatbeltOn = false
 local cruiseOn = false
@@ -50,6 +52,7 @@ local Menu = {
     isDegreesShowChecked = true,        -- isDegreesShowChecked
     isCinematicModeChecked = false,     -- isCinematicModeChecked
     isToggleMapShapeChecked = 'square', -- isToggleMapShapeChecked
+    isUseMPHChecked = config.UseMPH,    -- unidade de velocidade (true=MPH, false=km/h); player escolhe no menu
 }
 
 DisplayRadar(false)
@@ -784,7 +787,20 @@ RegisterNUICallback('updateMenuSettingsToClient', function(data, cb)
     Menu.isCompassShowChecked = data.isShowCompassChecked
     Menu.isShowStreetsChecked = data.isShowStreetsChecked
     Menu.isPointerShowChecked = data.isPointerShowChecked
+    if data.isUseMPHChecked ~= nil then
+        Menu.isUseMPHChecked = data.isUseMPHChecked
+        speedMultiplier = Menu.isUseMPHChecked and 2.23694 or 3.6
+    end
     CinematicShow(data.isCinematicModeChecked)
+    cb({})
+end)
+
+-- Player trocou a unidade de velocidade no menu (MPH <-> km/h). Recalcula o
+-- multiplicador na hora; o label da HUD acompanha via useMPH (ver loop do
+-- veiculo, que manda useMPH = Menu.isUseMPHChecked pra NUI).
+RegisterNUICallback('toggleSpeedUnit', function(data, cb)
+    Menu.isUseMPHChecked = data.useMPH and true or false
+    speedMultiplier = Menu.isUseMPHChecked and 2.23694 or 3.6
     cb({})
 end)
 
@@ -1087,7 +1103,7 @@ local function updateVehicleHud(data)
             altitude = data[6],
             showAltitude = data[7],
             showSeatbelt = data[8],
-            useMPH = Config.UseMPH,
+            useMPH = Menu.isUseMPHChecked,
         })
     end
 end
