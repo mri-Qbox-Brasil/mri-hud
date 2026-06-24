@@ -53,11 +53,17 @@ export default function App() {
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
+            // F10 no NUI so FECHA o modo de posicionamento (quando ativo).
+            // Abrir e trabalho do keymapping do Lua ('positioningMode'), que tem
+            // suas proprias guardas. Sem o gate em store.active, o F10 ativava o
+            // positioning sempre que o NUI tinha foco por outro motivo (ex: menu
+            // de settings aberto) — ativando coisa que nao devia.
             if (e.key === "F10") {
                 const store = usePositioningStore.getState();
-                if (!store.enabled) return;
-                if (store.active) fetchNui("closePositioningMode");
-                togglePositioning();
+                if (store.active) {
+                    fetchNui("closePositioningMode");
+                    togglePositioning();
+                }
                 return;
             }
             // ESC no modo de posicionamento: fecha o modo (libera foco NUI no
