@@ -26,7 +26,7 @@ export default function AircraftHud() {
     return (
         <>
             <DraggableHudElement id="aircraftHorizon" label="Horizonte" zIndex={15}>
-                <ScaledHudContent style={{ position: "fixed", bottom: "2vh", left: "43vw", pointerEvents: "none" }}>
+                <ScaledHudContent style={{ position: "fixed", bottom: "2.16vh", left: "43.43vw", pointerEvents: "none" }}>
                     <ArtificialHorizon size={160} pitch={pitch} roll={roll} />
                 </ScaledHudContent>
             </DraggableHudElement>

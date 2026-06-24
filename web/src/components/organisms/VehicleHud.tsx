@@ -33,7 +33,7 @@ export default function VehicleHud() {
   return (
     <>
       <DraggableHudElement id="speedometer" label="Velocímetro" zIndex={10}>
-        <ScaledHudContent style={{ position: "fixed", bottom: "13vh", left: "18vw", pointerEvents: "none" }}>
+        <ScaledHudContent style={{ position: "fixed", bottom: "12.21vh", left: "17.69vw", pointerEvents: "none" }}>
           <AnalogGauge
             size={140}
             value={speed}
@@ -58,7 +58,7 @@ export default function VehicleHud() {
 
       {(!marineActive && !aircraftActive || positioningActive || debugMode) && (
         <DraggableHudElement id="fuelgauge" label="Combustível" zIndex={10}>
-          <ScaledHudContent style={{ position: "fixed", bottom: "7vh", left: "23vw", pointerEvents: "none" }}>
+          <ScaledHudContent style={{ position: "fixed", bottom: "6.44vh", left: "22.61vw", pointerEvents: "none" }}>
             <AnalogGauge
               size={88}
               value={fuel}
@@ -83,7 +83,7 @@ export default function VehicleHud() {
 
       {showSeatBelt && (
         <DraggableHudElement id="seatbelt" label="Cinto" zIndex={10} canResize={false}>
-          <div style={{ position: "fixed", bottom: "8.5vh", left: "18vw", pointerEvents: "none" }}>
+          <div style={{ position: "fixed", bottom: "8.09vh", left: "17.91vw", pointerEvents: "none" }}>
             <SeatbeltIcon color={seatbeltColor} />
           </div>
         </DraggableHudElement>

@@ -179,7 +179,43 @@ interface PlayerStatusHudState extends playerStatusType {
   staticNitroHandleShow: (staticSetting: boolean, currentValue: number, engineValue: number) => boolean;
 }
 
-const stored = loadStored();
+// Versao dos defaults de estilo dos icones (definidos em types.ts via
+// createShapeIcon). Quando recalibramos os defaults de shape, bump aqui e a
+// migracao abaixo reconstroi o estilo de cada icone JA salvo a partir do seu
+// `shape`, adotando os novos defaults sem o jogador precisar resetar — e sem
+// perder shape/visibilidade/icone (cores ficam no colorEffectStore).
+export const ICON_DEFAULTS_VERSION = 2;
+
+const PLAYER_ICON_KEYS = [
+  "voice", "health", "armor", "hunger", "thirst", "stress", "oxygen",
+  "armed", "parachute", "engine", "harness", "cruise", "nitro", "dev",
+];
+
+function migrateStored(stored: Record<string, any>): Record<string, any> {
+  if (!stored || Object.keys(stored).length === 0) return stored;
+  if (stored.__iconsVersion === ICON_DEFAULTS_VERSION) return stored;
+
+  for (const key of PLAYER_ICON_KEYS) {
+    const saved = stored[key];
+    if (saved && saved.shape) {
+      // Recria o config a partir do shape -> pega os defaults novos do types.ts,
+      // preservando o que e escolha do jogador / runtime.
+      stored[key] = createShapeIcon(saved.shape, {
+        icon: saved.icon ?? null,
+        isShowing: saved.isShowing ?? false,
+        name: saved.name ?? key,
+        progressValue: saved.progressValue ?? 100,
+      });
+    }
+  }
+  stored.__iconsVersion = ICON_DEFAULTS_VERSION;
+  try {
+    localStorage.setItem(playerStoreLocalStorageName, JSON.stringify(stored));
+  } catch { /* ignore */ }
+  return stored;
+}
+
+const stored = migrateStored(loadStored());
 
 export const usePlayerStatusHudStore = create<PlayerStatusHudState>((set, get) => ({
   ...buildDefaultSettings(stored),
@@ -197,7 +233,11 @@ export const usePlayerStatusHudStore = create<PlayerStatusHudState>((set, get) =
           (icons as any)[icon] = { ...(icons as any)[icon], [settingName]: value };
         }
       }
-      return { icons };
+      // Atualiza tambem o globalIconSettings, senao os controles globais (que
+      // leem value={gs.<setting>}) ficam presos no valor antigo e o stepper
+      // parece nao funcionar.
+      const globalIconSettings = { ...state.globalIconSettings, [settingName]: value };
+      return { icons, globalIconSettings };
     });
   },
 
