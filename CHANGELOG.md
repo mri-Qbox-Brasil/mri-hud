@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.3.0...v2.4.0) (2026-06-25)
+
+
+### Features
+
+* velocimetro em tempo real e suave ([a9c1a7c](https://github.com/mri-Qbox-Brasil/mri-hud/commit/a9c1a7ca69c6bb86fde0b1d6cc4bcf558da92abd))
+
 # [2.3.0](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.2.0...v2.3.0) (2026-06-24)
 
 
