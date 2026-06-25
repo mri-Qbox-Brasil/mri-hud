@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { shapes, iconNames } from "../../types/types";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
@@ -35,10 +35,14 @@ export default function SingleStatusIconPanel() {
   const iconIndex = iconNames.indexOf(iconName);
   const panelIconColor = iconColors[iconIndex] ?? "#FFFFFF";
 
-  // Sync editSingleIconName/Stage into globalColorSettings for design-mode preview
-  useColorEffectStore.setState((s) => ({
-    globalColorSettings: { ...s.globalColorSettings, editSingleIconName: iconName, editSingleIconStage: stageIndex },
-  }));
+  // Sync editSingleIconName/Stage into globalColorSettings for design-mode preview.
+  // Em useEffect (nao no corpo do render) pra nao disparar setState durante o
+  // render — isso causava re-renders extras e travava a interacao dos controles.
+  useEffect(() => {
+    useColorEffectStore.setState((s) => ({
+      globalColorSettings: { ...s.globalColorSettings, editSingleIconName: iconName, editSingleIconStage: stageIndex },
+    }));
+  }, [iconName, stageIndex]);
 
   function handleIconChange(name: string) {
     setIconName(name as iconNamesKind);

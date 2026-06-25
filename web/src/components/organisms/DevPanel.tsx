@@ -7,9 +7,11 @@ import {
 import { usePositioningStore } from "../../stores/positioningStore";
 import { useMenuStore } from "../../stores/menuStore";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
+import ShapeLab from "./ShapeLab";
 
 export default function DevPanel() {
     const [open, setOpen] = useState(false);
+    const [shapeLab, setShapeLab] = useState(false);
 
     const positioningActive = usePositioningStore((s) => s.active);
     const togglePositioning = usePositioningStore((s) => s.toggle);
@@ -76,6 +78,13 @@ export default function DevPanel() {
                         }
                     />
 
+                    <DevButton
+                        icon={faVectorSquare}
+                        label="Shape Lab"
+                        active={shapeLab}
+                        onClick={() => setShapeLab((v) => !v)}
+                    />
+
                     {positioningActive && (
                         <button
                             onClick={resetAll}
@@ -121,6 +130,8 @@ export default function DevPanel() {
                 <FontAwesomeIcon icon={faCode} />
                 <FontAwesomeIcon icon={open ? faChevronDown : faChevronUp} style={{ fontSize: 9 }} />
             </button>
+
+            {shapeLab && <ShapeLab onClose={() => setShapeLab(false)} />}
         </div>
     );
 }

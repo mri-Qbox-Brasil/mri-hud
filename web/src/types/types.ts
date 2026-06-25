@@ -67,7 +67,6 @@ export const shapes = [
   "square-fill",
   "star-ring",
   "triangle-ring",
-  "transparent",
 ] as const;
 export type shapekind = (typeof shapes)[number];
 
@@ -159,50 +158,54 @@ export class baseIcon implements baseIconProps {
 export class ringIcon extends baseIcon implements ringIconProps {
   displayOutline = true;
   iconRotateDegree = 0;
-  ringSize = 2.5;
+  ringSize = 4;
   borderGap = 0.85;
 
   constructor(shape: shapekind, optionalProps = {}) {
     super(shape, optionalProps);
+    // ringSize agora e px real (o kit normaliza o stroke pelo viewBox), entao
+    // 4 = 4px em todas. Valores calibrados no Shape Lab.
     switch (shape) {
       case "inner-circle":
-        this.iconScaling = 0.45;
-        this.ringSize = 5;
+        this.iconScaling = 0.4;
+        this.ringSize = 4;
+        this.borderGap = 0.85;
+        this.iconTranslateY = 1;
         break;
       case "circle-ring":
         this.iconScaling = 0.4;
-        this.ringSize = 5;
+        this.ringSize = 4;
         break;
       case "diamond-ring":
         this.height = 60;
         this.width = 60;
-        this.iconScaling = 0.3;
-        // viewBox 16×16 scaled to 60px → factor 3.75 → 5px visual = 1.33 vb units
-        this.ringSize = 1.3;
+        this.iconScaling = 0.35;
+        this.ringSize = 4;
+        this.iconTranslateY = 0.7;
         break;
       case "hexagon-ring":
-        this.iconScaling = 0.4;
-        // viewBox 24×24 scaled to 50px → factor 2.08 → 5px visual = 2.4 vb units
-        this.ringSize = 2.4;
+        this.iconScaling = 0.35;
+        this.ringSize = 4;
+        this.iconTranslateY = 0.7;
         break;
       case "square-ring":
-        this.ringSize = 5;
+        this.ringSize = 4;
+        this.iconScaling = 0.45;
+        this.iconTranslateY = 3;
         break;
       case "star-ring":
         this.height = 55;
         this.width = 55;
-        // viewBox 38×40 scaled to 55px → factor 1.45 → 5px visual = 3.5 vb units
-        this.ringSize = 3.5;
+        this.ringSize = 4;
         this.iconScaling = 0.35;
-        this.iconTranslateY = 0.06;
+        this.iconTranslateY = 3;
         break;
       case "triangle-ring":
         this.height = 55;
         this.width = 55;
-        this.iconScaling = 0.3;
-        this.iconTranslateY = 0.09;
-        // viewBox 24×24 scaled to 55px → factor 2.29 → 5px visual = 2.2 vb units
-        this.ringSize = 2.2;
+        this.iconScaling = 0.35;
+        this.ringSize = 4;
+        this.iconTranslateY = 3;
         break;
     }
   }
@@ -224,20 +227,15 @@ export class roundEndIcon extends baseIcon implements roundEndIconProps {
     super(shape, optionalProps);
     switch (shape) {
       case "badge":
-        this.height = 4;
-        this.width = 35;
-        this.iconScaling = 1.4;
-        this.xAxisRound = 2;
-        this.yAxisRound = 0;
-        this.barHeight = 4;
-        break;
-      case "transparent":
-        this.height = 55;
+        // Novo modelo: height = altura TOTAL do badge (card+icone+barra), nao
+        // a altura da barra. barHeight ~ height*0.078; cardRadius fica no
+        // default proporcional do kit (~height*0.056).
+        this.height = 45;
         this.width = 45;
-        this.iconScaling = 0.38;
-        this.xAxisRound = 0;
-        this.yAxisRound = 0;
-        this.barHeight = 5;
+        this.iconScaling = 0.28;
+        this.xAxisRound = 5;
+        this.yAxisRound = 5;
+        this.barHeight = 3.5;
         break;
     }
   }
@@ -253,9 +251,11 @@ export class notchedIcon extends ringIcon implements notchedIconProps {
     switch (shape) {
       case "split-circle":
         this.dashes = 8;
-        this.gap = 2.5;
-        this.borderGap = 0.9;
-        this.ringSize = 5;
+        this.gap = 4;
+        this.borderGap = 0.85;
+        this.ringSize = 4;
+        this.iconScaling = 0.4;
+        this.iconTranslateY = 1;
         break;
     }
   }
@@ -268,7 +268,14 @@ export class fillIcon extends baseIcon implements fillIconProps {
     super(shape, optionalprops);
     switch (shape) {
       case "circle-fill":
-        this.borderSize = 3;
+        this.borderSize = 4;
+        this.iconScaling = 0.4;
+        this.iconTranslateY = 1;
+        break;
+      case "square-fill":
+        this.borderSize = 4;
+        this.iconScaling = 0.45;
+        this.iconTranslateY = 3;
         break;
     }
   }
@@ -307,7 +314,6 @@ export function createShapeIcon(
     case "square-fill":
       return new fillIcon(shape, optionalProps);
     case "badge":
-    case "transparent":
       return new roundEndIcon(shape, optionalProps);
     case "horizontal-bar":
       return new baseIcon(shape, optionalProps);

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { usePlayerStatusHudStore as usePlayerHudStore } from "../stores/playerStatusHudStore";
+import { usePlayerStatusHudStore as usePlayerHudStore, ICON_DEFAULTS_VERSION } from "../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../stores/colorEffectStore";
 import { useMenuStore } from "../stores/menuStore";
 import { useVehicleHudStore } from "../stores/vehicleHudStore";
@@ -320,6 +320,7 @@ export function saveUIDataToLocalStorage() {
             ...playerStatusIcondata.icons,
             globalIconSettings: playerStatusIcondata.globalIconSettings,
             dynamicIcons: playerStatusIcondata.dynamicIcons,
+            __iconsVersion: ICON_DEFAULTS_VERSION,
         })
     );
 

@@ -1,14 +1,14 @@
 {
   "name": "ps-hud",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Ultra customizable FiveM HUD with analog gauges, positioning mode, and multi-vehicle support.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/g5-studio/ps-hud.git"
+    "url": "git+https://github.com/mri-Qbox-Brasil/mri-hud.git"
   },
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/g5-studio/ps-hud/issues"
+    "url": "https://github.com/mri-Qbox-Brasil/mri-hud/issues"
   },
-  "homepage": "https://github.com/g5-studio/ps-hud#readme"
+  "homepage": "https://github.com/mri-Qbox-Brasil/mri-hud#readme"
 }
