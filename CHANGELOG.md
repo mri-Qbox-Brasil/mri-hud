@@ -1,3 +1,10 @@
+## [2.4.1](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.4.0...v2.4.1) (2026-06-27)
+
+
+### Bug Fixes
+
+* **positioning:** remove indicacao [F10] do botao de fechar e handler duplicado no React ([814c1ba](https://github.com/mri-Qbox-Brasil/mri-hud/commit/814c1ba782478340bf04fe9ddfefcba8b20f4ea3))
+
 # [2.4.0](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.3.0...v2.4.0) (2026-06-25)
 
 
