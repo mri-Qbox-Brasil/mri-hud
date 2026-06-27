@@ -122,7 +122,7 @@ const defaultTranslations: Translation = {
   resetAllPositionsDescription: "Resets every element back to its default position and size",
   positioningModeTitle: "Positioning Mode — Drag elements to reposition them",
   positioningResetAll: "Reset All",
-  positioningClose: "Done [F10]",
+  positioningClose: "Done",
 };
 
 export const useI18nStore = create<I18nState>((set) => ({
