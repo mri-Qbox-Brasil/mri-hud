@@ -926,6 +926,7 @@ RegisterNetEvent('hud:client:EnhancementEffect', function(data)
     end
 end)
 
+if config.EngineCommand then
 RegisterCommand('+engine', function()
     local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if vehicle == 0 or GetPedInVehicleSeat(vehicle, -1) ~= PlayerPedId() then return end
@@ -937,7 +938,8 @@ RegisterCommand('+engine', function()
     SetVehicleEngineOn(vehicle, not GetIsVehicleEngineRunning(vehicle), false, true)
 end)
 
-RegisterKeyMapping('+engine', Lang:t('info.toggle_engine'), 'keyboard', 'G')
+    RegisterKeyMapping('+engine', Lang:t('info.toggle_engine'), 'keyboard', 'G')
+end
 
 local function IsWhitelistedWeaponArmed(weapon)
     if weapon then

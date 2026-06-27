@@ -9,6 +9,7 @@ Config.MinimumSpeedUnbuckled = 50 -- Going Over This Speed Will Cause Stress
 Config.MinimumSpeed = 100 -- Going Over This Speed Will Cause Stress
 Config.DisablePoliceStress = false -- Default: false, If true will disable stress for people with the police job
 Config.VehicleEnabled = true -- Enable/Disable the vehicle portion of the HUD (this allows you to use a custom speedometer)
+Config.EngineCommand = false -- Enable/Disable the built-in engine toggle command (+engine, default key: G). Set to false if using another resource for this.
 
 -- Admin only to change hud icons/shapes
 Config.AdminOnly = false
