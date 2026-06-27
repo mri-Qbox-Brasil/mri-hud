@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.4.1...v2.5.0) (2026-06-27)
+
+
+### Features
+
+* **config:** adiciona Config.EngineCommand para controlar comando de ligar motor (G) ([f2f415f](https://github.com/mri-Qbox-Brasil/mri-hud/commit/f2f415f42ceacd2adf6098de29ef61fe47cf87d2))
+
 ## [2.4.1](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.4.0...v2.4.1) (2026-06-27)
 
 
