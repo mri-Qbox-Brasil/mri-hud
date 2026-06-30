@@ -1,4 +1,8 @@
 @import '@mriqbox/ui-kit/dist/style.css';
+/* Chakra Petch — fonte do tema digital da HUD de veiculo (design handoff). */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap');
+/* Cinzel / Cinzel Decorative / JetBrains Mono — skin 'sobrenatural' (handoff). */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@700;900&family=JetBrains+Mono:wght@400;600&display=swap');
 
 @tailwind base;
 @tailwind components;

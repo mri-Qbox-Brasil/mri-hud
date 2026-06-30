@@ -479,6 +479,8 @@ export const playerStoreLocalStorageName: string = "PSHudPlayerStatus";
 export const layoutStoreLocalStorageName: string = "PSHudLayout";
 export const colorStoreLocalStorageName: string = "PSHudColor";
 export const profileLocalStorageName: string = "PSHudProfile";
+export const vehicleThemeLocalStorageName: string = "PSHudVehicleTheme";
+export const playerSkinLocalStorageName: string = "PSHudPlayerSkin";
 
 export function capAmountToHundred(num: number) {
   return Math.min(num, 100);

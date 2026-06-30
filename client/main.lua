@@ -159,6 +159,17 @@ local function sendHudConfig()
         statusIcons = Config.StatusIcons,
         serverLogo  = Config.ServerLogo,
         positioning = Config.Positioning,
+        vehicleTheme = {
+            theme   = Config.VehicleHudTheme or 'classic',
+            variant = Config.VehicleHudVariant or 'ring',
+        },
+        playerSkin = {
+            skin      = Config.PlayerHudSkin or 'classic',
+            palette   = Config.SupernaturalPalette or 'pergaminho',
+            style     = Config.SupernaturalStyle or 'orbes',
+            layout    = Config.SupernaturalLayout or 'classico',
+            frameless = Config.SupernaturalFrameless or false,
+        },
     })
 end
 
@@ -758,6 +769,24 @@ RegisterNUICallback('toggleSpeedUnit', function(data, cb)
     cb({})
 end)
 
+-- Tema da HUD de veiculo escolhido pelo admin no menu. A UI ja persiste em
+-- localStorage; aqui so guardamos no client (para logica futura/server save).
+RegisterNUICallback('setVehicleTheme', function(data, cb)
+    Config.VehicleHudTheme   = data.theme or Config.VehicleHudTheme
+    Config.VehicleHudVariant = data.variant or Config.VehicleHudVariant
+    cb({})
+end)
+
+-- Skin do HUD do player escolhido pelo admin no menu (UI persiste em localStorage).
+RegisterNUICallback('setPlayerSkin', function(data, cb)
+    Config.PlayerHudSkin       = data.skin or Config.PlayerHudSkin
+    Config.SupernaturalPalette = data.palette or Config.SupernaturalPalette
+    Config.SupernaturalStyle   = data.style or Config.SupernaturalStyle
+    Config.SupernaturalLayout  = data.layout or Config.SupernaturalLayout
+    if data.frameless ~= nil then Config.SupernaturalFrameless = data.frameless end
+    cb({})
+end)
+
 RegisterNetEvent("hud:client:EngineHealth", function(newEngine)
     engine = newEngine
 end)
@@ -1285,7 +1314,11 @@ CreateThread(function()
 end)
 
 CreateThread(function()
-    local lastSpeed = -1
+    local lastSpeed   = -1
+    local lastRpm     = -1
+    local lastGear    = -1
+    local lastEngine  = -1
+    local lastHeading = -1
     while true do
         local wait = 250
         if LocalPlayer.state.isLoggedIn then
@@ -1293,13 +1326,36 @@ CreateThread(function()
             local veh = GetVehiclePedIsIn(ped, false)
             if veh ~= 0 and not IsThisModelABicycle(GetEntityModel(veh)) and GetPedInVehicleSeat(veh, -1) == ped then
                 wait = 0
-                local spd = math.ceil(GetEntitySpeed(veh) * speedMultiplier)
-                if spd ~= lastSpeed then
-                    lastSpeed = spd
-                    SendNUIMessage({ action = 'car', topic = 'speed', speed = spd })
+                local spd     = math.ceil(GetEntitySpeed(veh) * speedMultiplier)
+                -- Telemetria extra consumida pelo tema 'digital' (RPM/marcha/motor/proa).
+                -- O tema 'classic' ignora estes campos; custo e baixo (so numeros).
+                local rpm     = math.floor(GetVehicleCurrentRpm(veh) * 8000)
+                local gear    = GetVehicleCurrentGear(veh)
+                local engine  = math.max(0, math.min(100, math.floor(GetVehicleEngineHealth(veh) / 10)))
+                local heading = math.floor(GetEntityHeading(veh))
+                if spd ~= lastSpeed or rpm ~= lastRpm or gear ~= lastGear
+                    or engine ~= lastEngine or heading ~= lastHeading then
+                    lastSpeed   = spd
+                    lastRpm     = rpm
+                    lastGear    = gear
+                    lastEngine  = engine
+                    lastHeading = heading
+                    SendNUIMessage({
+                        action  = 'car',
+                        topic   = 'speed',
+                        speed   = spd,
+                        rpm     = rpm,
+                        gear    = gear,
+                        engine  = engine,
+                        heading = heading,
+                    })
                 end
             else
-                lastSpeed = -1
+                lastSpeed   = -1
+                lastRpm     = -1
+                lastGear    = -1
+                lastEngine  = -1
+                lastHeading = -1
             end
         end
         Wait(wait)

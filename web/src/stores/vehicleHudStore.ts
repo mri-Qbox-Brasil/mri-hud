@@ -6,6 +6,11 @@ type VehicleStatusType = {
   altitude: number;
   fuel: number;
   speed: number;
+  // Telemetria extra usada pelo tema 'digital' (vem do loop rapido de speed).
+  rpm: number;
+  gear: number;
+  engine: number;
+  heading: number;
   odometer: number;
   show: boolean;
   showAltitude: boolean;
@@ -19,7 +24,13 @@ type VehicleStatusType = {
 interface VehicleHudState extends VehicleStatusType {
   receiveShowMessage: (data: { show: boolean; seatbelt: boolean }) => void;
   receiveOdometerMessage: (data: { value: number }) => void;
-  receiveSpeedMessage: (data: { speed: number }) => void;
+  receiveSpeedMessage: (data: {
+    speed: number;
+    rpm?: number;
+    gear?: number;
+    engine?: number;
+    heading?: number;
+  }) => void;
   receiveUpdateMessage: (data: {
     show: boolean;
     isPaused: boolean;
@@ -38,6 +49,10 @@ export const useVehicleHudStore = create<VehicleHudState>((set) => ({
   altitude: 0,
   fuel: 0,
   speed: 0,
+  rpm: 0,
+  gear: 0,
+  engine: 100,
+  heading: 0,
   odometer: 0,
   show: false,
   showAltitude: false,
@@ -54,7 +69,13 @@ export const useVehicleHudStore = create<VehicleHudState>((set) => ({
     set({ odometer: Math.max(0, data.value) }),
 
   receiveSpeedMessage: (data) =>
-    set({ speed: data.speed }),
+    set((state) => ({
+      speed: data.speed,
+      rpm: data.rpm ?? state.rpm,
+      gear: data.gear ?? state.gear,
+      engine: data.engine ?? state.engine,
+      heading: data.heading ?? state.heading,
+    })),
 
   receiveUpdateMessage: (data) =>
     set((state) => {

@@ -2,6 +2,8 @@ import { useRef, useEffect, useState } from "react";
 import { useCompassHudStore } from "../../stores/compassHudStore";
 import { useMenuStore } from "../../stores/menuStore";
 import { usePositioningStore } from "../../stores/positioningStore";
+import { useVehicleThemeStore } from "../../stores/vehicleThemeStore";
+import { useVehicleHudStore } from "../../stores/vehicleHudStore";
 import debugMode from "../../stores/debugStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 
@@ -15,6 +17,11 @@ export default function CompassHud() {
   const isShowStreetsChecked = useMenuStore((s) => s.isShowStreetsChecked);
   const isPointerShowChecked = useMenuStore((s) => s.isPointerShowChecked);
   const positioningActive    = usePositioningStore((s) => s.active);
+
+  // O tema digital de veiculo ja desenha a propria fita de bussola no cluster;
+  // esconde a bussola legada quando ela estaria sobreposta (dentro do carro).
+  const vehicleTheme = useVehicleThemeStore((s) => s.theme);
+  const vehicleShown = useVehicleHudStore((s) => s.show);
 
   // Smoothly tween the viewBox heading, with instant-jump for wraparound
   const [tweened, setTweened] = useState(heading);
@@ -58,6 +65,7 @@ export default function CompassHud() {
   }, [heading]);
 
   if (!show && !debugMode && !positioningActive) return null;
+  if (vehicleTheme === "digital" && vehicleShown && !positioningActive) return null;
 
   return (
     <DraggableHudElement
