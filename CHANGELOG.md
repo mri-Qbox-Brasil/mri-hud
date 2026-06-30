@@ -1,3 +1,10 @@
+## [2.5.1](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.5.0...v2.5.1) (2026-06-30)
+
+
+### Bug Fixes
+
+* remove demoPanels ([3ecd9b8](https://github.com/mri-Qbox-Brasil/mri-hud/commit/3ecd9b82f6207c59ae1c443c6892850d9ea896a9))
+
 # [2.5.0](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.4.1...v2.5.0) (2026-06-27)
 
 
