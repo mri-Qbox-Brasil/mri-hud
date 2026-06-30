@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Cinzel+Decorative:wght@700;900&family=EB+Garamond:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ width:100%; height:100%; background:#07060a; overflow:hidden; }
+  @keyframes glowpulse{ 0%,100%{ opacity:.55 } 50%{ opacity:1 } }
+  @keyframes voiceripple{ 0%{ transform:scale(.8); opacity:.7 } 100%{ transform:scale(2.1); opacity:0 } }
+  @keyframes ember{ 0%{ transform:translateY(0) scale(1); opacity:0 } 12%{opacity:.7} 90%{opacity:.3} 100%{ transform:translateY(-180px) scale(.4); opacity:0 } }
+  @keyframes lowpulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(220,40,40,0), inset 0 0 28px rgba(0,0,0,.7) } 50%{ box-shadow:0 0 26px 4px rgba(220,40,40,.6), inset 0 0 28px rgba(0,0,0,.7) } }
+  @keyframes meniscus{ 0%,100%{ transform:translateY(0); opacity:.85 } 50%{ transform:translateY(-1.5px); opacity:1 } }
+  @keyframes sheen{ 0%{ transform:translate(-60%,-60%) rotate(28deg); opacity:0 } 18%{ opacity:.5 } 40%{ transform:translate(60%,60%) rotate(28deg); opacity:0 } 100%{ transform:translate(60%,60%) rotate(28deg); opacity:0 } }
+</style>
+</helmet>
+
+<div style="position:fixed; inset:0; font-family:'Cinzel',serif; color:#ece2cf; user-select:none;">
+
+  <!-- ===== GAMEPLAY BACKGROUND PLACEHOLDER ===== -->
+  <div style="position:absolute; inset:0; background:repeating-linear-gradient(135deg,#161009 0 22px,#120d08 22px 44px);"></div>
+  <div style="{{ ambient }}"></div>
+  <div style="position:absolute; inset:0; box-shadow:inset 0 0 380px 110px rgba(0,0,0,.9);"></div>
+  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; align-items:center; gap:14px; font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:3px; color:rgba(220,190,140,.3); text-transform:uppercase;">
+    <span style="width:60px; height:1px; background:rgba(220,190,140,.22);"></span> gameplay <span style="width:60px; height:1px; background:rgba(220,190,140,.22);"></span>
+  </div>
+  <sc-for list="{{ embers }}" as="p" hint-placeholder-count="8">
+    <div style="{{ p.style }}"></div>
+  </sc-for>
+
+  <!-- ===== SWITCHERS ===== -->
+  <div style="position:absolute; top:124px; left:50%; transform:translateX(-50%); z-index:50; display:flex; flex-direction:column; gap:5px; align-items:center; padding:9px 12px; background:rgba(12,8,4,.66); border:1px solid rgba(180,140,70,.2); border-radius:6px; backdrop-filter:blur(6px);">
+    <div style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:3px; color:#7a6740; text-transform:uppercase; margin-bottom:1px;">painel de estilo</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9c8458; text-transform:uppercase; min-width:94px; white-space:nowrap; text-align:right;">Estilo</span>
+      <div style="display:flex; gap:6px; padding:5px; background:rgba(16,11,6,.82); border:1px solid rgba(180,140,70,.3); border-radius:4px; backdrop-filter:blur(8px);">
+        <sc-for list="{{ estiloOpts }}" as="v" hint-placeholder-count="4"><button onClick="{{ v.onClick }}" style="{{ v.btnStyle }}">{{ v.label }}</button></sc-for>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9c8458; text-transform:uppercase; min-width:94px; white-space:nowrap; text-align:right;">Paleta</span>
+      <div style="display:flex; gap:6px; padding:5px; background:rgba(16,11,6,.82); border:1px solid rgba(180,140,70,.3); border-radius:4px; backdrop-filter:blur(8px);">
+        <sc-for list="{{ paletaOpts }}" as="v" hint-placeholder-count="6"><button onClick="{{ v.onClick }}" style="{{ v.btnStyle }}">{{ v.label }}</button></sc-for>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9c8458; text-transform:uppercase; min-width:94px; white-space:nowrap; text-align:right;">Disposição</span>
+      <div style="display:flex; gap:6px; padding:5px; background:rgba(16,11,6,.82); border:1px solid rgba(180,140,70,.3); border-radius:4px; backdrop-filter:blur(8px);">
+        <sc-for list="{{ layoutOpts }}" as="v" hint-placeholder-count="3"><button onClick="{{ v.onClick }}" style="{{ v.btnStyle }}">{{ v.label }}</button></sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOP LEFT: SERVER STATUS ===== -->
+  <div style="{{ serverPanel }}">
+    <span style="{{ corner.tl }}"></span><span style="{{ corner.tr }}"></span><span style="{{ corner.bl }}"></span><span style="{{ corner.br }}"></span>
+    <div style="display:flex; align-items:center; gap:11px;">
+      <span style="{{ sigilStyle }}">{{ sigil }}</span>
+      <div>
+        <div style="{{ serverNameStyle }}">{{ serverName }}</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:2px; color:#9c8458; margin-top:4px; text-transform:uppercase;">{{ tagline }}</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px; margin-top:12px; padding-top:11px; border-top:1px solid rgba(180,140,70,.18);">
+      <div style="display:flex; align-items:center; gap:7px;">
+        <span style="width:8px; height:8px; border-radius:50%; background:#7bbf63; box-shadow:0 0 8px #7bbf63; animation:glowpulse 2.4s infinite;"></span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#d8c9a6;">{{ players }} <span style="color:#857036;">online</span></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:7px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#857036;">ping</span>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#d8c9a6;">{{ ping }}ms</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOP RIGHT: MONEY + CLOCK ===== -->
+  <div style="position:absolute; top:24px; right:24px; z-index:30; display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
+    <div style="display:flex; gap:10px;">
+      <div style="{{ moneyPanel }}">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#857036; text-transform:uppercase;">moeda viva</div>
+        <div style="font-family:'Cinzel',serif; font-weight:700; font-size:22px; margin-top:2px; color:#efe3c6;">{{ cash }} <span style="font-size:13px; color:#9c8458;">au</span></div>
+      </div>
+      <div style="{{ moneyPanel }}">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#857036; text-transform:uppercase;">cofre etéreo</div>
+        <div style="{{ bankValueStyle }}">{{ bank }} <span style="font-size:13px; opacity:.7;">au</span></div>
+      </div>
+    </div>
+    <div style="{{ clockPanel }}">
+      <span style="{{ moonStyle }}">☾</span>
+      <div style="text-align:right;">
+        <div style="font-family:'Cinzel',serif; font-weight:700; font-size:20px; letter-spacing:2px; line-height:1;">{{ clock }}</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:#9c8458; margin-top:3px; text-transform:uppercase;">{{ dateStr }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM: VITALS + MINIMAP + VOICE ===== -->
+  <div style="{{ bottomLayer }}">
+    <sc-if value="{{ isUnido }}" hint-placeholder-val="{{ true }}">
+      <span style="{{ corner.tl }}"></span><span style="{{ corner.tr }}"></span><span style="{{ corner.bl }}"></span><span style="{{ corner.br }}"></span>
+    </sc-if>
+
+    <!-- ORBES: vida orb -->
+    <sc-if value="{{ isOrbes }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ vidaWrap }}">
+        <div style="{{ vida.orbWrap }}">
+          <div style="{{ vida.well }}"><div style="{{ vida.fill }}"><div style="{{ vida.surface }}"></div></div><div style="{{ vida.gloss }}"></div><div style="{{ vida.sheen }}"></div></div>
+          <div style="{{ vida.center }}"><span style="{{ vida.rune }}">{{ vida.glyph }}</span><span style="{{ vida.valStyle }}">{{ vida.value }}</span></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1.5px; color:#9c8458; text-transform:uppercase;">{{ vida.label }}</span>
+      </div>
+      <div style="{{ vialsWrap }}">
+        <sc-for list="{{ vials }}" as="v" hint-placeholder-count="4">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+            <div style="{{ v.orbWrap }}">
+              <div style="{{ v.well }}"><div style="{{ v.fill }}"><div style="{{ v.surface }}"></div></div><div style="{{ v.gloss }}"></div><div style="{{ v.sheen }}"></div></div>
+              <div style="{{ v.center }}"><span style="{{ v.rune }}">{{ v.glyph }}</span><span style="{{ v.valStyle }}">{{ v.value }}</span></div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#9c8458; text-transform:uppercase;">{{ v.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ANEIS: 6 ring gauges -->
+    <sc-if value="{{ isAneis }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ ringsWrap }}">
+        <sc-for list="{{ vitals }}" as="v" hint-placeholder-count="6">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+            <div style="{{ v.ringWrap }}">
+              <div style="{{ v.ringStyle }}"></div>
+              <div style="position:absolute; inset:6px; border-radius:50%; background:#0c0805; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;">
+                <span style="{{ v.runeStyle }}">{{ v.glyph }}</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#e7dac0;">{{ v.value }}</span>
+              </div>
+            </div>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#9c8458; text-transform:uppercase;">{{ v.label }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- BARRAS / CRISTAL -->
+    <sc-if value="{{ isBars }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ barsWrap }}">
+        <sc-for list="{{ vitals }}" as="v" hint-placeholder-count="6">
+          <div style="display:flex; align-items:center; gap:11px;">
+            <span style="{{ v.runeBarStyle }}">{{ v.glyph }}</span>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#9c8458; text-transform:uppercase; width:54px;">{{ v.label }}</span>
+            <div style="{{ barTrack }}"><div style="{{ v.barStyle }}"></div></div>
+            <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#e7dac0; width:26px; text-align:right;">{{ v.value }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- MINIMAP -->
+    <div style="{{ mapWrap }}">
+      <div style="{{ mapInner }}">
+        <div style="position:absolute; inset:0; background:radial-gradient(60% 60% at 50% 55%, rgba(200,150,70,.12), transparent 70%);"></div>
+        <div style="position:absolute; top:0; bottom:0; left:38%; width:7px; background:rgba(150,120,70,.25); transform:skewX(-12deg);"></div>
+        <div style="position:absolute; left:0; right:0; top:52%; height:7px; background:rgba(150,120,70,.25);"></div>
+        <div style="position:absolute; left:0; right:0; top:24%; height:4px; background:rgba(150,120,70,.16); transform:skewY(-3deg);"></div>
+        <span style="position:absolute; top:30%; left:62%; width:7px; height:7px; background:#dca33a; border-radius:50%; box-shadow:0 0 7px #dca33a;"></span>
+        <span style="position:absolute; top:68%; left:24%; width:7px; height:7px; background:#7bbf63; border-radius:50%; box-shadow:0 0 7px #7bbf63;"></span>
+        <span style="{{ blipAccent }}"></span>
+        <div style="position:absolute; top:55%; left:38%; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-bottom:16px solid #f3e9d4; transform:translate(-50%,-50%) rotate(28deg); filter:drop-shadow(0 0 5px rgba(255,220,150,.9));"></div>
+        <div style="position:absolute; top:7px; left:9px; font-family:'Cinzel',serif; font-weight:700; font-size:13px; color:rgba(240,225,190,.6);">N</div>
+        <div style="position:absolute; bottom:7px; left:10px; right:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:#cdb98c; text-transform:uppercase;">Beco do Véu</span>
+          <span style="font-family:'JetBrains Mono',monospace; font-size:9px; color:#9c8458;">▲ Distrito IV</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOICE -->
+    <div style="{{ voiceWrap }}">
+      <div style="{{ micRing }}">
+        <sc-if value="{{ talking }}" hint-placeholder-val="{{ false }}"><span style="{{ micRipple }}"></span></sc-if>
+        <span style="{{ micGlyphStyle }}">⊻</span>
+      </div>
+      <div style="display:flex; gap:3px; align-items:flex-end; height:16px;">
+        <sc-for list="{{ voiceBars }}" as="b" hint-placeholder-count="5"><span style="{{ b.style }}"></span></sc-for>
+      </div>
+      <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:#9c8458; text-transform:uppercase;">{{ voiceRange }}</span>
+    </div>
+
+    <!-- ORBES: mana orb (flank-right in clássico) -->
+    <sc-if value="{{ isOrbes }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ manaWrap }}">
+        <div style="{{ mana.orbWrap }}">
+          <div style="{{ mana.well }}"><div style="{{ mana.fill }}"><div style="{{ mana.surface }}"></div></div><div style="{{ mana.gloss }}"></div><div style="{{ mana.sheen }}"></div></div>
+          <div style="{{ mana.center }}"><span style="{{ mana.rune }}">{{ mana.glyph }}</span><span style="{{ mana.valStyle }}">{{ mana.value }}</span></div>
+        </div>
+        <span style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1.5px; color:#9c8458; text-transform:uppercase;">{{ mana.label }}</span>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080}}">
+class Component extends DCLogic {
+  state = {
+    estilo:'orbes', paleta:'pergaminho', layout:'unido',
+    talking:false, voicePhase:0, minutes:3*60+33,
+    vitals:[
+      { key:'vida',  label:'Vida',    glyph:'ᚺ', hue:25,  value:72 },
+      { key:'folego',label:'Fôlego',  glyph:'ᛋ', hue:135, value:64 },
+      { key:'fome',  label:'Fome',    glyph:'ᚠ', hue:60,  value:48 },
+      { key:'sede',  label:'Sede',    glyph:'ᛚ', hue:230, value:81 },
+      { key:'sanid', label:'Sanidade',glyph:'ᛟ', hue:185, value:34 },
+      { key:'mana',  label:'Mana',    glyph:'ᛜ', hue:295, value:55 },
+    ],
+  };
+
+  componentDidMount(){
+    this._t=setInterval(()=>this.setState(s=>{
+      const minutes=(s.minutes+7)%1440;
+      const vitals=s.vitals.map(v=>{
+        if(v.key==='folego') return {...v,value:clamp(v.value+(Math.random()*16-8))};
+        if(v.key==='mana')   return {...v,value:clamp(v.value+(Math.random()*8-3))};
+        if(v.key==='sanid')  return {...v,value:clamp(v.value+(Math.random()*5-2.4))};
+        return v;
+      });
+      return {minutes,vitals,voicePhase:s.voicePhase+1};
+    }),900);
+    this._v=setInterval(()=>this.setState(s=>({talking:!s.talking})),3200);
+  }
+  componentWillUnmount(){ clearInterval(this._t); clearInterval(this._v); }
+
+  cfg(){
+    const v=this.state.paleta;
+    if(v==='sangue')    return { accent:'#c75b4a', deep:'#5e1f18', glow:'rgba(199,91,74,.5)', stone:'#1a1010', stone2:'#241413', amb:'rgba(180,60,40,.10)' };
+    if(v==='eterno')    return { accent:'#a87fe0', deep:'#3e2767', glow:'rgba(168,127,224,.5)', stone:'#150f1d', stone2:'#1f1630', amb:'rgba(120,70,200,.12)' };
+    if(v==='esmeralda') return { accent:'#5fb87a', deep:'#1f5236', glow:'rgba(95,184,122,.5)', stone:'#0e1611', stone2:'#142019', amb:'rgba(50,160,100,.12)' };
+    if(v==='geada')     return { accent:'#6fc2d6', deep:'#1f4e5e', glow:'rgba(111,194,214,.5)', stone:'#0d141a', stone2:'#131e26', amb:'rgba(90,180,210,.12)' };
+    if(v==='cinzas')    return { accent:'#bcae98', deep:'#5a5040', glow:'rgba(188,174,152,.45)', stone:'#15130f', stone2:'#1f1c16', amb:'rgba(180,170,150,.10)' };
+    return { accent:'#d9b25e', deep:'#6e4f1c', glow:'rgba(217,178,94,.5)', stone:'#181208', stone2:'#22190c', amb:'rgba(200,150,60,.12)' };
+  }
+
+  renderVals(){
+    const c=this.cfg(), accent=c.accent, est=this.state.estilo, lay=this.state.layout;
+    const cristal = est==='cristal';
+    const stoneBg=`radial-gradient(120% 130% at 30% 0%, rgba(255,225,160,.05), transparent 55%), linear-gradient(160deg, ${c.stone2}, ${c.stone}), repeating-linear-gradient(115deg, rgba(255,255,255,.02) 0 2px, transparent 2px 6px), repeating-linear-gradient(28deg, rgba(0,0,0,.14) 0 3px, transparent 3px 9px)`;
+    const panelBase={ background:stoneBg, border:'1px solid rgba(180,140,70,.4)', boxShadow:'0 10px 34px rgba(0,0,0,.6), inset 0 0 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(180,140,70,.1), inset 0 1px 0 rgba(255,220,150,.1)', borderRadius:'5px', position:'relative' };
+    const vc=(h)=>`oklch(0.62 0.15 ${h})`;
+    const vca=(h,a)=>`oklch(0.62 0.15 ${h} / ${a})`;
+    const corn=(pos)=>({ position:'absolute', width:'7px', height:'7px', transform:'rotate(45deg)', background:accent, boxShadow:`0 0 6px ${c.glow}`, ...pos });
+    const framed = lay!=='unido';
+    const blk=(extra)=> framed ? {...panelBase, ...extra} : (extra||{});
+
+    // ---- switchers ----
+    const mkOpt=(cur,setter)=>(o)=>{ const on=cur===o.key; return { label:o.label, onClick:()=>this.setState({[setter]:o.key}),
+      btnStyle:{ fontFamily:"'Cinzel',serif", fontWeight:600, fontSize:'10px', letterSpacing:'.5px', textTransform:'uppercase', cursor:'pointer', padding:'5px 9px', borderRadius:'3px', border:'1px solid '+(on?accent:'rgba(180,140,70,.22)'), background:on?`linear-gradient(160deg, ${c.deep}, #140d05)`:'transparent', color:on?'#fff4e0':'#c9b486', textShadow:on?`0 0 8px ${c.glow}, 0 1px 2px rgba(0,0,0,.7)`:'none', boxShadow:on?`0 0 14px ${c.glow}, inset 0 1px 6px rgba(0,0,0,.5)`:'none' } }; };
+    const estiloOpts=[{key:'orbes',label:'Orbes'},{key:'aneis',label:'Anéis'},{key:'barras',label:'Barras'},{key:'cristal',label:'Cristal'}].map(mkOpt(est,'estilo'));
+    const paletaOpts=[{key:'pergaminho',label:'Pergaminho'},{key:'sangue',label:'Sangue'},{key:'eterno',label:'Eterno'},{key:'esmeralda',label:'Esmeralda'},{key:'geada',label:'Geada'},{key:'cinzas',label:'Cinzas'}].map(mkOpt(this.state.paleta,'paleta'));
+    const layoutOpts=[{key:'unido',label:'Unido'},{key:'separado',label:'Separado'},{key:'classico',label:'Clássico'}].map(mkOpt(lay,'layout'));
+
+    // ---- per-vital styles ----
+    const mk=(v)=>{
+      const col=vc(v.hue), pct=Math.round(v.value), deg=pct*3.6, low=v.key==='vida'&&pct<30;
+      return { label:v.label, glyph:v.glyph, value:pct,
+        ringWrap:{ position:'relative', width:'62px', height:'62px', borderRadius:'50%' },
+        ringStyle:{ position:'absolute', inset:0, borderRadius:'50%', background:`conic-gradient(${col} ${deg}deg, rgba(255,255,255,.06) ${deg}deg 360deg)`, filter:`drop-shadow(0 0 6px ${vca(v.hue,.4)})` },
+        runeStyle:{ fontSize:'17px', lineHeight:1, color:col, textShadow:`0 0 8px ${vca(v.hue,.6)}` },
+        runeBarStyle:{ fontSize:'16px', width:'20px', textAlign:'center', color:col, textShadow:`0 0 8px ${vca(v.hue,.6)}` },
+        barStyle:{ position:'absolute', inset:0, width:pct+'%', transition:'width .4s', background:`linear-gradient(90deg, ${vca(v.hue,.6)}, ${col})`, boxShadow:`0 0 10px ${vca(v.hue,.55)}`, clipPath:cristal?'polygon(0 0,100% 0,90% 100%,0 100%)':'none' } };
+    };
+    const vitals=this.state.vitals.map(mk);
+
+    // ---- orbs ----
+    const bezel=(s,low,hue)=>({ position:'relative', width:s+'px', height:s+'px', borderRadius:'50%', animation:low?'lowpulse 1.1s infinite':'none', background:'radial-gradient(circle at 36% 28%, #f7e3ad, #c79a44 42%, #8a6526 64%, #4a3514 82%, #2a1d0c)', boxShadow:`0 5px 16px rgba(0,0,0,.7), 0 0 22px ${vca(hue,.30)}, inset 0 2px 5px rgba(255,238,190,.65), inset 0 -5px 9px rgba(0,0,0,.6), inset 0 0 0 1px rgba(40,28,12,.7)` });
+    const orb=(v,size)=>{ size=size||96; const big=size>70; const col=vc(v.hue), pct=Math.round(v.value), low=v.key==='vida'&&pct<30;      return { label:v.label, glyph:v.glyph, value:pct, orbWrap:bezel(size,low,v.hue),
+        well:{ position:'absolute', inset:'3px', borderRadius:'50%', overflow:'hidden', background:'radial-gradient(circle at 40% 35%, #1c150c, #0a0703)', boxShadow:'inset 0 0 18px rgba(0,0,0,.9), inset 0 0 0 2px rgba(0,0,0,.65), inset 0 0 0 3px rgba(180,140,70,.22)' },
+        fill:{ position:'absolute', left:0, right:0, bottom:0, height:pct+'%', transition:'height .5s', background:`linear-gradient(180deg, ${vca(v.hue,.95)}, ${vca(v.hue,.8)} 40%, ${vca(v.hue,.45)})`, boxShadow:`inset 0 6px 10px ${vca(v.hue,.7)}, 0 -2px 8px ${vca(v.hue,.55)}` },
+        surface:{ position:'absolute', top:'-1px', left:0, right:0, height:big?'5px':'3px', background:`linear-gradient(180deg, oklch(0.85 0.12 ${v.hue} / .95), transparent)`, boxShadow:`0 0 7px ${vca(v.hue,.9)}`, animation:'meniscus 3.4s ease-in-out infinite' },
+        sheen:{ position:'absolute', top:'8%', left:'14%', width:'46%', height:'38%', borderRadius:'50%', background:'radial-gradient(circle, rgba(255,255,255,.55), transparent 72%)', pointerEvents:'none', animation:'sheen 6.5s ease-in-out infinite', zIndex:3 },
+        gloss:{ position:'absolute', top:'9%', left:'15%', width:'44%', height:'32%', borderRadius:'50%', background:'radial-gradient(circle, rgba(255,255,255,.42), transparent 70%)', pointerEvents:'none' },
+        center:{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:'1px', zIndex:2 },
+        rune:{ fontSize:big?'19px':'15px', lineHeight:1, color:'#f3e9d4', textShadow:`0 0 8px ${col}, 0 1px 2px #000` },
+        valStyle:{ fontFamily:"'JetBrains Mono',monospace", fontSize:big?'12px':'10px', color:'#f3e9d4', textShadow:'0 1px 2px #000' } };
+    };
+    const vials=this.state.vitals.filter(v=>v.key!=='vida'&&v.key!=='mana').map(v=>orb(v,58));
+
+    const voiceBars=[0,1,2,3,4].map(i=>{ const h=this.state.talking?4+Math.abs(Math.sin(this.state.voicePhase*0.9+i))*12:3;
+      return { style:{ width:'3px', borderRadius:'2px', height:h+'px', opacity:this.state.talking?1:.35, transition:'height .15s', background:accent } }; });
+    const embers=[0,1,2,3,4,5,6,7].map(i=>({ style:{ position:'absolute', bottom:'-10px', left:((i*12+5)%96)+'%', width:(3+i%3)+'px', height:(3+i%3)+'px', borderRadius:'50%', background:accent, filter:'blur(.5px)', boxShadow:`0 0 8px ${accent}`, pointerEvents:'none', animation:`ember ${8+i*1.5}s linear ${i*1.2}s infinite` } }));
+
+    const mm=String(this.state.minutes%60).padStart(2,'0'), hh=String(Math.floor(this.state.minutes/60)).padStart(2,'0');
+
+    // ---- bottom layout ----
+    const bottomBase={ position:'absolute', bottom:'22px', left:'22px', zIndex:30, display:'flex', alignItems:'flex-end' };
+    let bottomLayer;
+    if(lay==='unido')        bottomLayer={ ...panelBase, ...bottomBase, position:'absolute', padding:'16px 20px', gap:'18px', alignItems:'center' };
+    else if(lay==='classico')bottomLayer={ ...bottomBase, right:'22px', gap:'14px' };
+    else                     bottomLayer={ ...bottomBase, gap:'14px' };
+
+    return {
+      serverName:'Véu Sombrio', tagline:'occult roleplay', sigil:'VS',
+      players:'87/128', ping:42, cash:'12.480', bank:'84.300',
+      clock:`${hh}:${mm}`, dateStr:'III · Lua Negra',
+      estiloOpts, paletaOpts, layoutOpts, vitals, vials, voiceBars, embers, talking:this.state.talking,
+      voiceRange:this.state.talking?'NORMAL':'MUDO',
+      vida:orb(this.state.vitals.find(v=>v.key==='vida')),
+      mana:orb(this.state.vitals.find(v=>v.key==='mana')),
+      isOrbes:est==='orbes', isAneis:est==='aneis', isBars:est==='barras'||est==='cristal',
+      isUnido:lay==='unido',
+
+      ambient:{ position:'absolute', inset:0, background:`radial-gradient(120% 80% at 50% 25%, ${c.amb}, transparent 60%), radial-gradient(80% 60% at 18% 95%, ${c.amb}, transparent 55%)` },
+      corner:{ tl:corn({top:'5px',left:'5px'}), tr:corn({top:'5px',right:'5px'}), bl:corn({bottom:'5px',left:'5px'}), br:corn({bottom:'5px',right:'5px'}) },
+
+      serverPanel:{ ...panelBase, position:'absolute', top:'24px', left:'24px', zIndex:30, padding:'14px 18px', minWidth:'240px', borderLeft:'3px solid '+accent },
+      sigilStyle:{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:'12px', lineHeight:1, padding:'7px 8px', border:'1px solid '+accent+'77', borderRadius:'3px', color:accent, textShadow:`0 0 10px ${c.glow}`, background:'rgba(0,0,0,.3)' },
+      serverNameStyle:{ fontFamily:"'Cinzel Decorative',serif", fontWeight:900, fontSize:'20px', letterSpacing:'1px', lineHeight:1, color:accent, textShadow:`0 0 14px ${c.glow}` },
+      moneyPanel:{ ...panelBase, padding:'10px 16px', minWidth:'138px', textAlign:'right', borderTop:'2px solid '+accent },
+      bankValueStyle:{ fontFamily:"'Cinzel',serif", fontWeight:700, fontSize:'22px', marginTop:'2px', color:accent, textShadow:`0 0 14px ${c.glow}` },
+      clockPanel:{ ...panelBase, display:'flex', alignItems:'center', gap:'12px', padding:'8px 18px' },
+      moonStyle:{ fontFamily:"'Cinzel Decorative',serif", fontSize:'17px', color:accent, textShadow:`0 0 14px ${c.glow}` },
+
+      bottomLayer,
+      vidaWrap: blk({ display:'flex', flexDirection:'column', alignItems:'center', gap:'7px', padding:framed?'12px 16px':0 }),
+      manaWrap: blk({ display:'flex', flexDirection:'column', alignItems:'center', gap:'7px', padding:framed?'12px 16px':0, marginLeft:lay==='classico'?'auto':0 }),
+      vialsWrap: blk({ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'14px 18px', padding:framed?'14px 16px':'0 4px' }),
+      ringsWrap: blk({ display:'flex', gap:'14px', alignItems:'flex-end', padding:framed?'14px 18px':0 }),
+      barsWrap: blk({ display:'flex', flexDirection:'column', gap:'9px', width:'320px', padding:framed?'16px 18px':0, clipPath:cristal&&framed?'polygon(0 0,100% 0,100% 82%,96% 100%,0 100%)':'none' }),
+      barTrack:{ flex:1, height:'11px', background:'rgba(255,255,255,.06)', overflow:'hidden', position:'relative', clipPath:cristal?'polygon(0 0,100% 0,94% 100%,0 100%)':'none', borderRadius:cristal?'0':'3px' },
+
+      mapWrap: blk({ padding:framed?'6px':0 }),
+      mapInner:{ position:'relative', width:'220px', height:'160px', overflow:'hidden', background:'repeating-linear-gradient(45deg,#19130a 0 14px,#130e07 14px 28px)', border:'1px solid rgba(180,140,70,.35)' },
+      blipAccent:{ position:'absolute', top:'44%', left:'80%', width:'9px', height:'9px', borderRadius:'50%', background:accent, boxShadow:`0 0 9px ${accent}` },
+
+      voiceWrap: blk({ display:'flex', flexDirection:'column', alignItems:'center', gap:'6px', padding:'12px 12px 10px' }),
+      micRing:{ position:'relative', width:'42px', height:'42px', display:'flex', alignItems:'center', justifyContent:'center', borderRadius:'50%', border:'1px solid '+(this.state.talking?accent:'rgba(180,140,70,.35)'), background:this.state.talking?`${accent}22`:'rgba(0,0,0,.25)', boxShadow:this.state.talking?`0 0 16px ${c.glow}`:'none', transition:'all .2s' },
+      micRipple:{ position:'absolute', inset:0, borderRadius:'50%', border:'1px solid '+accent, animation:'voiceripple 1.1s ease-out infinite' },
+      micGlyphStyle:{ fontSize:'18px', lineHeight:1, color:this.state.talking?accent:'#857036', transition:'color .2s' },
+    };
+  }
+}
+function clamp(n){ return Math.max(2, Math.min(100, n)); }
+</script>
+</body>
+</html>

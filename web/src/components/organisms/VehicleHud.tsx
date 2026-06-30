@@ -3,13 +3,25 @@ import { useVehicleHudStore } from "../../stores/vehicleHudStore";
 import { useMarineHudStore } from "../../stores/marineHudStore";
 import { useAircraftHudStore } from "../../stores/aircraftHudStore";
 import { usePositioningStore } from "../../stores/positioningStore";
+import { useVehicleThemeStore } from "../../stores/vehicleThemeStore";
 import debugMode from "../../stores/debugStore";
 import AnalogGauge from "../molecules/hud-shapes/AnalogGauge";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
 import { useSmoothValue } from "../../hooks/useSmoothValue";
+import VehicleDigitalHud from "./VehicleDigitalHud";
 
 export default function VehicleHud() {
+  const theme = useVehicleThemeStore((s) => s.theme);
+
+  // Tema 'digital' = cluster do design handoff. Tema 'classic' (default) =
+  // velocimetro analogico abaixo. Trocar de tema nao remove nenhum dos dois.
+  if (theme === "digital") return <VehicleDigitalHud />;
+
+  return <VehicleClassicHud />;
+}
+
+function VehicleClassicHud() {
   const show        = useVehicleHudStore((s) => s.show);
   const rawSpeed    = useVehicleHudStore((s) => s.speed);
   const speed       = useSmoothValue(rawSpeed, 70);

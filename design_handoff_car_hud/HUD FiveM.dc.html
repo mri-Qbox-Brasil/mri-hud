@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+</helmet>
+
+<div style="position:absolute; left:0; top:0; width:900px; font-family:'Chakra Petch',sans-serif;">
+  <div data-drags-parent="1" style="font:700 30px 'Chakra Petch'; color:#1c242d; letter-spacing:-0.01em;">HUD digital — painel de carro</div>
+  <div style="font:500 14px 'Chakra Petch'; color:#5d6b78; letter-spacing:0.04em; margin-top:8px;">FiveM · 3 formatos de velocímetro · tema ciano/tech · com animação de demonstração</div>
+</div>
+
+<div style="position:absolute; left:0; top:150px; width:880px; font-family:'Chakra Petch',sans-serif;">
+  <div data-drags-parent="1" style="font:600 13px 'Chakra Petch'; color:#3a4654; letter-spacing:0.16em; text-transform:uppercase; margin-bottom:12px;">01 — Mostrador circular</div>
+  <div style="width:880px; height:495px; border-radius:5px; overflow:hidden; box-shadow:0 16px 44px rgba(0,0,0,0.4); position:relative;">
+    <dc-import name="CarHud" variant="ring" style="position:absolute; inset:0;" hint-size="880px,495px"></dc-import>
+  </div>
+</div>
+
+<div style="position:absolute; left:970px; top:150px; width:880px; font-family:'Chakra Petch',sans-serif;">
+  <div data-drags-parent="1" style="font:600 13px 'Chakra Petch'; color:#3a4654; letter-spacing:0.16em; text-transform:uppercase; margin-bottom:12px;">02 — Arco semicircular</div>
+  <div style="width:880px; height:495px; border-radius:5px; overflow:hidden; box-shadow:0 16px 44px rgba(0,0,0,0.4); position:relative;">
+    <dc-import name="CarHud" variant="arc" style="position:absolute; inset:0;" hint-size="880px,495px"></dc-import>
+  </div>
+</div>
+
+<div style="position:absolute; left:1940px; top:150px; width:880px; font-family:'Chakra Petch',sans-serif;">
+  <div data-drags-parent="1" style="font:600 13px 'Chakra Petch'; color:#3a4654; letter-spacing:0.16em; text-transform:uppercase; margin-bottom:12px;">03 — Linear minimalista</div>
+  <div style="width:880px; height:495px; border-radius:5px; overflow:hidden; box-shadow:0 16px 44px rgba(0,0,0,0.4); position:relative;">
+    <dc-import name="CarHud" variant="linear" style="position:absolute; inset:0;" hint-size="880px,495px"></dc-import>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -11,6 +11,24 @@ Config.DisablePoliceStress = false -- Default: false, If true will disable stres
 Config.VehicleEnabled = true -- Enable/Disable the vehicle portion of the HUD (this allows you to use a custom speedometer)
 Config.EngineCommand = false -- Enable/Disable the built-in engine toggle command (+engine, default key: G). Set to false if using another resource for this.
 
+-- Tema padrao da HUD de veiculo. Define o visual usado por todos os players
+-- (default global). Admins podem trocar individualmente pelo menu do HUD.
+--   'classic' = velocimetro analogico atual (gauges do ui-kit)
+--   'digital' = cluster digital/tech ciano (velocidade + fuel/eng + RPM/marcha + turbo + bussola)
+Config.VehicleHudTheme = 'classic'
+-- Formato do velocimetro no tema 'digital': 'ring' (circular), 'arc' (semicircular) ou 'linear'.
+Config.VehicleHudVariant = 'ring'
+
+-- Skin da HUD do PLAYER (vitais/dinheiro/servidor/voz). Independente do veiculo.
+--   'classic'      = HUD atual
+--   'sobrenatural' = reskin ocultista/Diablo II (orbes de vitais, paineis de pedra)
+Config.PlayerHudSkin = 'classic'
+-- Customizacao do skin 'sobrenatural' (admins podem trocar no menu):
+Config.SupernaturalPalette = 'pergaminho' -- pergaminho | sangue | eterno | esmeralda | geada | cinzas
+Config.SupernaturalStyle   = 'orbes'      -- orbes | aneis | barras | cristal
+Config.SupernaturalLayout  = 'classico'   -- unido | separado | classico
+Config.SupernaturalFrameless = false      -- true = remove os fundos de pedra das orbes + dinheiro (servidor mantem)
+
 -- Admin only to change hud icons/shapes
 Config.AdminOnly = false
 

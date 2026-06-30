@@ -2,7 +2,14 @@ import type { playerHudIcons } from "../../types/types";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
 import { useExternalStatusStore } from "../../stores/externalStatusStore";
+import { useVehicleThemeStore } from "../../stores/vehicleThemeStore";
+import { useVehicleHudStore } from "../../stores/vehicleHudStore";
 import MetaShape from "../molecules/MetaShape";
+
+// Icones de status do player que o cluster do tema 'digital' ja exibe e que,
+// portanto, sao ocultados dentro do veiculo pra nao duplicar. Por ora so o
+// cinto (harness) — engine/nitro/cruise seguem visiveis.
+const DIGITAL_DUPLICATED_ICONS: Array<keyof playerHudIcons> = ["harness"];
 
 interface IconsListProps {
   isReversed?: boolean;
@@ -23,6 +30,13 @@ export default function IconsList({
   const globalColorSettings = useColorEffectStore((s) => s.globalColorSettings);
   const externalIcons = useExternalStatusStore((s) => s.icons);
 
+  // Com o tema digital ativo dentro do veiculo, oculta os icones duplicados
+  // pelo cluster (atualmente so o cinto). Nao some no designMode (customizacao)
+  // pra que ainda seja configuravel no menu.
+  const vehicleTheme = useVehicleThemeStore((s) => s.theme);
+  const inVehicle = useVehicleHudStore((s) => s.show);
+  const digitalActive = vehicleTheme === "digital" && inVehicle;
+
   let orderList: Array<keyof playerHudIcons> =
     iconsToShow.length ? iconsToShow : showingOrder;
   if (isReversed) orderList = [...orderList].reverse();
@@ -42,8 +56,11 @@ export default function IconsList({
         const currentEffect = colorData.colorEffects[effectIndex];
         const buffColor = externalIcons[iconName as string];
 
+        const hiddenByDigital =
+          digitalActive && !designMode && DIGITAL_DUPLICATED_ICONS.includes(iconName);
         const isVisible =
-          (icon.isShowing && !iconsToNotShow.includes(iconName)) || designMode;
+          (icon.isShowing && !iconsToNotShow.includes(iconName) && !hiddenByDigital) ||
+          designMode;
         if (!isVisible) return null;
 
         const hudIconInfo = {

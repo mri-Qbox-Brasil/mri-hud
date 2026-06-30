@@ -14,6 +14,9 @@ import { useMoneyHudStore } from "../stores/moneyHudStore";
 import { useThemeStore } from "../stores/themeStore";
 import { useAircraftHudStore } from "../stores/aircraftHudStore";
 import { useMarineHudStore } from "../stores/marineHudStore";
+import { useVehicleThemeStore } from "../stores/vehicleThemeStore";
+import { usePlayerSkinStore } from "../stores/playerSkinStore";
+import { useSupernaturalVitalsStore } from "../stores/supernaturalVitalsStore";
 import { initI18n } from "./i18n";
 import {
     colorStoreLocalStorageName,
@@ -209,6 +212,14 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
             }
             break;
 
+        case "vitals":
+            // Stats custom do skin sobrenatural (folego/sanidade/mana), 0-100,
+            // alimentados por outros resources.
+            if (data.topic === "supernatural") {
+                useSupernaturalVitalsStore.getState().receiveMessage(data as any);
+            }
+            break;
+
         case "setLang":
             initI18n(data.lang);
             break;
@@ -225,6 +236,12 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
                     enabled: data.positioning.enabled,
                     elements: data.positioning.elements,
                 });
+            }
+            if (data.vehicleTheme) {
+                useVehicleThemeStore.getState().setConfig(data.vehicleTheme);
+            }
+            if (data.playerSkin) {
+                usePlayerSkinStore.getState().setConfig(data.playerSkin);
             }
             break;
 

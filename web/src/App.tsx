@@ -3,6 +3,7 @@ import { useEventHandler, fetchNui } from "./utils/eventHandler";
 import { useMenuStore } from "./stores/menuStore";
 import { usePlayerStatusHudStore } from "./stores/playerStatusHudStore";
 import { usePositioningStore } from "./stores/positioningStore";
+import { usePlayerSkinStore } from "./stores/playerSkinStore";
 import { useThemeStore } from "./stores/themeStore";
 import { useAccentColor } from "./hooks/useAccentColor";
 import debugMode from "./stores/debugStore";
@@ -19,6 +20,7 @@ import MarineHud from "./components/organisms/MarineHud";
 import PositioningOverlay from "./components/organisms/PositioningOverlay";
 import DevPanel from "./components/organisms/DevPanel";
 import ServerLogoHud from "./components/organisms/ServerLogoHud";
+import SupernaturalSkin from "./components/organisms/SupernaturalSkin";
 
 export default function App() {
     useEventHandler();
@@ -31,6 +33,10 @@ export default function App() {
     const handleKeyUp = useMenuStore((s) => s.handleKeyUp);
     const isCinematicModeChecked = useMenuStore((s) => s.isCinematicModeChecked);
     const togglePositioning = usePositioningStore((s) => s.toggle);
+
+    // Skin 'sobrenatural' substitui a HUD de player classica (vitais + dinheiro
+    // + server logo + voz). Nao afeta veiculo/bussola/gauges.
+    const supernatural = usePlayerSkinStore((s) => s.skin) === "sobrenatural";
 
     // Design-mode progress animation
     const isUpRef = useRef(true);
@@ -77,12 +83,18 @@ export default function App() {
         <main className={`${debugMode ? "bg-gray-300" : "bg-transparent"} min-h-screen`}>
             <PositioningOverlay />
             {debugMode && <DevPanel />}
-            <ServerLogoHud />
+            {!supernatural && <ServerLogoHud />}
             {!isCinematicModeChecked && (
                 <>
                     <CompassHud />
-                    <MoneyHud />
-                    <MetaLayout />
+                    {supernatural ? (
+                        <SupernaturalSkin />
+                    ) : (
+                        <>
+                            <MoneyHud />
+                            <MetaLayout />
+                        </>
+                    )}
                     <VehicleHud />
                     <GaugesHud />
                     <AircraftHud />

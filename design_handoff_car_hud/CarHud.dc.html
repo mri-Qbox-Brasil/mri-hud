@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+</helmet>
+<div style="position:relative; width:100%; height:100%; overflow:hidden; font-family:'Chakra Petch',sans-serif; background:radial-gradient(125% 95% at 50% 0%, #161e26 0%, #0b1015 55%, #06090d 100%);">
+
+  <!-- gameplay placeholder texture -->
+  <div style="position:absolute; inset:0; opacity:0.045; background-image:repeating-linear-gradient(135deg,#ffffff 0 1px, transparent 1px 16px);"></div>
+  <div style="position:absolute; top:14px; left:16px; font:11px ui-monospace,monospace; letter-spacing:0.12em; color:rgba(255,255,255,0.26);">// LIVE GAMEPLAY RENDERS BEHIND HUD</div>
+
+  <!-- minimap (bottom-left, canonical) -->
+  <sc-if value="{{ showMinimap }}" hint-placeholder-val="{{ true }}">
+  <div style="position:absolute; left:22px; bottom:22px; width:128px; height:128px; border-radius:7px; overflow:hidden; background:#0c1219; border:1px solid rgba(70,224,255,0.18); box-shadow:0 10px 28px rgba(0,0,0,0.45);">
+     <div style="position:absolute; inset:0; opacity:0.55; background-image:repeating-linear-gradient(0deg,#101a22 0 1px, transparent 1px 21px), repeating-linear-gradient(90deg,#101a22 0 1px, transparent 1px 21px);"></div>
+     <div style="position:absolute; left:-20px; top:30%; width:180px; height:18px; background:rgba(70,224,255,0.07); transform:rotate(-24deg);"></div>
+     <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate( calc({{headingDeg}} * 1deg) ); width:0; height:0; border-left:7px solid transparent; border-right:7px solid transparent; border-bottom:15px solid {{accent}}; filter:drop-shadow(0 0 6px rgba(70,224,255,0.6));"></div>
+     <div style="position:absolute; top:6px; left:50%; transform:translateX(-50%); font:600 9px 'Chakra Petch'; color:rgba(255,255,255,0.55);">N</div>
+     <div style="position:absolute; bottom:6px; right:8px; font:500 8px ui-monospace,monospace; letter-spacing:0.14em; color:rgba(255,255,255,0.3);">MAP</div>
+  </div>
+  </sc-if>
+
+  <!-- center cluster -->
+  <div style="position:absolute; left:50%; bottom:26px; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:16px;">
+
+     <!-- compass strip -->
+     <div style="position:relative; width:236px; height:34px; overflow:hidden;">
+        <div style="position:absolute; left:0; top:0; bottom:0; width:100%; transform:translateX( calc({{compassX}} * 1px) );">
+           <sc-for list="{{ ticks }}" as="tk" hint-placeholder-count="20">
+              <div style="position:absolute; left:{{tk.left}}px; bottom:0; transform:translateX(-50%);">
+                 <div style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:1px; height:{{tk.h}}px; background:{{tk.col}};"></div>
+                 <div style="position:absolute; bottom:16px; left:50%; transform:translateX(-50%); font:600 10px 'Chakra Petch'; color:{{tk.col}}; white-space:nowrap;">{{tk.label}}</div>
+              </div>
+           </sc-for>
+        </div>
+        <div style="position:absolute; left:118px; top:6px; bottom:0; width:1px; background:{{accent}}; opacity:0.7;"></div>
+        <div style="position:absolute; left:118px; top:0; transform:translateX(-50%); width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:6px solid {{accent}};"></div>
+        <div style="position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(8,11,15,0.96), transparent 16%, transparent 84%, rgba(8,11,15,0.96));"></div>
+     </div>
+
+     <!-- gauges row -->
+     <div style="display:flex; align-items:center; gap:24px;">
+
+        <!-- left rail: fuel + engine -->
+        <div style="display:flex; align-items:flex-end; gap:16px;">
+           <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+              <div style="font:600 10px 'Chakra Petch'; color:#fff;">{{fuel}}</div>
+              <div style="position:relative; width:7px; height:78px; border-radius:5px; background:rgba(255,255,255,0.08); overflow:hidden;">
+                 <div style="position:absolute; left:0; right:0; bottom:0; height:calc({{fuel}} * 1%); background:{{fuelCol}}; border-radius:5px;"></div>
+              </div>
+              <div style="font:500 9px 'Chakra Petch'; letter-spacing:0.16em; color:rgba(255,255,255,0.45);">FUEL</div>
+           </div>
+           <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+              <div style="font:600 10px 'Chakra Petch'; color:#fff;">{{eng}}</div>
+              <div style="position:relative; width:7px; height:78px; border-radius:5px; background:rgba(255,255,255,0.08); overflow:hidden;">
+                 <div style="position:absolute; left:0; right:0; bottom:0; height:calc({{eng}} * 1%); background:{{engCol}}; border-radius:5px;"></div>
+              </div>
+              <div style="font:500 9px 'Chakra Petch'; letter-spacing:0.16em; color:rgba(255,255,255,0.45);">ENG</div>
+           </div>
+        </div>
+
+        <!-- speedo slot -->
+        <div style="min-width:300px; display:flex; justify-content:center;">
+
+           <!-- RING -->
+           <sc-if value="{{ isRing }}" hint-placeholder-val="{{ true }}">
+           <div style="position:relative; width:206px; height:206px;">
+              <div style="position:absolute; inset:0; border-radius:50%; background:conic-gradient({{accent}} calc({{pSpeed}} * 1%), rgba(255,255,255,0.07) 0); -webkit-mask:radial-gradient(circle, transparent 80px, #000 81px); mask:radial-gradient(circle, transparent 80px, #000 81px);"></div>
+              <div style="position:absolute; inset:16px; border-radius:50%; border:1px solid rgba(255,255,255,0.05);"></div>
+              <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                 <div style="font:600 60px 'Chakra Petch'; color:#fff; line-height:0.85; text-shadow:0 0 22px rgba(70,224,255,0.32);">{{speedInt}}</div>
+                 <div style="font:500 10px 'Chakra Petch'; letter-spacing:0.32em; color:rgba(255,255,255,0.5); margin-top:7px;">KM/H</div>
+              </div>
+           </div>
+           </sc-if>
+
+           <!-- ARC -->
+           <sc-if value="{{ isArc }}" hint-placeholder-val="{{ true }}">
+           <div style="display:flex; flex-direction:column; align-items:center;">
+              <div style="position:relative; width:280px; height:140px; overflow:hidden;">
+                 <div style="position:absolute; top:0; left:0; width:280px; height:280px; border-radius:50%; background:conic-gradient(from -90deg, {{accent}} calc({{pArc}} * 1%), rgba(255,255,255,0.07) 0); -webkit-mask:radial-gradient(circle, transparent 108px, #000 109px); mask:radial-gradient(circle, transparent 108px, #000 109px);"></div>
+              </div>
+              <div style="display:flex; flex-direction:column; align-items:center; margin-top:-50px;">
+                 <div style="font:600 56px 'Chakra Petch'; color:#fff; line-height:0.85; text-shadow:0 0 22px rgba(70,224,255,0.32);">{{speedInt}}</div>
+                 <div style="font:500 10px 'Chakra Petch'; letter-spacing:0.32em; color:rgba(255,255,255,0.5); margin-top:5px;">KM/H</div>
+              </div>
+           </div>
+           </sc-if>
+
+           <!-- LINEAR -->
+           <sc-if value="{{ isLinear }}" hint-placeholder-val="{{ true }}">
+           <div style="display:flex; flex-direction:column; align-items:flex-start; gap:11px; width:280px;">
+              <div style="display:flex; align-items:baseline; gap:11px;">
+                 <div style="font:600 72px 'Chakra Petch'; color:#fff; line-height:0.78; text-shadow:0 0 22px rgba(70,224,255,0.32);">{{speedInt}}</div>
+                 <div style="font:500 11px 'Chakra Petch'; letter-spacing:0.3em; color:rgba(255,255,255,0.5);">KM/H</div>
+              </div>
+              <div style="position:relative; width:100%; height:6px; border-radius:4px; background:rgba(255,255,255,0.08); overflow:hidden;">
+                 <div style="position:absolute; left:0; top:0; bottom:0; border-radius:4px; width:calc({{speedPct}} * 1%); background:{{accent}}; box-shadow:0 0 12px {{accent}};"></div>
+                 <div style="position:absolute; inset:0; background-image:repeating-linear-gradient(90deg, rgba(8,11,15,0.85) 0 1px, transparent 1px 26px);"></div>
+              </div>
+           </div>
+           </sc-if>
+
+        </div>
+
+        <!-- right rail: turbo + belt -->
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+           <div style="display:flex; flex-direction:column; align-items:center; gap:7px;">
+              <div style="font:600 10px 'Chakra Petch'; color:#fff;">{{boost}}</div>
+              <div style="position:relative; width:7px; height:60px; border-radius:5px; background:rgba(255,255,255,0.08); overflow:hidden;">
+                 <div style="position:absolute; left:0; right:0; bottom:0; height:calc({{boost}} * 1%); background:{{accent}}; border-radius:5px; box-shadow:0 0 8px {{accent}};"></div>
+              </div>
+              <div style="font:500 9px 'Chakra Petch'; letter-spacing:0.16em; color:rgba(255,255,255,0.45);">TURBO</div>
+           </div>
+           <div style="display:flex; align-items:center; gap:6px; padding:5px 9px; border-radius:20px; background:rgba(70,224,255,0.1); border:1px solid rgba(70,224,255,0.32);">
+              <div style="width:6px; height:6px; border-radius:50%; background:{{accent}}; box-shadow:0 0 8px {{accent}};"></div>
+              <div style="font:600 9px 'Chakra Petch'; letter-spacing:0.16em; color:{{accent}};">BELT</div>
+           </div>
+        </div>
+
+     </div>
+
+     <!-- tach line -->
+     <div style="display:flex; align-items:flex-end; gap:16px;">
+        <div style="display:flex; flex-direction:column; align-items:center; line-height:1;">
+           <div style="font:700 22px 'Chakra Petch'; color:#fff;">{{gear}}</div>
+           <div style="font:500 8px 'Chakra Petch'; letter-spacing:0.2em; color:rgba(255,255,255,0.4); margin-top:3px;">GEAR</div>
+        </div>
+        <div style="display:flex; align-items:flex-end; gap:3px; height:28px;">
+           <sc-for list="{{ seg }}" as="s" hint-placeholder-count="10">
+              <div style="width:5px; border-radius:2px; height:{{s.h}}px; background:{{s.bg}};"></div>
+           </sc-for>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-start; line-height:1;">
+           <div style="font:600 16px 'Chakra Petch'; color:#fff;">{{rpmInt}}</div>
+           <div style="font:500 8px 'Chakra Petch'; letter-spacing:0.2em; color:rgba(255,255,255,0.4); margin-top:3px;">RPM</div>
+        </div>
+     </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:880,&quot;height&quot;:495},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ring&quot;,&quot;arc&quot;,&quot;linear&quot;],&quot;default&quot;:&quot;ring&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#46e0ff&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showMinimap&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;animate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { now: 0 };
+  componentDidMount() {
+    if (this.props.animate === false) { this.setState({ now: 3400 }); return; }
+    this._start = performance.now();
+    this._last = -999;
+    const loop = () => {
+      this._raf = requestAnimationFrame(loop);
+      const el = performance.now() - this._start;
+      if (el - this._last < 32) return;
+      this._last = el;
+      this.setState({ now: el });
+    };
+    this._raf = requestAnimationFrame(loop);
+  }
+  componentWillUnmount() { if (this._raf) cancelAnimationFrame(this._raf); }
+  clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  renderVals() {
+    const C = (v, a, b) => this.clamp(v, a, b);
+    const accent = this.props.accent || '#46e0ff';
+    const variant = this.props.variant || 'ring';
+    const t = (this.state.now || 0) / 1000;
+    const MAXS = 200, MAXR = 8000;
+    const f = (x) => 90 + 78 * Math.sin(x * 0.22) + 12 * Math.sin(x * 0.9);
+    const sp = C(f(t), 0, MAXS);
+    const accel = sp - C(f(t - 0.12), 0, MAXS);
+    const bands = [[0, 20], [20, 45], [45, 75], [75, 110], [110, 150], [150, 200]];
+    let gear = 1, frac = 0;
+    for (let i = 0; i < bands.length; i++) {
+      if (sp >= bands[i][0]) { gear = i + 1; frac = (sp - bands[i][0]) / (bands[i][1] - bands[i][0]); }
+    }
+    frac = C(frac, 0, 1);
+    const rpm = C(1200 + frac * 5600 + 60 * Math.sin(t * 7), 700, MAXR);
+    const speedFrac = sp / MAXS, rpmFrac = rpm / MAXR;
+    const boost = C(accel * 22, 0, 100);
+    const fuel = 44 + 28 * Math.cos(t * 0.04);
+    const eng = 88 + 6 * Math.sin(t * 0.3);
+    const headingDeg = ((t * 9) % 360 + 360) % 360;
+    const lit = Math.round(rpmFrac * 10);
+    const heights = [9, 11, 13, 15, 17, 19, 21, 23, 25, 27];
+    const seg = heights.map((h, i) => ({
+      h,
+      bg: i < lit ? (i >= 8 ? '#ff5a52' : (i >= 7 ? '#ffc24d' : accent)) : 'rgba(255,255,255,0.10)'
+    }));
+    const barCol = (p) => p > 50 ? accent : (p > 22 ? '#ffc24d' : '#ff5a52');
+    const lab = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 180: 'S', 225: 'SW', 270: 'W', 315: 'NW' };
+    const ticks = [];
+    for (let d = 0; d <= 720; d += 15) {
+      const major = d % 45 === 0;
+      ticks.push({
+        left: d * 3,
+        h: major ? 12 : 6,
+        col: major ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.20)',
+        label: major ? (lab[d % 360] || '') : ''
+      });
+    }
+    return {
+      accent,
+      isRing: variant === 'ring', isArc: variant === 'arc', isLinear: variant === 'linear',
+      speedInt: Math.round(sp), rpmInt: Math.round(rpm), gear,
+      pSpeed: speedFrac * 100, pArc: speedFrac * 50, speedPct: speedFrac * 100,
+      seg,
+      fuel: Math.round(fuel), eng: Math.round(eng), boost: Math.round(boost),
+      fuelCol: barCol(fuel), engCol: barCol(eng),
+      headingDeg: Math.round(headingDeg),
+      compassX: 118 - headingDeg * 3,
+      ticks,
+      showMinimap: this.props.showMinimap !== false
+    };
+  }
+}
+</script>
+</body>
+</html>

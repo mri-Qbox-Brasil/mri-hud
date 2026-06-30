@@ -1,11 +1,20 @@
 import { useMenuStore } from "../../stores/menuStore";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { usePositioningStore } from "../../stores/positioningStore";
+import { useVehicleThemeStore, SPEEDO_VARIANTS, type SpeedoVariant } from "../../stores/vehicleThemeStore";
+import {
+  usePlayerSkinStore,
+  SKIN_PALETTES,
+  VITAL_STYLES,
+  type SkinPalette,
+  type VitalStyle,
+} from "../../stores/playerSkinStore";
 import { useI18nStore } from "../../utils/i18n";
 import { fetchNui } from "../../utils/eventHandler";
 import Button from "../atoms/Button";
 import Checkbox from "../atoms/Checkbox";
 import Switch from "../atoms/Switch";
+import HudSelect from "../atoms/HudSelect";
 import PsLogo from "../atoms/PsLogo";
 
 export default function HudPanel() {
@@ -29,6 +38,21 @@ export default function HudPanel() {
   const isCinematicModeChecked = useMenuStore((s) => s.isCinematicModeChecked);
   const isUseMPHChecked = useMenuStore((s) => s.isUseMPHChecked);
   const positioningEnabled = usePositioningStore((s) => s.enabled);
+
+  const isAdmin = useMenuStore((s) => s.isAdmin);
+  const vehicleTheme = useVehicleThemeStore((s) => s.theme);
+  const speedoVariant = useVehicleThemeStore((s) => s.variant);
+  const setVehicleTheme = useVehicleThemeStore((s) => s.setTheme);
+  const setSpeedoVariant = useVehicleThemeStore((s) => s.setVariant);
+
+  const playerSkin = usePlayerSkinStore((s) => s.skin);
+  const skinPalette = usePlayerSkinStore((s) => s.palette);
+  const vitalStyle = usePlayerSkinStore((s) => s.vitalStyle);
+  const skinFrameless = usePlayerSkinStore((s) => s.frameless);
+  const setPlayerSkin = usePlayerSkinStore((s) => s.setSkin);
+  const setSkinPalette = usePlayerSkinStore((s) => s.setPalette);
+  const setVitalStyle = usePlayerSkinStore((s) => s.setVitalStyle);
+  const setSkinFrameless = usePlayerSkinStore((s) => s.setFrameless);
 
   const dynamicIcons = usePlayerStatusHudStore((s) => s.dynamicIcons);
 
@@ -165,12 +189,67 @@ export default function HudPanel() {
         />
         <p className="font-semibold text-base pb-2">{t.metricsTypeDescription}</p>
 
+        {/* Tema da HUD de veiculo: classico (analogico) x digital (cluster). Admin escolhe. */}
+        <p className="font-semibold text-base pt-1" style={{ color: "hsl(var(--foreground))" }}>{t.vehicleThemeLabel}</p>
+        <div style={{ opacity: isAdmin ? 1 : 0.5, pointerEvents: isAdmin ? "auto" : "none" }}>
+          <Switch
+            checked={vehicleTheme === "digital"}
+            checkedText={t.vehicleThemeDigital}
+            uncheckedText={t.vehicleThemeClassic}
+            onChange={(v) => setVehicleTheme(v ? "digital" : "classic")}
+          />
+          {vehicleTheme === "digital" && (
+            <div className="pb-2">
+              <p className="font-semibold text-base pb-1">{t.vehicleSpeedoVariantLabel}</p>
+              <HudSelect
+                values={SPEEDO_VARIANTS}
+                value={speedoVariant}
+                onChange={(v) => setSpeedoVariant(v as SpeedoVariant)}
+              />
+              <p className="text-base pt-1">{t.vehicleSpeedoVariantDescription}</p>
+            </div>
+          )}
+        </div>
+        <p className="font-semibold text-base pb-2">
+          {isAdmin ? t.vehicleThemeDescription : t.vehicleThemeAdminOnly}
+        </p>
+
         <Checkbox checked={isMapEnabledChecked} primaryText={t.minimapEnabled}
           onChange={(v) => { set({ isMapEnabledChecked: v }); fetchNui("HideMap", { checked: v }); }} />
         <Checkbox checked={dynamicIcons.engine} primaryText={t.showEngineAlways}
           onChange={(v) => { setPlayer().updateShowingDynamicIcon("engine", v); fetchNui("dynamicChange"); }} />
         <Checkbox checked={dynamicIcons.nitro} primaryText={t.showNitroAlways}
           onChange={(v) => { setPlayer().updateShowingDynamicIcon("nitro", v); fetchNui("dynamicChange"); }} />
+      </div>
+
+      <hr style={{ borderColor: "hsl(var(--border))" }} />
+
+      {/* Skin do HUD do player: classico x sobrenatural. Admin escolhe. */}
+      <div className="my-3 text-base font-semibold" style={{ color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.06em" }}><p>{t.playerSkinLabel}</p></div>
+      <div className="mx-4 mb-4 flex flex-col" style={{ opacity: isAdmin ? 1 : 0.5, pointerEvents: isAdmin ? "auto" : "none" }}>
+        <Switch
+          checked={playerSkin === "sobrenatural"}
+          checkedText={t.playerSkinSupernatural}
+          uncheckedText={t.playerSkinClassic}
+          onChange={(v) => setPlayerSkin(v ? "sobrenatural" : "classic")}
+        />
+        {playerSkin === "sobrenatural" && (
+          <div className="flex flex-col gap-3 pb-2">
+            <div>
+              <p className="font-semibold text-base pb-1">{t.skinPaletteLabel}</p>
+              <HudSelect values={SKIN_PALETTES} value={skinPalette} onChange={(v) => setSkinPalette(v as SkinPalette)} />
+            </div>
+            <div>
+              <p className="font-semibold text-base pb-1">{t.skinStyleLabel}</p>
+              <HudSelect values={VITAL_STYLES} value={vitalStyle} onChange={(v) => setVitalStyle(v as VitalStyle)} />
+            </div>
+            <Checkbox checked={skinFrameless} primaryText={t.skinFramelessLabel}
+              onChange={(v) => setSkinFrameless(v)} />
+          </div>
+        )}
+        <p className="font-semibold text-base pb-2">
+          {isAdmin ? t.playerSkinDescription : t.playerSkinAdminOnly}
+        </p>
       </div>
 
       <hr style={{ borderColor: "hsl(var(--border))" }} />

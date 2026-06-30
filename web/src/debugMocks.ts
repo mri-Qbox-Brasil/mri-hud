@@ -8,6 +8,9 @@ import { useDynamicPanelsStore } from "./stores/dynamicPanelsStore";
 import { useAircraftHudStore } from "./stores/aircraftHudStore";
 import { useMarineHudStore } from "./stores/marineHudStore";
 import { useServerLogoStore } from "./stores/serverLogoStore";
+import { useVehicleThemeStore } from "./stores/vehicleThemeStore";
+import { usePlayerSkinStore } from "./stores/playerSkinStore";
+import { useSupernaturalVitalsStore } from "./stores/supernaturalVitalsStore";
 
 if (debugMode) {
     usePlayerStatusHudStore.setState({ designMode: true });
@@ -16,6 +19,10 @@ if (debugMode) {
         show: true,
         speed: 87,
         fuel: 65,
+        rpm: 4200,
+        gear: 3,
+        engine: 88,
+        heading: 135,
         altitude: 120,
         fuelColor: "#FFFFFF",
         showAltitude: true,
@@ -23,6 +30,15 @@ if (debugMode) {
         seatbeltColor: "#e85b14",
         useMPH: false,
     });
+
+    // Preview do tema novo: abre no 'digital' pra visualizar o cluster do
+    // handoff. Troque no menu (secao Veiculo) pra comparar com o 'classic'.
+    useVehicleThemeStore.setState({ theme: "digital", variant: "ring" });
+
+    // Preview do skin sobrenatural: ativa e popula os vitais custom. Troque
+    // skin/paleta/estilo/layout no menu (secao Skin do HUD).
+    usePlayerSkinStore.setState({ skin: "sobrenatural", palette: "pergaminho", vitalStyle: "orbes", layout: "classico" });
+    useSupernaturalVitalsStore.setState({ folego: 64, sanidade: 34, mana: 55 });
 
     useCompassHudStore.setState({
         show: true,
