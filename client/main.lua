@@ -283,15 +283,7 @@ RegisterCommand('menu', function()
     SendNUIMessage({ action = "open" })
 end)
 
-RegisterCommand('positioningMode', function()
-    if positioningMode then return end
-    if not Config.Positioning.enabled then return end
-    positioningMode = true
-    Wait(50)
-    TriggerEvent("hud:client:playOpenMenuSounds")
-    SetNuiFocus(true, true)
-    SendNUIMessage({ action = "positioning", topic = "open" })
-end)
+
 
 RegisterNUICallback('closeMenu', function(_, cb)
     cb({})
@@ -319,7 +311,7 @@ RegisterNUICallback('closePositioningMode', function(_, cb)
 end)
 
 RegisterKeyMapping('menu', Lang:t('info.open_menu'), 'keyboard', Config.OpenMenu)
-RegisterKeyMapping('positioningMode', Lang:t('info.positioning_mode'), 'keyboard', Config.PositioningKey)
+-- RegisterKeyMapping('positioningModeInternal', Lang:t('info.positioning_mode'), 'keyboard', Config.PositioningKey)
 
 -- Reset hud
 local function restartHud()
@@ -896,6 +888,7 @@ RegisterNetEvent('hud:client:EnhancementEffect', function(data)
     end
 end)
 
+if config.EngineCommand then
 RegisterCommand('+engine', function()
     local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if vehicle == 0 or GetPedInVehicleSeat(vehicle, -1) ~= PlayerPedId() then return end
@@ -907,7 +900,8 @@ RegisterCommand('+engine', function()
     SetVehicleEngineOn(vehicle, not GetIsVehicleEngineRunning(vehicle), false, true)
 end)
 
-RegisterKeyMapping('+engine', Lang:t('info.toggle_engine'), 'keyboard', 'G')
+    RegisterKeyMapping('+engine', Lang:t('info.toggle_engine'), 'keyboard', 'G')
+end
 
 local function IsWhitelistedWeaponArmed(weapon)
     if weapon then
