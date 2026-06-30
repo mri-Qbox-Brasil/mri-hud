@@ -42,7 +42,7 @@ local Menu = {
     isMapNotifChecked = true,           -- isMapNotifChecked
     isLowFuelChecked = true,            -- isLowFuelChecked
     isCinematicNotifChecked = true,     -- isCinematicNotifChecked
-    isMapEnabledChecked = false,        -- isMapEnabledChecked
+    isMapEnabledChecked = true,         -- isMapEnabledChecked
     isDynamicEngineChecked = true,      -- isDynamicEngineChecked
     isDynamicNitroChecked = true,       -- isDynamicNitroChecked
     isChangeCompassFPSChecked = true,   -- isChangeCompassFPSChecked
@@ -242,48 +242,11 @@ RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
     -- if hudSettings then loadSettings(json.decode(hudSettings)) end
     loadSettings()
     PlayerData = QBCore.Functions.GetPlayerData()
-    -- start demo panels after player and NUI are likely ready
-    StartDemoPanels()
-end)
-
--- Demo panels: only runs when Config.EnableDemoPanels = true
-local demoRunning = false
-local function StartDemoPanels()
-    if not Config.EnableDemoPanels then return end
-    if demoRunning then return end
-    demoRunning = true
-    -- initial panel
-    sendAddPanel({
-        id = 'demo_fuel',
-        title = 'Fuel',
-        icon = 'fuel.svg', -- place a fuel.png in html/assets/panels/ to see image
-        value = '100 %',
-        isShowing = true,
-    })
-
-    CreateThread(function()
-        local fuel = 100
-        while demoRunning do
-            Wait(5000)
-            fuel = math.max(0, fuel - math.random(1, 6))
-            sendUpdatePanel('demo_fuel', { value = tostring(fuel) .. ' %' })
-            if fuel <= 0 then
-                demoRunning = false
-                Wait(2000)
-                sendRemovePanel('demo_fuel')
-                break
-            end
-        end
     end)
-end
 
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
-    demoRunning = false
-    sendRemovePanel('demo_fuel')
 end)
-
-
 
 RegisterNetEvent("QBCore:Client:OnPlayerUnload", function()
     PlayerData = {}
@@ -304,7 +267,6 @@ AddEventHandler('onResourceStart', function(resourceName)
     -- local hudSettings = GetResourceKvpString('hudSettings')
     -- if hudSettings then loadSettings(json.decode(hudSettings)) end
     loadSettings()
-    StartDemoPanels()
 end)
 
 AddEventHandler("pma-voice:radioActive", function(isRadioTalking)

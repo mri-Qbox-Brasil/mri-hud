@@ -172,14 +172,8 @@ Config.ServerLogo = {
     src    = "https://assets.mriqbox.com.br/branding/logo96.webp", -- nome do arquivo em html/
     width  = 80,         -- largura em px
     x      = 50,         -- posição horizontal (vw %)
-    y      = 3,          -- posição vertical   (vh %)
+    y      = 5,          -- posição vertical   (vh %)
 }
-
--- ─────────────────────────────────────────────────────────────────
--- Demo Panels — ativa painéis de demonstração ao carregar.
--- Útil para testes; desative em produção.
--- ─────────────────────────────────────────────────────────────────
-Config.EnableDemoPanels = true
 
 -- ─────────────────────────────────────────────────────────────────
 -- Positioning Mode — controla quais elementos podem ser reposicionados.
