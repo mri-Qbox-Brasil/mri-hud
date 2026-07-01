@@ -9,13 +9,13 @@ import debugMode from "../../stores/debugStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
 import {
-  SKINS,
   ORDER,
   LABEL,
   KEYFRAMES,
   VitalPanel,
   MoneyPanel,
   VoicePanel,
+  resolveSkin,
   type StyleKey,
   type VitalValues,
 } from "./SupernaturalHud";
@@ -73,11 +73,13 @@ export default function SupernaturalSkin() {
   const palette = usePlayerSkinStore((s) => s.palette);
   const vitalStyle = usePlayerSkinStore((s) => s.vitalStyle);
   const frameless = usePlayerSkinStore((s) => s.frameless);
+  const vitalOverrides = usePlayerSkinStore((s) => s.vitalOverrides);
+  const customPalette = usePlayerSkinStore((s) => s.customPalette);
   const positioningActive = usePositioningStore((s) => s.active);
 
   if (!show && !debugMode && !positioningActive) return null;
 
-  const c = SKINS[palette];
+  const c = resolveSkin(palette, customPalette);
   const framed = !frameless; // frameless afeta vitais + dinheiro (servidor mantem)
   const v = (name: string) => Math.round((icons as any)[name]?.progressValue ?? 0);
   const vitals: VitalValues = {
@@ -107,11 +109,18 @@ export default function SupernaturalSkin() {
         <VoicePanel voice={voice} c={c} framed={framed} />
       </SkinEl>
 
-      {ORDER.map((k, i) => (
-        <SkinEl key={k} id={`skinVital_${k}`} label={LABEL[k]} anchor={vitalAnchor(vitalStyle, k, i)}>
-          <VitalPanel k={k} value={vitals[k]} style={vitalStyle} c={c} framed={framed} />
-        </SkinEl>
-      ))}
+      {ORDER.map((k, i) => {
+        // Vital oculto: nao renderiza (o indice i e mantido pra nao deslocar as
+        // ancoras dos demais). Reative no menu pra reposicionar no F10.
+        if (vitalOverrides[k]?.hidden) return null;
+        const ov = vitalOverrides[k];
+        const label = ov?.label || LABEL[k];
+        return (
+          <SkinEl key={k} id={`skinVital_${k}`} label={label} anchor={vitalAnchor(vitalStyle, k, i)}>
+            <VitalPanel k={k} value={vitals[k]} style={vitalStyle} c={c} framed={framed} ov={ov} />
+          </SkinEl>
+        );
+      })}
     </>
   );
 }

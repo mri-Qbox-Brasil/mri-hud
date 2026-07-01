@@ -101,6 +101,17 @@ export default function HudConfigPanel({ embedded = false }: Props) {
         </MriButton>
       </MriPageHeader>
 
+      {/* Config global e ABSOLUTA: ao salvar, aplica em todos os players na hora
+          e sobrescreve qualquer ajuste local que eles tenham feito no F10. */}
+      <MriCard className="p-3 flex items-start gap-3 border-primary/30">
+        <ShieldAlert className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <p className="text-xs text-muted-foreground">
+          Estas são as configurações <span className="text-foreground font-semibold">globais</span> da HUD.
+          Ao salvar, elas se aplicam a <span className="text-foreground font-semibold">todos os players imediatamente</span> e
+          têm prioridade absoluta sobre ajustes locais feitos no menu do jogador (F10).
+        </p>
+      </MriCard>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Veículo */}
         <MriCard className="p-4">

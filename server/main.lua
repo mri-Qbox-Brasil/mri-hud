@@ -4,6 +4,39 @@ local ResetStress = false
 -- Locale ox_lib (mesmo convar do cliente). Ver locales/*.json.
 lib.locale(GetConvar('qb_locale', 'en'))
 
+-- ── Cores da suite MRI via convar (padrao mri_Qspawn) ───────────────────────
+-- accent = `mri:color`, fundo = `mri:backgroundColor`. O SERVIDOR observa a
+-- mudanca (AddConvarChangeListener), resolve/valida o valor e faz broadcast do
+-- evento pros clients, que repassam pra NUI. Server-side (nao client) porque
+-- convar setada com `set` (nao replicada) so e visivel no servidor — assim o
+-- sync funciona independente de a convar ser replicada ou nao.
+local HEX6 = '^#%x%x%x%x%x%x$'
+local function resolveColor(convar, default)
+    local v = GetConvar(convar, '')
+    if type(v) == 'string' and v:match(HEX6) then return v end
+    return default
+end
+local function currentAccent() return resolveColor('mri:color', '#00E699') end
+local function currentBackground() return resolveColor('mri:backgroundColor', '') end -- '' = mantem o default do tema
+
+AddConvarChangeListener('mri:color', function(name)
+    if name ~= 'mri:color' then return end
+    TriggerClientEvent('mri_hud:client:accentColorChanged', -1, currentAccent())
+end)
+AddConvarChangeListener('mri:backgroundColor', function(name)
+    if name ~= 'mri:backgroundColor' then return end
+    TriggerClientEvent('mri_hud:client:backgroundColorChanged', -1, currentBackground())
+end)
+
+-- Client pede as cores atuais ao carregar (server-authoritative -> robusto
+-- mesmo se a convar nao for replicada). Responde so pro solicitante.
+RegisterNetEvent('mri_hud:server:requestColors', function()
+    local src = source
+    TriggerClientEvent('mri_hud:client:accentColorChanged', src, currentAccent())
+    local bg = currentBackground()
+    if bg ~= '' then TriggerClientEvent('mri_hud:client:backgroundColorChanged', src, bg) end
+end)
+
 QBCore.Commands.Add('cash', locale('info.check_cash_balance'), {}, false, function(source, args)
     local Player = QBCore.Functions.GetPlayer(source)
     local cashamount = Player.PlayerData.money.cash

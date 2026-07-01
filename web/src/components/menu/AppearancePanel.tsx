@@ -9,6 +9,7 @@ import {
   MriSettingField,
   MriSegmentedTabs,
   MriSelect,
+  MriColorPicker,
 } from "@mriqbox/ui-kit";
 import { useMenuStore } from "../../stores/menuStore";
 import { useVehicleThemeStore, SPEEDO_VARIANTS, type SpeedoVariant } from "../../stores/vehicleThemeStore";
@@ -73,10 +74,12 @@ export default function AppearancePanel() {
   const skinPalette = usePlayerSkinStore((s) => s.palette);
   const vitalStyle = usePlayerSkinStore((s) => s.vitalStyle);
   const skinFrameless = usePlayerSkinStore((s) => s.frameless);
+  const customPalette = usePlayerSkinStore((s) => s.customPalette);
   const setPlayerSkin = usePlayerSkinStore((s) => s.setSkin);
   const setSkinPalette = usePlayerSkinStore((s) => s.setPalette);
   const setVitalStyle = usePlayerSkinStore((s) => s.setVitalStyle);
   const setSkinFrameless = usePlayerSkinStore((s) => s.setFrameless);
+  const setCustomPaletteColor = usePlayerSkinStore((s) => s.setCustomPaletteColor);
 
   const compassType = useCompassStyleStore((s) => s.type);
   const setCompassType = useCompassStyleStore((s) => s.setType);
@@ -137,6 +140,20 @@ export default function AppearancePanel() {
                 <MriSelect options={toOptions(SKIN_PALETTES)} value={skinPalette}
                   onChange={(v) => setSkinPalette(v as SkinPalette)} className="w-full" />
               </MriSettingField>
+              {skinPalette === "custom" && (
+                <MriSettingField label={t("menu.appearance.custom_palette")} description={t("menu.appearance.custom_palette_desc")}>
+                  <div className="flex items-center gap-4">
+                    {(["accent", "deep", "stone"] as const).map((field) => (
+                      <div key={field} className="flex flex-col items-center gap-1">
+                        <MriColorPicker active format="hex" color={customPalette[field]} onChange={(hex) => setCustomPaletteColor(field, hex)} />
+                        <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                          {t(`menu.appearance.custom_${field}`)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </MriSettingField>
+              )}
               <MriSettingField label={t("menu.appearance.skin_style")}>
                 <MriSelect options={toOptions(VITAL_STYLES)} value={vitalStyle}
                   onChange={(v) => setVitalStyle(v as VitalStyle)} className="w-full" />

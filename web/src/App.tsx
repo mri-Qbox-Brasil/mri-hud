@@ -5,7 +5,7 @@ import { usePlayerStatusHudStore } from "./stores/playerStatusHudStore";
 import { usePositioningStore } from "./stores/positioningStore";
 import { usePlayerSkinStore } from "./stores/playerSkinStore";
 import { useThemeStore } from "./stores/themeStore";
-import { useAccentColor } from "./hooks/useAccentColor";
+import { useAccentColor, useBackgroundColor } from "./hooks/useAccentColor";
 import debugMode from "./stores/debugStore";
 import "./debugMocks";
 import MetaLayout from "./components/templates/MetaLayout";
@@ -60,10 +60,13 @@ export default function App() {
 function HudApp() {
     useEventHandler();
 
-    // Suite MRI accent — Lua manda em updateUISettings; themeStore guarda;
-    // useAccentColor aplica nas CSS vars --primary/--ring em runtime.
+    // Suite MRI accent + fundo — Lua manda em updateUISettings (broadcast das
+    // convars mri:color / mri:backgroundColor); themeStore guarda; os hooks
+    // aplicam nas CSS vars --primary/--ring e --background em runtime.
     const accentColor = useThemeStore((s) => s.accentColor);
     useAccentColor(accentColor);
+    const backgroundColor = useThemeStore((s) => s.backgroundColor);
+    useBackgroundColor(backgroundColor);
 
     const handleKeyUp = useMenuStore((s) => s.handleKeyUp);
     const isCinematicModeChecked = useMenuStore((s) => s.isCinematicModeChecked);

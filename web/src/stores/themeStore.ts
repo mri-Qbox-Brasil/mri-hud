@@ -15,16 +15,26 @@ import { create } from "zustand";
  */
 interface ThemeState {
   accentColor: string;
+  /** Cor de fundo da suite MRI (convar `mri:backgroundColor`). "" = usa o
+   *  default do tema (nao sobrescreve). */
+  backgroundColor: string;
   setAccentColor: (hex: string) => void;
+  setBackgroundColor: (hex: string) => void;
 }
 
 const DEFAULT_ACCENT = "#00E699";
+const HEX = /^#[0-9a-f]{6}([0-9a-f]{2})?$/i;
 
 export const useThemeStore = create<ThemeState>((set) => ({
   accentColor: DEFAULT_ACCENT,
+  backgroundColor: "",
   setAccentColor: (hex) => {
     // Aceita so hex 6 ou 8 chars. Invalido = mantem o atual.
-    if (!/^#[0-9a-f]{6}([0-9a-f]{2})?$/i.test(hex)) return;
+    if (!HEX.test(hex)) return;
     set({ accentColor: hex });
+  },
+  setBackgroundColor: (hex) => {
+    if (!HEX.test(hex)) return;
+    set({ backgroundColor: hex });
   },
 }));

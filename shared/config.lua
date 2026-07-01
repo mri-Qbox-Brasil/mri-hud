@@ -28,6 +28,9 @@ Config.SupernaturalPalette = 'pergaminho' -- pergaminho | sangue | eterno | esme
 Config.SupernaturalStyle   = 'orbes'      -- orbes | aneis | barras | cristal
 Config.SupernaturalLayout  = 'classico'   -- unido | separado | classico
 Config.SupernaturalFrameless = false      -- true = remove os fundos de pedra das orbes + dinheiro (servidor mantem)
+-- NOTA: a customizacao por vital (cor/glifo/rotulo/visibilidade) e a paleta
+-- 'custom' sao LOCAIS por cliente (localStorage da NUI, editaveis no F10 pelo
+-- admin) — nao vivem no config global do painel admin (que so guarda primitivos).
 
 -- Vitais custom do skin sobrenatural (alimentam folego/sanidade/mana da orbe).
 --   folego   = stamina de sprint nativa (client-side, sem persistencia; = ao oxygen atual)

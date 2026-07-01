@@ -10,7 +10,11 @@ import { vehicleThemeLocalStorageName } from "../types/types";
  *   1. Config.VehicleHudTheme/Variant (shared/config.lua) -> default global,
  *      entregue via `hudconfig` no init (setConfig).
  *   2. Override local do player (admin escolhe no menu) -> persistido em
- *      localStorage; vence o default do config quando presente.
+ *      localStorage; vence o default do config quando presente...
+ *   3. ...EXCETO quando a config vem marcada como `force` (absoluta): o admin
+ *      salvou no painel Qadmin, ou e um usuario comum recebendo o global no
+ *      load. Nesse caso o global sobrescreve E limpa o override local. Assim a
+ *      config admin sempre vence a customizacao do usuario comum.
  *
  * O override do menu eh gated por admin no AppearancePanel ("admin escolher").
  */
@@ -24,8 +28,9 @@ interface VehicleThemeState {
   variant: SpeedoVariant;
   /** True quando o player sobrescreveu o default via menu (persiste localmente). */
   overridden: boolean;
-  /** Default global vindo do Config.VehicleHud* (hudconfig). */
-  setConfig: (cfg: { theme?: string; variant?: string }) => void;
+  /** Config global vinda do Config.VehicleHud* (hudconfig). `force` = absoluta
+   *  (sobrescreve e limpa o override local). */
+  setConfig: (cfg: { theme?: string; variant?: string }, force?: boolean) => void;
   /** Troca feita pelo admin no menu -> vira override local. */
   setTheme: (theme: VehicleTheme) => void;
   setVariant: (variant: SpeedoVariant) => void;
@@ -67,13 +72,18 @@ export const useVehicleThemeStore = create<VehicleThemeState>((set, get) => ({
   variant: stored.variant ?? "ring",
   overridden: stored.overridden ?? false,
 
-  setConfig: (cfg) => {
-    // Default do config so se aplica quando o player nao tem override local.
-    if (get().overridden) return;
+  setConfig: (cfg, force) => {
+    // Sem force: default do config so se aplica se o player nao tem override
+    // local. Com force (config admin absoluta): aplica sempre e limpa o override.
+    if (get().overridden && !force) return;
     const next: Partial<VehicleThemeState> = {};
     if (isTheme(cfg.theme)) next.theme = cfg.theme;
     if (isVariant(cfg.variant)) next.variant = cfg.variant;
-    if (Object.keys(next).length) set(next);
+    if (force) next.overridden = false;
+    if (Object.keys(next).length) {
+      set(next);
+      if (force) persist(get());
+    }
   },
 
   setTheme: (theme) => {

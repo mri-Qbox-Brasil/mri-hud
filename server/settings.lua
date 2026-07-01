@@ -85,7 +85,9 @@ RegisterNetEvent('mri_hud:server:updateSetting', function(key, value)
     if not hasAdminPerm(src) then return end
     if type(key) ~= 'string' or not isPrimitive(value) then return end
     persistSetting(key, value)
-    TriggerClientEvent('mri_hud:client:settingsUpdated', -1, GetPrimitiveSettings())
+    -- force=true: config global do admin e ABSOLUTA -> sobrescreve qualquer
+    -- override local dos players (limpa o "overridden" nas stores da NUI).
+    TriggerClientEvent('mri_hud:client:settingsUpdated', -1, GetPrimitiveSettings(), true)
 end)
 
 -- Escrita em lote (botao Salvar do painel Qadmin). Recebe um patch
@@ -102,16 +104,20 @@ lib.callback.register('mri_hud:saveSettings', function(source, patch)
         end
     end
     if changed then
-        TriggerClientEvent('mri_hud:client:settingsUpdated', -1, GetPrimitiveSettings())
+        -- force=true: publish global absoluto (ver comentario em updateSetting).
+        TriggerClientEvent('mri_hud:client:settingsUpdated', -1, GetPrimitiveSettings(), true)
     end
     return true, GetPrimitiveSettings()
 end)
 
--- Client pede o estado atual ao carregar (aplica sobre o Config default do
--- config.lua que roda no client via shared_script).
+-- Client pede o estado atual ao carregar. force = (nao e admin): usuario comum
+-- SEMPRE recebe o global de forma absoluta (nao consegue manter override local);
+-- admin recebe sem force, entao mantem seu preview local do F10 ate o proximo
+-- save global. Assim a config admin sempre vence a customizacao do usuario comum.
 RegisterNetEvent('mri_hud:server:requestSettings', function()
     local src = source
-    TriggerClientEvent('mri_hud:client:settingsUpdated', src, GetPrimitiveSettings())
+    local force = not hasAdminPerm(src)
+    TriggerClientEvent('mri_hud:client:settingsUpdated', src, GetPrimitiveSettings(), force)
 end)
 
 -- db.lua dispara isto depois de criar as tabelas (ver comentario la sobre o

@@ -24,6 +24,22 @@ export interface VitalValues {
   mana: number;
 }
 
+/** Sobrescrita de um vital (do menu). Campos ausentes usam o default do kit.
+ * Estruturalmente igual ao VitalOverride do playerSkinStore. */
+export interface VitalOverride {
+  color?: string;
+  glyph?: string;
+  label?: string;
+  hidden?: boolean;
+}
+
+/** Cores livres da paleta 'custom' (accent/deep/stone; o resto e derivado). */
+export interface CustomPalette {
+  accent: string;
+  deep: string;
+  stone: string;
+}
+
 /* --------------------------------------------------------------- paletas */
 export interface Skin { accent: string; deep: string; glow: string; stone: string; stone2: string; amb: string; }
 export const SKINS: Record<SkinKey, Skin> = {
@@ -40,6 +56,7 @@ const HUE: Record<keyof VitalValues, number> = { vida: 25, folego: 135, fome: 60
 const GLYPH: Record<keyof VitalValues, string> = { vida: "ᚺ", folego: "ᛋ", fome: "ᚠ", sede: "ᛚ", sanidade: "ᛟ", mana: "ᛜ" };
 const LABELS: Record<keyof VitalValues, string> = { vida: "Vida", folego: "Fôlego", fome: "Fome", sede: "Sede", sanidade: "Sanidade", mana: "Mana" };
 export const LABEL = LABELS;
+export const GLYPH_DEFAULT = GLYPH;
 export const ORDER: (keyof VitalValues)[] = ["vida", "folego", "fome", "sede", "sanidade", "mana"];
 
 // Converte OKLCH -> sRGB. O CEF (Chromium) do FiveM e antigo e NAO suporta a
@@ -83,6 +100,54 @@ const rgba = (hex: string, a: number) => {
   const [r, g, b] = hexToRgb(hex);
   return `rgba(${r}, ${g}, ${b}, ${a})`;
 };
+const rgbToHex = (r: number, g: number, b: number) =>
+  "#" + [r, g, b].map((x) => Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0")).join("");
+
+/** Hex da cor default de cada vital (o `vc(hue)` como hex, pro color-picker do
+ * menu mostrar o valor de partida). Calculado uma vez. */
+export const DEFAULT_VITAL_COLOR = Object.fromEntries(
+  ORDER.map((k) => {
+    const [r, g, b] = oklchToRgb(0.62, 0.15, HUE[k]);
+    return [k, rgbToHex(r, g, b)];
+  })
+) as Record<keyof VitalValues, string>;
+
+// Clareia um hex somando `amt` a cada canal (pro stone2 derivado da paleta custom).
+function lighten(hex: string, amt: number): string {
+  const [r, g, b] = hexToRgb(hex);
+  return `rgb(${Math.min(255, r + amt)}, ${Math.min(255, g + amt)}, ${Math.min(255, b + amt)})`;
+}
+
+/** Resolve a Skin (conjunto de cores dos paineis) a partir da paleta. 'custom'
+ * deriva glow/stone2/amb das 3 cores livres; as demais vem de SKINS. */
+export function resolveSkin(palette: string, custom?: CustomPalette): Skin {
+  if (palette === "custom" && custom) {
+    return {
+      accent: custom.accent,
+      deep: custom.deep,
+      glow: rgba(custom.accent, 0.5),
+      stone: custom.stone,
+      stone2: lighten(custom.stone, 14),
+      amb: rgba(custom.accent, 0.12),
+    };
+  }
+  return SKINS[(palette as SkinKey)] ?? SKINS.pergaminho;
+}
+
+/** Resolve cor/glifo/rotulo de um vital aplicando o override (se houver).
+ * `ca(a)` = cor com alpha (do override em hex, ou da matiz oklch default). */
+function resolveVital(k: keyof VitalValues, ov?: VitalOverride) {
+  const hue = HUE[k];
+  const oc = ov?.color;
+  return {
+    col: oc || vc(hue),
+    ca: (a: number) => (oc ? rgba(oc, a) : vca(hue, a)),
+    glyph: ov?.glyph || GLYPH[k],
+    label: ov?.label || LABELS[k],
+    // banda do menisco: highlight claro (override -> proprio hex; default -> L alto)
+    hi: oc ? rgba(oc, 0.95) : okc(0.85, 0.12, hue, 0.95),
+  };
+}
 
 /* ------------------------------------------------------- keyframes (uma vez) */
 export const KEYFRAMES = `
@@ -93,6 +158,7 @@ export const KEYFRAMES = `
 @keyframes hud-sheen{0%{transform:translate(-60%,-60%) rotate(28deg);opacity:0}18%{opacity:.5}40%{transform:translate(60%,60%) rotate(28deg);opacity:0}100%{transform:translate(60%,60%) rotate(28deg);opacity:0}}
 @keyframes hud-chalicebubble{0%{transform:translateY(110%) scale(.3);opacity:0}20%{opacity:.8}90%{opacity:.4}100%{transform:translateY(-10%) scale(1.1);opacity:0}}
 @keyframes hud-vsighalo{0%,100%{opacity:.35;transform:scale(.94)}50%{opacity:.85;transform:scale(1.02)}}
+@keyframes hud-splash{0%{transform:scaleY(1);opacity:.55}25%{transform:scaleY(2.1);opacity:1}100%{transform:scaleY(1);opacity:.8}}
 `;
 
 /* --------------------------------------------------------- paineis de pedra */
@@ -110,38 +176,80 @@ function Corners({ c }: { c: Skin }) {
 const labelMono: React.CSSProperties = { fontFamily: "'JetBrains Mono',monospace", textTransform: "uppercase" };
 
 /* ============================================================ vitais */
-function Orb({ k, value, size, low }: { k: keyof VitalValues; value: number; size: number; low: boolean }) {
-  const hue = HUE[k], col = vc(hue), pct = Math.round(value), big = size > 70;
+
+/**
+ * Névoa (mist) do líquido — do handoff do cálice (`chaliceLiquid==='mist'`).
+ * Um leve escurecimento + uma faixa de luz vertical (transparente→branco→
+ * transparente) pulsando de opacidade -> vapor etéreo dentro do elixir. Fica
+ * em inset:0 do líquido (revelado pela altura), sem transform -> dentro da
+ * bounding box da orbe. CEF-safe (linear-gradient + opacity).
+ */
+function MistLiquid() {
   return (
-    <div className="flex flex-col items-center gap-1.5">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ background: "rgba(10,9,7,.10)" }}>
       <div
-        className="relative rounded-full"
-        style={{
-          width: size, height: size,
-          background: "radial-gradient(circle at 36% 28%, #f7e3ad, #c79a44 42%, #8a6526 64%, #4a3514 82%, #2a1d0c)",
-          boxShadow: `0 5px 16px rgba(0,0,0,.7), 0 0 22px ${vca(hue, .3)}, inset 0 2px 5px rgba(255,238,190,.65), inset 0 -5px 9px rgba(0,0,0,.6), inset 0 0 0 1px rgba(40,28,12,.7)`,
-          animation: low ? "hud-lowpulse 1.1s infinite" : undefined,
-        }}
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(0deg, transparent, rgba(255,255,255,.16) 50%, transparent)", animation: "hud-glowpulse 2.6s ease-in-out infinite" }}
+      />
+    </div>
+  );
+}
+
+/**
+ * Globo de líquido (orbe) compartilhado por Orb (vitais) e CustomOrb (API).
+ * O nível é a altura do líquido (transição suave ao mudar). O elixir tem uma
+ * névoa (MistLiquid) pulsando dentro; ao mudar o nível, uma banda clara
+ * ("splash") na superfície re-dispara (via key={pct} -> remonta e reinicia a
+ * animação). `ca(a)` = cor do líquido com alpha; `hi` = brilho da superfície;
+ * `shadowCol` = cor do brilho do glifo.
+ */
+function LiquidGlobe({
+  size, pct, low, ca, hi, glyph, shadowCol,
+}: { size: number; pct: number; low: boolean; ca: (a: number) => string; hi: string; glyph: string; shadowCol: string }) {
+  const big = size > 70;
+  return (
+    <div
+      className="relative rounded-full"
+      style={{
+        width: size, height: size,
+        background: "radial-gradient(circle at 36% 28%, #f7e3ad, #c79a44 42%, #8a6526 64%, #4a3514 82%, #2a1d0c)",
+        boxShadow: `0 5px 16px rgba(0,0,0,.7), 0 0 22px ${ca(.3)}, inset 0 2px 5px rgba(255,238,190,.65), inset 0 -5px 9px rgba(0,0,0,.6), inset 0 0 0 1px rgba(40,28,12,.7)`,
+        animation: low ? "hud-lowpulse 1.1s infinite" : undefined,
+      }}
+    >
+      <div
+        className="absolute rounded-full overflow-hidden"
+        style={{ inset: 3, background: "radial-gradient(circle at 40% 35%, #1c150c, #0a0703)", boxShadow: "inset 0 0 18px rgba(0,0,0,.9), inset 0 0 0 2px rgba(0,0,0,.65), inset 0 0 0 3px rgba(180,140,70,.22)" }}
       >
         <div
-          className="absolute rounded-full overflow-hidden"
-          style={{ inset: 3, background: "radial-gradient(circle at 40% 35%, #1c150c, #0a0703)", boxShadow: "inset 0 0 18px rgba(0,0,0,.9), inset 0 0 0 2px rgba(0,0,0,.65), inset 0 0 0 3px rgba(180,140,70,.22)" }}
+          className="absolute left-0 right-0 bottom-0 overflow-hidden transition-[height] duration-500"
+          style={{ height: `${pct}%`, background: `linear-gradient(180deg, ${ca(.95)}, ${ca(.8)} 40%, ${ca(.45)})`, boxShadow: `inset 0 6px 10px ${ca(.7)}, 0 -2px 8px ${ca(.55)}` }}
         >
+          <MistLiquid />
+          {/* splash: banda clara na superfície que reage a cada mudança de nível */}
           <div
-            className="absolute left-0 right-0 bottom-0 transition-[height] duration-500"
-            style={{ height: `${pct}%`, background: `linear-gradient(180deg, ${vca(hue, .95)}, ${vca(hue, .8)} 40%, ${vca(hue, .45)})`, boxShadow: `inset 0 6px 10px ${vca(hue, .7)}, 0 -2px 8px ${vca(hue, .55)}` }}
-          >
-            <div className="absolute left-0 right-0" style={{ top: -1, height: big ? 5 : 3, background: `linear-gradient(180deg, ${okc(0.85, 0.12, hue, 0.95)}, transparent)`, boxShadow: `0 0 7px ${vca(hue, .9)}`, animation: "hud-meniscus 3.4s ease-in-out infinite" }} />
-          </div>
-          <div className="absolute rounded-full pointer-events-none" style={{ top: "9%", left: "15%", width: "44%", height: "32%", background: "radial-gradient(circle, rgba(255,255,255,.42), transparent 70%)" }} />
-          <div className="absolute rounded-full pointer-events-none z-[3]" style={{ top: "8%", left: "14%", width: "46%", height: "38%", background: "radial-gradient(circle, rgba(255,255,255,.55), transparent 72%)", animation: "hud-sheen 6.5s ease-in-out infinite" }} />
+            key={pct}
+            className="absolute left-0 right-0 z-[2]"
+            style={{ top: 0, height: big ? 4 : 3, background: `linear-gradient(180deg, ${hi}, transparent)`, transformOrigin: "center", animation: "hud-splash .55s ease-out", pointerEvents: "none" }}
+          />
         </div>
-        <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-px">
-          <span style={{ fontFamily: "'Cinzel',serif", fontSize: big ? 19 : 15, lineHeight: 1, color: "#f3e9d4", textShadow: `0 0 8px ${col}, 0 1px 2px #000` }}>{GLYPH[k]}</span>
-          <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: big ? 12 : 10, color: "#f3e9d4", textShadow: "0 1px 2px #000" }}>{pct}</span>
-        </div>
+        <div className="absolute rounded-full pointer-events-none" style={{ top: "9%", left: "15%", width: "44%", height: "32%", background: "radial-gradient(circle, rgba(255,255,255,.42), transparent 70%)" }} />
+        <div className="absolute rounded-full pointer-events-none z-[3]" style={{ top: "8%", left: "14%", width: "46%", height: "38%", background: "radial-gradient(circle, rgba(255,255,255,.55), transparent 72%)", animation: "hud-sheen 6.5s ease-in-out infinite" }} />
       </div>
-      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1.5, color: "#9c8458", textTransform: "uppercase" }}>{LABELS[k]}</span>
+      <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-px">
+        <span style={{ fontFamily: "'Cinzel',serif", fontSize: big ? 19 : 15, lineHeight: 1, color: "#f3e9d4", textShadow: `0 0 8px ${shadowCol}, 0 1px 2px #000` }}>{glyph}</span>
+        <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: big ? 12 : 10, color: "#f3e9d4", textShadow: "0 1px 2px #000" }}>{pct}</span>
+      </div>
+    </div>
+  );
+}
+
+function Orb({ k, value, size, low, ov }: { k: keyof VitalValues; value: number; size: number; low: boolean; ov?: VitalOverride }) {
+  const r = resolveVital(k, ov), pct = Math.round(value);
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <LiquidGlobe size={size} pct={pct} low={low} ca={r.ca} hi={r.hi} glyph={r.glyph} shadowCol={r.col} />
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1.5, color: "#9c8458", textTransform: "uppercase" }}>{r.label}</span>
     </div>
   );
 }
@@ -153,36 +261,10 @@ export function CustomOrb({
   value, color, glyph, label, size = 58, low = false,
 }: { value: number; color: string; glyph: string; label: string; size?: number; low?: boolean }) {
   const pct = Math.max(0, Math.min(100, Math.round(value)));
-  const big = size > 70;
+  const ca = (a: number) => rgba(color, a);
   return (
     <div className="flex flex-col items-center gap-1.5">
-      <div
-        className="relative rounded-full"
-        style={{
-          width: size, height: size,
-          background: "radial-gradient(circle at 36% 28%, #f7e3ad, #c79a44 42%, #8a6526 64%, #4a3514 82%, #2a1d0c)",
-          boxShadow: `0 5px 16px rgba(0,0,0,.7), 0 0 22px ${rgba(color, .3)}, inset 0 2px 5px rgba(255,238,190,.65), inset 0 -5px 9px rgba(0,0,0,.6), inset 0 0 0 1px rgba(40,28,12,.7)`,
-          animation: low ? "hud-lowpulse 1.1s infinite" : undefined,
-        }}
-      >
-        <div
-          className="absolute rounded-full overflow-hidden"
-          style={{ inset: 3, background: "radial-gradient(circle at 40% 35%, #1c150c, #0a0703)", boxShadow: "inset 0 0 18px rgba(0,0,0,.9), inset 0 0 0 2px rgba(0,0,0,.65), inset 0 0 0 3px rgba(180,140,70,.22)" }}
-        >
-          <div
-            className="absolute left-0 right-0 bottom-0 transition-[height] duration-500"
-            style={{ height: `${pct}%`, background: `linear-gradient(180deg, ${rgba(color, .95)}, ${rgba(color, .8)} 40%, ${rgba(color, .45)})`, boxShadow: `inset 0 6px 10px ${rgba(color, .7)}, 0 -2px 8px ${rgba(color, .55)}` }}
-          >
-            <div className="absolute left-0 right-0" style={{ top: -1, height: big ? 5 : 3, background: `linear-gradient(180deg, ${rgba(color, .95)}, transparent)`, boxShadow: `0 0 7px ${rgba(color, .9)}`, animation: "hud-meniscus 3.4s ease-in-out infinite" }} />
-          </div>
-          <div className="absolute rounded-full pointer-events-none" style={{ top: "9%", left: "15%", width: "44%", height: "32%", background: "radial-gradient(circle, rgba(255,255,255,.42), transparent 70%)" }} />
-          <div className="absolute rounded-full pointer-events-none z-[3]" style={{ top: "8%", left: "14%", width: "46%", height: "38%", background: "radial-gradient(circle, rgba(255,255,255,.55), transparent 72%)", animation: "hud-sheen 6.5s ease-in-out infinite" }} />
-        </div>
-        <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-px">
-          <span style={{ fontFamily: "'Cinzel',serif", fontSize: big ? 19 : 15, lineHeight: 1, color: "#f3e9d4", textShadow: `0 0 8px ${color}, 0 1px 2px #000` }}>{glyph}</span>
-          <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: big ? 12 : 10, color: "#f3e9d4", textShadow: "0 1px 2px #000" }}>{pct}</span>
-        </div>
-      </div>
+      <LiquidGlobe size={size} pct={pct} low={low} ca={ca} hi={rgba(color, .95)} glyph={glyph} shadowCol={color} />
       <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1.5, color: "#9c8458", textTransform: "uppercase" }}>{label}</span>
     </div>
   );
@@ -198,8 +280,8 @@ const CHALICE_BUBBLES = [
   { left: "30%", delay: "2.5s", dur: "2.8s", s: 4 },
   { left: "84%", delay: "1.7s", dur: "4s",   s: 6 },
 ];
-function Chalice({ k, value, size, low }: { k: keyof VitalValues; value: number; size: number; low: boolean }) {
-  const hue = HUE[k], col = vc(hue), pct = Math.round(value), big = size > 70;
+function Chalice({ k, value, size, low, ov }: { k: keyof VitalValues; value: number; size: number; low: boolean; ov?: VitalOverride }) {
+  const r = resolveVital(k, ov), pct = Math.round(value), big = size > 70;
   return (
     <div className="flex flex-col items-center gap-1">
       <div
@@ -219,8 +301,8 @@ function Chalice({ k, value, size, low }: { k: keyof VitalValues; value: number;
             className="absolute left-0 right-0 bottom-0 transition-[height] duration-500"
             style={{
               height: `${pct}%`,
-              background: `linear-gradient(180deg, ${vca(hue, .95)}, ${vca(hue, .7)} 45%, ${vca(hue, .45)})`,
-              boxShadow: `inset 0 6px 10px ${vca(hue, .6)}, 0 0 15px ${vca(hue, .55)}`,
+              background: `linear-gradient(180deg, ${r.ca(.95)}, ${r.ca(.7)} 45%, ${r.ca(.45)})`,
+              boxShadow: `inset 0 6px 10px ${r.ca(.6)}, 0 0 15px ${r.ca(.55)}`,
             }}
           >
             {CHALICE_BUBBLES.map((b, i) => (
@@ -243,61 +325,61 @@ function Chalice({ k, value, size, low }: { k: keyof VitalValues; value: number;
         </div>
         {/* glifo + valor + label */}
         <div className="relative z-10 flex flex-col items-center justify-center" style={{ textShadow: "0 2px 4px rgba(0,0,0,.9)" }}>
-          <span style={{ fontSize: big ? 16 : 12, lineHeight: 1, color: col, textShadow: `0 0 8px ${vca(hue, .6)}` }}>{GLYPH[k]}</span>
+          <span style={{ fontSize: big ? 16 : 12, lineHeight: 1, color: r.col, textShadow: `0 0 8px ${r.ca(.6)}` }}>{r.glyph}</span>
           <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: big ? 13 : 10, color: "#f3e9d4" }}>{pct}</span>
         </div>
       </div>
-      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1, color: "#9c8458", textTransform: "uppercase" }}>{LABELS[k]}</span>
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1, color: "#9c8458", textTransform: "uppercase" }}>{r.label}</span>
     </div>
   );
 }
 
-function Ring({ k, value }: { k: keyof VitalValues; value: number }) {
-  const hue = HUE[k], col = vc(hue), pct = Math.round(value), deg = pct * 3.6;
+function Ring({ k, value, ov }: { k: keyof VitalValues; value: number; ov?: VitalOverride }) {
+  const r = resolveVital(k, ov), pct = Math.round(value), deg = pct * 3.6;
   return (
     <div className="flex flex-col items-center gap-1.5">
       <div className="relative rounded-full" style={{ width: 62, height: 62 }}>
-        <div className="absolute inset-0 rounded-full" style={{ background: `conic-gradient(${col} ${deg}deg, rgba(255,255,255,.06) ${deg}deg 360deg)`, filter: `drop-shadow(0 0 6px ${vca(hue, .4)})` }} />
+        <div className="absolute inset-0 rounded-full" style={{ background: `conic-gradient(${r.col} ${deg}deg, rgba(255,255,255,.06) ${deg}deg 360deg)`, filter: `drop-shadow(0 0 6px ${r.ca(.4)})` }} />
         <div className="absolute rounded-full flex flex-col items-center justify-center gap-px" style={{ inset: 6, background: "#0c0805" }}>
-          <span style={{ fontSize: 17, lineHeight: 1, color: col, textShadow: `0 0 8px ${vca(hue, .6)}` }}>{GLYPH[k]}</span>
+          <span style={{ fontSize: 17, lineHeight: 1, color: r.col, textShadow: `0 0 8px ${r.ca(.6)}` }}>{r.glyph}</span>
           <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, color: "#e7dac0" }}>{pct}</span>
         </div>
       </div>
-      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1, color: "#9c8458", textTransform: "uppercase" }}>{LABELS[k]}</span>
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1, color: "#9c8458", textTransform: "uppercase" }}>{r.label}</span>
     </div>
   );
 }
 
-function Bar({ k, value, cristal }: { k: keyof VitalValues; value: number; cristal: boolean }) {
-  const hue = HUE[k], col = vc(hue), pct = Math.round(value);
+function Bar({ k, value, cristal, ov }: { k: keyof VitalValues; value: number; cristal: boolean; ov?: VitalOverride }) {
+  const r = resolveVital(k, ov), pct = Math.round(value);
   return (
     <div className="flex items-center gap-[11px]" style={{ width: 320 }}>
-      <span className="text-center" style={{ fontSize: 16, width: 20, color: col, textShadow: `0 0 8px ${vca(hue, .6)}` }}>{GLYPH[k]}</span>
-      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: 1, color: "#9c8458", textTransform: "uppercase", width: 54 }}>{LABELS[k]}</span>
+      <span className="text-center" style={{ fontSize: 16, width: 20, color: r.col, textShadow: `0 0 8px ${r.ca(.6)}` }}>{r.glyph}</span>
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 9, letterSpacing: 1, color: "#9c8458", textTransform: "uppercase", width: 54 }}>{r.label}</span>
       <div className="relative flex-1 overflow-hidden" style={{ height: 11, background: "rgba(255,255,255,.06)", clipPath: cristal ? "polygon(0 0,100% 0,94% 100%,0 100%)" : undefined, borderRadius: cristal ? 0 : 3 }}>
-        <div className="absolute inset-0 transition-[width] duration-500" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${vca(hue, .6)}, ${col})`, boxShadow: `0 0 10px ${vca(hue, .55)}`, clipPath: cristal ? "polygon(0 0,100% 0,90% 100%,0 100%)" : undefined }} />
+        <div className="absolute inset-0 transition-[width] duration-500" style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${r.ca(.6)}, ${r.col})`, boxShadow: `0 0 10px ${r.ca(.55)}`, clipPath: cristal ? "polygon(0 0,100% 0,90% 100%,0 100%)" : undefined }} />
       </div>
       <span className="text-right" style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, color: "#e7dac0", width: 26 }}>{pct}</span>
     </div>
   );
 }
 
-function Vital({ k, value, style }: { k: keyof VitalValues; value: number; style: StyleKey }) {
+function Vital({ k, value, style, ov }: { k: keyof VitalValues; value: number; style: StyleKey; ov?: VitalOverride }) {
   if (style === "orbes") {
     const big = k === "vida" || k === "mana";
-    return <Orb k={k} value={value} size={big ? 96 : 58} low={k === "vida" && Math.round(value) < 30} />;
+    return <Orb k={k} value={value} size={big ? 96 : 58} low={k === "vida" && Math.round(value) < 30} ov={ov} />;
   }
   if (style === "calice") {
     const big = k === "vida" || k === "mana";
-    return <Chalice k={k} value={value} size={big ? 96 : 58} low={k === "vida" && Math.round(value) < 30} />;
+    return <Chalice k={k} value={value} size={big ? 96 : 58} low={k === "vida" && Math.round(value) < 30} ov={ov} />;
   }
-  if (style === "aneis") return <Ring k={k} value={value} />;
-  return <Bar k={k} value={value} cristal={style === "cristal"} />;
+  if (style === "aneis") return <Ring k={k} value={value} ov={ov} />;
+  return <Bar k={k} value={value} cristal={style === "cristal"} ov={ov} />;
 }
 
 /** Uma orbe/anel/barra, opcionalmente dentro do painel de pedra. */
-export function VitalPanel({ k, value, style, c, framed }: { k: keyof VitalValues; value: number; style: StyleKey; c: Skin; framed: boolean }) {
-  const inner = <Vital k={k} value={value} style={style} />;
+export function VitalPanel({ k, value, style, c, framed, ov }: { k: keyof VitalValues; value: number; style: StyleKey; c: Skin; framed: boolean; ov?: VitalOverride }) {
+  const inner = <Vital k={k} value={value} style={style} ov={ov} />;
   if (!framed) return inner;
   return <div style={{ ...panelBase(c), padding: 11, display: "inline-flex" }}>{inner}</div>;
 }

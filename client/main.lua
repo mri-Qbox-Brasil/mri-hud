@@ -163,9 +163,27 @@ AddConvarChangeListener('mri:color', function(name)
     SendNUIMessage({ action = 'updateUISettings', accentColor = getMriAccent() })
 end)
 
-local function sendHudConfig()
+-- Cores da suite MRI vindas do SERVIDOR (broadcast das convars mri:color /
+-- mri:backgroundColor — ver server/main.lua). Caminho robusto (funciona mesmo
+-- se a convar nao for replicada). Repassa pra NUI (updateUISettings).
+local function isValidHex6(c) return type(c) == 'string' and c:match(HEX_PATTERN) end
+RegisterNetEvent('mri_hud:client:accentColorChanged', function(newColor)
+    if not isValidHex6(newColor) then return end
+    SendNUIMessage({ action = 'updateUISettings', accentColor = newColor })
+end)
+RegisterNetEvent('mri_hud:client:backgroundColorChanged', function(newColor)
+    if not isValidHex6(newColor) then return end
+    SendNUIMessage({ action = 'updateUISettings', backgroundColor = newColor })
+end)
+
+-- force: quando true, marca a config como global-absoluta -> a NUI sobrescreve
+-- override local do player. Customizacao por vital (cor/glifo/rotulo/visibilidade)
+-- e paleta custom NAO vivem aqui: sao locais por cliente (localStorage da NUI),
+-- fora do sistema global do painel admin.
+local function sendHudConfig(force)
     SendNUIMessage({
         action      = 'hudconfig',
+        force       = force == true,
         statusIcons = Config.StatusIcons,
         serverLogo  = Config.ServerLogo,
         positioning = Config.Positioning,
@@ -304,18 +322,23 @@ local function HandleSetupResource()
     -- Config local (shared) comeca com os defaults do config.lua; a resposta
     -- (mri_hud:client:settingsUpdated) sobrescreve com o que esta no banco.
     TriggerServerEvent('mri_hud:server:requestSettings')
+    -- Puxa accent/fundo atuais das convars MRI direto do servidor (robusto
+    -- mesmo se a convar nao for replicada). Ver server/main.lua.
+    TriggerServerEvent('mri_hud:server:requestColors')
 end
 
 -- Aplica em runtime as configs globais vindas do DB (boot ou quando um admin
 -- muda algo pelo plugin do mri_Qadmin). Sobrescreve o Config local primitivo e
 -- re-emite o que a NUI consome (tema de veiculo/skin + status admin).
-RegisterNetEvent('mri_hud:client:settingsUpdated', function(settings)
+RegisterNetEvent('mri_hud:client:settingsUpdated', function(settings, force)
     if type(settings) ~= 'table' then return end
     for k, v in pairs(settings) do
         Config[k] = v
     end
     SendAdminStatus()
-    sendHudConfig()
+    -- force propaga pra NUI: quando true, as stores aplicam o global de forma
+    -- absoluta (sobrescrevem o override local do player).
+    sendHudConfig(force)
 end)
 
 RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
@@ -863,7 +886,10 @@ RegisterNUICallback('setVehicleTheme', function(data, cb)
     cb({})
 end)
 
--- Skin do HUD do player escolhido pelo admin no menu (UI persiste em localStorage).
+-- Skin do HUD do player: preview LOCAL do admin no F10 (a store da NUI persiste
+-- em localStorage). O publish global/absoluto e feito pelo painel admin
+-- (adminSaveConfig -> DB -> broadcast). Aqui so espelhamos no Config local pra
+-- este cliente. Customizacao por vital/paleta custom sao locais (nao passam aqui).
 RegisterNUICallback('setPlayerSkin', function(data, cb)
     Config.PlayerHudSkin       = data.skin or Config.PlayerHudSkin
     Config.SupernaturalPalette = data.palette or Config.SupernaturalPalette

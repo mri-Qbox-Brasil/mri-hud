@@ -1,4 +1,4 @@
-import { Save, RotateCcw, Sparkles } from "lucide-react";
+import { Save, RotateCcw } from "lucide-react";
 import { MriCard, MriButton, MriSwitch, MriAccordion } from "@mriqbox/ui-kit";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
@@ -12,6 +12,7 @@ import SingleStatusIconPanel from "./SingleStatusIconPanel";
 import GlobalLayoutPanel from "./GlobalLayoutPanel";
 import UtilityFunctionPanel from "./UtilityFunctionPanel";
 import ProfilePanel from "./ProfilePanel";
+import SupernaturalCustomizer from "./SupernaturalCustomizer";
 
 export default function StatusIconsPanel() {
   const t = useT();
@@ -21,19 +22,11 @@ export default function StatusIconsPanel() {
   const isAdmin = useMenuStore((s) => s.isAdmin);
   const playerSkin = usePlayerSkinStore((s) => s.skin);
 
-  // O designer abaixo edita a HUD de icones classica (MetaLayout). Skins que
-  // desenham os proprios vitais (ex.: sobrenatural) nao usam nada disto, entao
-  // escondemos os controles e mostramos um aviso pra nao configurar no vazio.
-  if (playerSkin !== "classic") {
-    return (
-      <div className="flex flex-col gap-4 py-4">
-        <MriCard className="p-6 flex flex-col items-center gap-3 text-center">
-          <Sparkles className="w-8 h-8 text-primary" />
-          <p className="text-sm font-bold text-foreground">{t("menu.icons.notice_title")}</p>
-          <p className="text-xs text-muted-foreground max-w-md">{t("menu.icons.notice_body")}</p>
-        </MriCard>
-      </div>
-    );
+  // O designer abaixo edita a HUD de icones classica (MetaLayout). O skin
+  // sobrenatural desenha os proprios vitais, entao troca este painel pelo seu
+  // customizador (cor/glifo/rotulo/visibilidade por vital).
+  if (playerSkin === "sobrenatural") {
+    return <SupernaturalCustomizer />;
   }
 
   return (

@@ -136,6 +136,9 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
             if (typeof data.accentColor === "string") {
                 useThemeStore.getState().setAccentColor(data.accentColor);
             }
+            if (typeof data.backgroundColor === "string") {
+                useThemeStore.getState().setBackgroundColor(data.backgroundColor);
+            }
             if (!data.icons || !data.layout || !data.colors) return;
             usePlayerHudStore.getState().receiveUIUpdateMessage(data.icons);
             useLayoutStore.getState().receiveUIUpdateMessage(data.layout);
@@ -286,11 +289,13 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
                     elements: data.positioning.elements,
                 });
             }
+            // force=true -> config global absoluta: as stores aplicam por cima
+            // do override local do player (e o limpam). Ver server/settings.lua.
             if (data.vehicleTheme) {
-                useVehicleThemeStore.getState().setConfig(data.vehicleTheme);
+                useVehicleThemeStore.getState().setConfig(data.vehicleTheme, data.force === true);
             }
             if (data.playerSkin) {
-                usePlayerSkinStore.getState().setConfig(data.playerSkin);
+                usePlayerSkinStore.getState().setConfig(data.playerSkin, data.force === true);
             }
             break;
 
