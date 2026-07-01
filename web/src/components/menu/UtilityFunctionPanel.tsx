@@ -1,4 +1,4 @@
-import { faScrewdriverWrench } from "@fortawesome/free-solid-svg-icons";
+import { Wrench } from "lucide-react";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
 import { useI18nStore } from "../../utils/i18n";
 import Panel from "../atoms/Panel";
@@ -8,7 +8,7 @@ export default function UtilityFunctionPanel() {
   const t = useI18nStore((s) => s.translations);
 
   return (
-    <Panel name={t.utilityFunctions} icon={faScrewdriverWrench} color="white">
+    <Panel name={t.utilityFunctions} icon={Wrench}>
       <div className="flex flex-row mx-4">
         <Button
           name={t.copyProgressColorsToIconsColors}

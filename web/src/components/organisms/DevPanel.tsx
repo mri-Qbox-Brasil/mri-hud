@@ -56,13 +56,6 @@ export default function DevPanel() {
                     </div>
 
                     <DevButton
-                        icon={faArrowsUpDownLeftRight}
-                        label="Posicionamento"
-                        active={positioningActive}
-                        onClick={togglePositioning}
-                    />
-
-                    <DevButton
                         icon={faBars}
                         label="Menu"
                         active={menuOpen}
@@ -84,25 +77,6 @@ export default function DevPanel() {
                         active={shapeLab}
                         onClick={() => setShapeLab((v) => !v)}
                     />
-
-                    {positioningActive && (
-                        <button
-                            onClick={resetAll}
-                            style={{
-                                marginTop: 4,
-                                background: "rgba(239,68,68,0.12)",
-                                border: "1px solid rgba(239,68,68,0.3)",
-                                color: "rgba(252,165,165,0.8)",
-                                borderRadius: 6,
-                                padding: "4px 10px",
-                                cursor: "pointer",
-                                fontSize: 11,
-                                fontFamily: "monospace",
-                            }}
-                        >
-                            Resetar posições
-                        </button>
-                    )}
                 </div>
             )}
 

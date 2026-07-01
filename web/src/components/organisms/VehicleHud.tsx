@@ -34,8 +34,13 @@ function VehicleClassicHud() {
   const marineActive      = useMarineHudStore((s) => s.show);
   const aircraftActive    = useAircraftHudStore((s) => s.show);
   const positioningActive = usePositioningStore((s) => s.active);
+  const showAll           = usePositioningStore((s) => s.showAll);
 
-  if (!show && !debugMode && !positioningActive) return null;
+  // No posicionamento: só força aparecer se "Mostrar tudo" estiver ligado;
+  // senão respeita o contexto atual (show). Fora do posicionamento, debug força.
+  const forceAll = positioningActive ? showAll : debugMode;
+
+  if (!show && !forceAll) return null;
 
   const speedMax    = useMPH ? 120 : 200;
   const speedUnit   = useMPH ? "mph" : "km/h";
@@ -70,7 +75,7 @@ function VehicleClassicHud() {
         </ScaledHudContent>
       </DraggableHudElement>
 
-      {(!marineActive && !aircraftActive || positioningActive || debugMode) && (
+      {(!marineActive && !aircraftActive || forceAll) && (
         <DraggableHudElement id="fuelgauge" label="Combustível" zIndex={10}>
           <ScaledHudContent style={{ position: "fixed", bottom: "6.44vh", left: "22.61vw", pointerEvents: "none" }}>
             <AnalogGauge

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { User } from "lucide-react";
 import { useProfileStore } from "../../stores/profileStore";
 import { useI18nStore } from "../../utils/i18n";
 import Panel from "../atoms/Panel";
@@ -14,7 +14,7 @@ export default function ProfilePanel() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   return (
-    <Panel name={t.customizationProfiles} icon={faUser} color="white">
+    <Panel name={t.customizationProfiles} icon={User}>
       <div className="mx-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
         {profiles.map((profile, i) => (
           <div key={i} className="flex flex-col justify-end items-center border-2 p-3 border-border rounded-lg my-3">

@@ -244,7 +244,23 @@ local function HandleSetupResource()
     end
     sendUILang()
     sendHudConfig()
+    -- Puxa as configs globais persistidas no DB (server/settings.lua). O
+    -- Config local (shared) comeca com os defaults do config.lua; a resposta
+    -- (mri_hud:client:settingsUpdated) sobrescreve com o que esta no banco.
+    TriggerServerEvent('mri_hud:server:requestSettings')
 end
+
+-- Aplica em runtime as configs globais vindas do DB (boot ou quando um admin
+-- muda algo pelo plugin do mri_Qadmin). Sobrescreve o Config local primitivo e
+-- re-emite o que a NUI consome (tema de veiculo/skin + status admin).
+RegisterNetEvent('mri_hud:client:settingsUpdated', function(settings)
+    if type(settings) ~= 'table' then return end
+    for k, v in pairs(settings) do
+        Config[k] = v
+    end
+    SendAdminStatus()
+    sendHudConfig()
+end)
 
 RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
     Wait(2000)
@@ -302,6 +318,20 @@ RegisterNUICallback('closeMenu', function(_, cb)
     TriggerEvent("hud:client:playCloseMenuSounds")
     showMenu = false
     SetNuiFocus(false, false)
+end)
+
+-- Callbacks NUI do painel de config global embedded (plugin do mri_Qadmin).
+-- A NUI do HUD, quando hospedada no iframe do Qadmin (?embedded=1), renderiza o
+-- HudConfigPanel que chama estes callbacks. fetchNui resolve o resource dono
+-- (o HUD), entao caem aqui mesmo dentro do Qadmin.
+RegisterNUICallback('adminGetConfig', function(_, cb)
+    local settings = lib.callback.await('mri_hud:getSettings', false)
+    cb(settings or {})
+end)
+
+RegisterNUICallback('adminSaveConfig', function(data, cb)
+    local ok, result = lib.callback.await('mri_hud:saveSettings', false, data)
+    cb({ success = ok == true, config = ok and result or nil })
 end)
 
 -- Transitions directly from the settings menu into positioning mode without

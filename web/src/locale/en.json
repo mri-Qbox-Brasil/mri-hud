@@ -36,6 +36,8 @@
   "showEngineAlways": "Show Engine Always",
   "showNitroAlways": "Show Nitro Always",
   "compassMenu": "Compass",
+  "compassTypeLabel": "Compass Type",
+  "compassTypeDescription": "Compass visual style (classic strip or digital)",
   "compassEnabled": "Compass Enabled",
   "compassEnabledDescription": "Disabling this will make it so you can't see the compass navigation",
   "showStreetNamesEnabled": "Show Street Names Enabled",
@@ -118,6 +120,7 @@
   "resetAllPositions": "Reset All Positions",
   "resetAllPositionsDescription": "Resets every element back to its default position and size",
   "positioningModeTitle": "Positioning Mode — Drag elements to reposition them",
+  "positioningShowAll": "Show all",
   "positioningResetAll": "Reset All",
   "positioningClose": "Done"
 }

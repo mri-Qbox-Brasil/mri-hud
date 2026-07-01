@@ -1,5 +1,6 @@
 import { useMarineHudStore } from "../../stores/marineHudStore";
 import { usePositioningStore } from "../../stores/positioningStore";
+import debugMode from "../../stores/debugStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
 import Clinometer from "../molecules/hud-shapes/Clinometer";
@@ -12,8 +13,12 @@ export default function MarineHud() {
     const pitch             = useMarineHudStore((s) => s.pitch);
     const roll              = useMarineHudStore((s) => s.roll);
     const positioningActive = usePositioningStore((s) => s.active);
+    const showAll           = usePositioningStore((s) => s.showAll);
 
-    if (!show && !positioningActive) return null;
+    // Posicionamento força só com "Mostrar tudo"; senão respeita o contexto atual.
+    const forceAll = positioningActive ? showAll : debugMode;
+
+    if (!show && !forceAll) return null;
 
     return (
         <>

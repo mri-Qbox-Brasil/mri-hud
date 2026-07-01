@@ -296,8 +296,14 @@ export async function fetchNui(eventName: string, data: unknown = {}) {
         headers: { "Content-Type": "application/json; charset=UTF-8" },
         body: JSON.stringify(data),
     };
+    // Resolve o nome do resource em runtime. Necessario pro modo embedded
+    // (iframe hospedado pelo mri_Qadmin): GetParentResourceName aponta pro
+    // resource dono da NUI (o proprio HUD), entao o callback registrado em
+    // client/main.lua responde. Fallback 'ps-hud' pro nome historico.
+    const w = window as unknown as { GetParentResourceName?: () => string; resourceName?: string };
+    const resourceName = w.GetParentResourceName ? w.GetParentResourceName() : (w.resourceName || "ps-hud");
     try {
-        const resp = await fetch(`https://ps-hud/${eventName}`, options);
+        const resp = await fetch(`https://${resourceName}/${eventName}`, options);
         return await resp.json();
     } catch {
         // silently fail when not in FiveM context

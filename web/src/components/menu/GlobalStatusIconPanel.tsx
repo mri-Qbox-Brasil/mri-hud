@@ -1,4 +1,4 @@
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { Globe } from "lucide-react";
 import { shapes } from "../../types/types";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
@@ -18,7 +18,7 @@ export default function GlobalStatusIconPanel() {
   const colorStore = useColorEffectStore.getState;
 
   return (
-    <Panel name={t.globalStatusIconsSettings} icon={faGlobe} color="white">
+    <Panel name={t.globalStatusIconsSettings} icon={Globe}>
       <div className="flex justify-center mb-8">
         <div className="w-50">
           <p className="text-lg text-center mb-2">{t.iconShape}</p>

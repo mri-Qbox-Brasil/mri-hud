@@ -9,6 +9,19 @@
 @tailwind utilities;
 
 /*
+ * Default de cor de borda alinhado ao shadcn/@mriqbox/ui-kit. Sem isso, o
+ * preflight do Tailwind (@tailwind base) seta `border-color: currentColor`
+ * em `*`, e componentes do kit que usam apenas `border` (ex: MriCard) ficam
+ * com borda branca (herda a cor do texto). Esta regra faz o `border` cru
+ * cair no token --border, como no ui-kit.
+ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+}
+
+/*
  * Tokens shadcn alinhados com @mriqbox/ui-kit. --primary e --ring sao
  * sobrescritos em runtime pelo useAccentColor (reage a convar mri:color
  * da suite MRI). Default = #00E699 (suite accent canonico) em HSL.

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Gauge } from "lucide-react";
 import { shapes, iconNames } from "../../types/types";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
@@ -50,7 +51,7 @@ export default function SingleStatusIconPanel() {
   }
 
   return (
-    <Panel name={t.singleStatusIconSettings} color={panelIconColor}>
+    <Panel name={t.singleStatusIconSettings} icon={Gauge}>
       <div className="flex flex-row mb-8 mt-4">
         <div className="flex-1">
           <div className="max-w-50 ml-8">

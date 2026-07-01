@@ -25,11 +25,16 @@ export interface ElementPermission {
 
 interface PositioningState {
     active: boolean;
+    /** Quando false (padrão), o posicionamento exibe só os elementos do contexto
+     *  atual (veículo/aeronave/barco ativo). Quando true, força TODOS os
+     *  instrumentos a aparecer pra reposicionar. Toggle na barra superior. */
+    showAll: boolean;
     enabled: boolean;
     permissions: Record<string, ElementPermission>;
     elements: Record<string, ElementState>;
     gaugeOverrides: Record<string, GaugeOverride>;
     toggle: () => void;
+    toggleShowAll: () => void;
     move: (id: string, dx: number, dy: number) => void;
     toggleHidden: (id: string) => void;
     toggleVertical: (id: string) => void;
@@ -75,13 +80,20 @@ const initial = load();
 
 export const usePositioningStore = create<PositioningState>((set) => ({
     active: false,
+    showAll: false,
     enabled: true,
     permissions: {},
     elements: initial.elements,
     gaugeOverrides: initial.gaugeOverrides,
 
     toggle() {
-        set((s) => ({ active: !s.active }));
+        // Ao sair do posicionamento, reseta showAll pra próxima abertura começar
+        // filtrada (só o contexto atual).
+        set((s) => ({ active: !s.active, showAll: s.active ? false : s.showAll }));
+    },
+
+    toggleShowAll() {
+        set((s) => ({ showAll: !s.showAll }));
     },
 
     move(id, dx, dy) {

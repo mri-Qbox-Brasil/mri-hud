@@ -1,10 +1,12 @@
-import { MriButton } from "@mriqbox/ui-kit";
+import { MriButton, MriSwitch } from "@mriqbox/ui-kit";
 import { usePositioningStore } from "../../stores/positioningStore";
 import { fetchNui } from "../../utils/eventHandler";
 import { useI18nStore } from "../../utils/i18n";
 
 export default function PositioningOverlay() {
     const active = usePositioningStore((s) => s.active);
+    const showAll = usePositioningStore((s) => s.showAll);
+    const toggleShowAll = usePositioningStore((s) => s.toggleShowAll);
     const toggle = usePositioningStore((s) => s.toggle);
     const resetAll = usePositioningStore((s) => s.resetAll);
     const t = useI18nStore((s) => s.translations);
@@ -40,7 +42,12 @@ export default function PositioningOverlay() {
             >
                 <span className="text-foreground">{t.positioningModeTitle}</span>
 
-                <div className="flex gap-2">
+                <div className="flex items-center gap-4">
+                    {/* Toggle: filtrar só o contexto atual vs mostrar todos os instrumentos. */}
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <MriSwitch checked={showAll} onCheckedChange={toggleShowAll} aria-label={t.positioningShowAll || "Mostrar tudo"} />
+                        <span className="text-muted-foreground">{t.positioningShowAll || "Mostrar tudo"}</span>
+                    </label>
                     <MriButton variant="destructive" size="sm" onClick={resetAll}>
                         {t.positioningResetAll}
                     </MriButton>

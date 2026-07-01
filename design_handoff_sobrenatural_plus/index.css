@@ -1,0 +1,76 @@
+/* RPG Chalice Custom Animations and Styles */
+@keyframes chaliceBubble {
+  0% {
+    transform: translateY(110%) scale(0.3);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-10%) scale(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes vortexSpin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg) scale(1);
+  }
+}
+
+@keyframes runeGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 2px rgba(139, 92, 246, 0.4)) brightness(0.9);
+  }
+  50% {
+    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 1)) brightness(1.3);
+  }
+}
+
+@keyframes chaliceGargoylePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.chalice-bubble-item {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  animation: chaliceBubble 4s infinite linear;
+  pointer-events: none;
+}
+
+.chalice-vortex-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140%;
+  height: 140%;
+  border-radius: 40%;
+  opacity: 0.25;
+  animation: vortexSpin 8s infinite linear;
+  pointer-events: none;
+}
+
+.animate-rune-glow {
+  animation: runeGlow 3s infinite ease-in-out;
+}
+
+.animate-gargoyle-pulse {
+  animation: chaliceGargoylePulse 5s infinite ease-in-out;
+}

@@ -14,7 +14,6 @@ import {
   LABEL,
   KEYFRAMES,
   VitalPanel,
-  ServerPanel,
   MoneyPanel,
   VoicePanel,
   type StyleKey,
@@ -91,23 +90,21 @@ export default function SupernaturalSkin() {
   };
 
   const money = { cash: cash.toLocaleString("pt-BR"), bank: bank.toLocaleString("pt-BR") };
-  const server = { name: "MRI", tagline: "roleplay", sigil: "MRI", players: "", ping: 0 };
   const voice = { talking: voiceEffect > 0, range: voiceEffect > 0 ? "NORMAL" : "MUDO" };
 
   return (
     <>
       <style>{KEYFRAMES}</style>
 
-      <SkinEl id="skinServer" label="Servidor" anchor={{ top: 24, left: 24 }}>
-        <ServerPanel server={server} c={c} />
-      </SkinEl>
+      {/* Painel de servidor da skin removido: usamos o ServerLogoHud clássico
+          (gold plaque) tambem na sobrenatural — ver App.tsx. */}
 
       <SkinEl id="skinMoney" label="Dinheiro" anchor={{ top: 24, right: 24 }}>
         <MoneyPanel money={money} c={c} framed={framed} />
       </SkinEl>
 
-      <SkinEl id="skinVoice" label="Voz" anchor={{ bottom: 26, left: 320 }} canResize={false}>
-        <VoicePanel voice={voice} c={c} framed />
+      <SkinEl id="skinVoice" label="Voz" anchor={{ bottom: 26, left: 320 }}>
+        <VoicePanel voice={voice} c={c} framed={framed} />
       </SkinEl>
 
       {ORDER.map((k, i) => (

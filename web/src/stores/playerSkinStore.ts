@@ -19,11 +19,11 @@ import { playerSkinLocalStorageName } from "../types/types";
  */
 export type PlayerSkin = "classic" | "sobrenatural";
 export type SkinPalette = "pergaminho" | "sangue" | "eterno" | "esmeralda" | "geada" | "cinzas";
-export type VitalStyle = "orbes" | "aneis" | "barras" | "cristal";
+export type VitalStyle = "orbes" | "aneis" | "barras" | "cristal" | "calice";
 export type SkinLayout = "unido" | "separado" | "classico";
 
 export const SKIN_PALETTES: readonly SkinPalette[] = ["pergaminho", "sangue", "eterno", "esmeralda", "geada", "cinzas"];
-export const VITAL_STYLES: readonly VitalStyle[] = ["orbes", "aneis", "barras", "cristal"];
+export const VITAL_STYLES: readonly VitalStyle[] = ["orbes", "aneis", "barras", "cristal", "calice"];
 export const SKIN_LAYOUTS: readonly SkinLayout[] = ["unido", "separado", "classico"];
 
 interface PlayerSkinState {

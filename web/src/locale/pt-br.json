@@ -38,6 +38,8 @@
   "showEngineAlways": "Exibir Motor Sempre",
   "showNitroAlways": "Exibir Nitro Sempre",
   "compassMenu": "Bússola",
+  "compassTypeLabel": "Tipo da Bússola",
+  "compassTypeDescription": "Estilo visual da bússola (fita clássica ou digital)",
   "compassEnabled": "Ativar Bússola",
   "compassEnabledDescription": "Desativar isso fará com que você não veja a navegação por bússola",
   "showStreetNamesEnabled": "Ativar Nomes de Ruas",
@@ -118,6 +120,7 @@
   "resetAllPositions": "Resetar Todas as Posições",
   "resetAllPositionsDescription": "Restaura a posição e o tamanho padrão de todos os elementos",
   "positioningModeTitle": "Modo de Posicionamento — Arraste os elementos para reposicioná-los",
+  "positioningShowAll": "Mostrar tudo",
   "positioningResetAll": "Resetar tudo",
   "positioningClose": "Concluir"
 }

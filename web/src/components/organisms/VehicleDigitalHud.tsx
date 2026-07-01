@@ -94,13 +94,17 @@ export default function VehicleDigitalHud() {
   const marineActive = useMarineHudStore((s) => s.show);
   const aircraftActive = useAircraftHudStore((s) => s.show);
   const positioningActive = usePositioningStore((s) => s.active);
+  const showAll = usePositioningStore((s) => s.showAll);
+
+  // Posicionamento força só com "Mostrar tudo"; senão respeita o contexto.
+  const forceAll = positioningActive ? showAll : debugMode;
 
   const speedMax = useMPH ? 120 : 200;
   const boost = useBoost(speed, speedMax);
 
-  if (!show && !debugMode && !positioningActive) return null;
+  if (!show && !forceAll) return null;
   // Em barco/aviao o cluster digital de carro nao se aplica.
-  if ((marineActive || aircraftActive) && !positioningActive && !debugMode) return null;
+  if ((marineActive || aircraftActive) && !forceAll) return null;
 
   // GTA heading e anti-horario (90 = Oeste); converte pra bussola horaria (90 = Leste).
   const bearing = ((360 - heading) % 360 + 360) % 360;

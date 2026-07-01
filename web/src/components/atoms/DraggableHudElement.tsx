@@ -1,10 +1,11 @@
-import { useRef, useCallback, useState, useLayoutEffect, type ReactNode } from "react";
+import { useRef, useCallback, useState, useEffect, useLayoutEffect, type ReactNode } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faEye, faEyeSlash, faArrowsUpDownLeftRight,
     faRotateLeft, faRotate, faMinus, faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { usePositioningStore } from "../../stores/positioningStore";
+import { setElementBounds, removeElementBounds, getOtherBounds } from "../../stores/hudBoundsRegistry";
 import { HudScaleContext } from "./hudScaleContext";
 
 interface Props {
@@ -39,6 +40,10 @@ export default function DraggableHudElement({
     const scale = el?.scale ?? 1;
 
     const [dragging, setDragging] = useState(false);
+    // Feedback do imã: posicao (coord de tela) das linhas-guia travadas agora,
+    // ou null se o eixo nao esta grudado. Cobre centro da tela E alinhamento
+    // com outros elementos (bordas/centros).
+    const [snap, setSnap] = useState<{ x: number | null; y: number | null }>({ x: null, y: null });
     const [naturalBounds, setNaturalBounds] = useState<{ l: number; t: number; r: number; b: number } | null>(null);
 
     const dragRef = useRef({ startX: 0, startY: 0, startDx: 0, startDy: 0 });
@@ -50,8 +55,13 @@ export default function DraggableHudElement({
     const dyRef = useRef(dy);
     dxRef.current = dx;
     dyRef.current = dy;
+    // Espelha naturalBounds pro onMove ler sem virar dependencia.
+    const naturalBoundsRef = useRef(naturalBounds);
+    naturalBoundsRef.current = naturalBounds;
 
     const MARGIN = 20;
+    // Distancia (px) em que o elemento "gruda" no centro da tela (imã).
+    const SNAP_PX = 12;
 
     // Measure the element's visual center when entering positioning mode
     useLayoutEffect(() => {
@@ -82,6 +92,20 @@ export default function DraggableHudElement({
         }
         return () => setNaturalBounds(null);
     }, [active]);
+
+    // Publica os bounds atuais (natural + offset) no registro compartilhado pra
+    // que os OUTROS elementos possam se alinhar a este durante o arraste.
+    useEffect(() => {
+        if (!active || !naturalBounds) {
+            removeElementBounds(id);
+            return;
+        }
+        setElementBounds(id, {
+            l: naturalBounds.l + dx, t: naturalBounds.t + dy,
+            r: naturalBounds.r + dx, b: naturalBounds.b + dy,
+        });
+        return () => removeElementBounds(id);
+    }, [active, naturalBounds, dx, dy, id]);
 
     const onMouseDown = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
@@ -117,14 +141,46 @@ export default function DraggableHudElement({
 
         const onMove = (ev: MouseEvent) => {
             const { minDx, maxDx, minDy, maxDy } = boundsRef.current;
-            const ndx = Math.max(minDx, Math.min(maxDx,
-                dragRef.current.startDx + ev.clientX - dragRef.current.startX));
-            const ndy = Math.max(minDy, Math.min(maxDy,
-                dragRef.current.startDy + ev.clientY - dragRef.current.startY));
+            let ndx = dragRef.current.startDx + ev.clientX - dragRef.current.startX;
+            let ndy = dragRef.current.startDy + ev.clientY - dragRef.current.startY;
+
+            // Snapping de alinhamento: as âncoras do elemento (esquerda/centro/
+            // direita em X; topo/meio/base em Y) grudam no centro da tela e nas
+            // bordas/centros dos OUTROS elementos. naturalBounds está em coords
+            // dx=0, então o offset que alinha uma âncora a uma linha = linha - âncora.
+            let lineX: number | null = null;
+            let lineY: number | null = null;
+            const nb = naturalBoundsRef.current;
+            if (nb) {
+                const others = getOtherBounds(id);
+                const anchorsX = [nb.l, (nb.l + nb.r) / 2, nb.r];
+                const anchorsY = [nb.t, (nb.t + nb.b) / 2, nb.b];
+
+                // Pares (ancora, alvo) candidatos. Centro da tela só casa com a
+                // ancora-centro; outros elementos casam com qualquer ancora.
+                const pairsX: Array<[number, number]> = [[anchorsX[1], window.innerWidth / 2]];
+                const pairsY: Array<[number, number]> = [[anchorsY[1], window.innerHeight / 2]];
+                for (const ob of others) {
+                    const tX = [ob.l, (ob.l + ob.r) / 2, ob.r];
+                    const tY = [ob.t, (ob.t + ob.b) / 2, ob.b];
+                    for (const a of anchorsX) for (const tgt of tX) pairsX.push([a, tgt]);
+                    for (const a of anchorsY) for (const tgt of tY) pairsY.push([a, tgt]);
+                }
+
+                const sX = bestSnap(ndx, pairsX, SNAP_PX);
+                if (sX) { ndx = sX.off; lineX = sX.line; }
+                const sY = bestSnap(ndy, pairsY, SNAP_PX);
+                if (sY) { ndy = sY.off; lineY = sY.line; }
+            }
+
+            ndx = Math.max(minDx, Math.min(maxDx, ndx));
+            ndy = Math.max(minDy, Math.min(maxDy, ndy));
+            setSnap((prev) => (prev.x === lineX && prev.y === lineY ? prev : { x: lineX, y: lineY }));
             move(id, ndx, ndy);
         };
         const onUp = () => {
             setDragging(false);
+            setSnap({ x: null, y: null });
             window.removeEventListener("mousemove", onMove);
             window.removeEventListener("mouseup", onUp);
         };
@@ -189,6 +245,42 @@ export default function DraggableHudElement({
                         borderRadius: 6,
                         pointerEvents: "none",
                         zIndex: 9998,
+                    }}
+                />
+            )}
+
+            {/* Linhas-guia do imã: aparecem no eixo travado (centro da tela ou
+                alinhamento com outro elemento). snap.x/snap.y são coords de tela;
+                compensam o transform translate(dx,dy) do wrapper (-dx/-dy). */}
+            {dragging && snap.x !== null && (
+                <div
+                    style={{
+                        position: "absolute",
+                        left: snap.x - dx,
+                        top: -dy,
+                        width: 1,
+                        height: "100vh",
+                        background: "hsl(var(--primary))",
+                        boxShadow: "0 0 6px hsl(var(--primary) / 0.7)",
+                        opacity: 0.75,
+                        pointerEvents: "none",
+                        zIndex: 9996,
+                    }}
+                />
+            )}
+            {dragging && snap.y !== null && (
+                <div
+                    style={{
+                        position: "absolute",
+                        top: snap.y - dy,
+                        left: -dx,
+                        height: 1,
+                        width: "100vw",
+                        background: "hsl(var(--primary))",
+                        boxShadow: "0 0 6px hsl(var(--primary) / 0.7)",
+                        opacity: 0.75,
+                        pointerEvents: "none",
+                        zIndex: 9996,
                     }}
                 />
             )}
@@ -293,6 +385,25 @@ export default function DraggableHudElement({
             )}
         </div>
     );
+}
+
+// Dado um offset atual (pos) e uma lista de pares [ancora, alvo], retorna o
+// offset que melhor alinha alguma ancora ao seu alvo (o mais proximo dentro de
+// snapPx), junto da coord da linha (alvo) pra desenhar a guia. null se nenhum.
+function bestSnap(
+    pos: number,
+    pairs: Array<[number, number]>,
+    snapPx: number,
+): { off: number; line: number } | null {
+    let best: { off: number; line: number; dist: number } | null = null;
+    for (const [anchor, target] of pairs) {
+        const off = target - anchor;
+        const dist = Math.abs(pos - off);
+        if (dist <= snapPx && (best === null || dist < best.dist)) {
+            best = { off, line: target, dist };
+        }
+    }
+    return best ? { off: best.off, line: best.line } : null;
 }
 
 function BadgeBtn({

@@ -11,6 +11,7 @@ import { useServerLogoStore } from "./stores/serverLogoStore";
 import { useVehicleThemeStore } from "./stores/vehicleThemeStore";
 import { usePlayerSkinStore } from "./stores/playerSkinStore";
 import { useSupernaturalVitalsStore } from "./stores/supernaturalVitalsStore";
+import mriLogo from "./assets/mri-logo.png";
 
 if (debugMode) {
     usePlayerStatusHudStore.setState({ designMode: true });
@@ -53,79 +54,11 @@ if (debugMode) {
         bank: 87340,
     });
 
-    useDynamicGaugesStore.getState().setAll([
-
-        {
-            id: "speed-analog",
-            style: "analog",
-            needleStyle: "needle",
-            arcLength: 75,
-            rotation: 225,
-            size: 180,
-            ringSize: 6,
-            color: "#00cfff",
-            outlineColor: "#00cfff",
-            outlineOpacity: 0.28,
-            label: "SPEED",
-            unit: "km/h",
-            x: 80,
-            y: 82,
-            minValue: 0,
-            maxValue: 200,
-            majorTickInterval: 20,
-            minorTickCount: 4,
-            showValue: true,
-            value: 87,
-        },
-        {
-            id: "rpm-analog",
-            style: "analog",
-            needleStyle: "digital",
-            arcLength: 75,
-            rotation: 225,
-            size: 140,
-            ringSize: 5,
-            color: "#ff6600",
-            outlineColor: "#ff6600",
-            outlineOpacity: 0.28,
-            label: "RPM",
-            unit: "rpm",
-            x: 87,
-            y: 82,
-            minValue: 0,
-            maxValue: 8000,
-            majorTickInterval: 1000,
-            minorTickCount: 4,
-            showValue: true,
-            value: 4200,
-        },
-        {
-            id: "fuel-analog",
-            style: "analog",
-            needleStyle: "arc",
-            arcLength: 65,
-            rotation: 237,
-            size: 90,
-            ringSize: 5,
-            color: "#22c55e",
-            outlineColor: "#22c55e",
-            outlineOpacity: 0.28,
-            label: "FUEL",
-            unit: "%",
-            x: 74,
-            y: 82,
-            minValue: 0,
-            maxValue: 100,
-            majorTickInterval: 25,
-            minorTickCount: 1,
-            showValue: true,
-            value: 65,
-        },
-    ]);
-
     // 12° port heel, 18 knots, 72% RPM, 3° bow-up trim
+    // show:false = contexto atual é "carro"; o debugMode ainda os exibe no
+    // preview normal, mas o modo posicionamento (sem "Mostrar tudo") os filtra.
     useMarineHudStore.setState({
-        show: true,
+        show: false,
         speedKnots: 18,
         rpm: 72,
         pitch: 3,
@@ -134,7 +67,7 @@ if (debugMode) {
 
     // pitch 8° nose-up, 15° right bank
     useAircraftHudStore.setState({
-        show: true,
+        show: false,
         airspeed: 185,
         altitude: 1250,
         verticalSpeed: 3.2,
@@ -142,7 +75,9 @@ if (debugMode) {
         roll: 15,
     });
 
-    useServerLogoStore.getState().setConfig({ enabled: true, src: "logo.png", width: 80, x: 50, y: 3 });
+    // Placeholder do preview: mri-logo.png (asset bundlado que resolve no dev).
+    // Em jogo real o src vem do Config.ServerLogo enviado pelo Lua.
+    useServerLogoStore.getState().setConfig({ enabled: true, src: mriLogo, width: 120, x: 8, y: 6 });
 
     useDynamicPanelsStore.getState().addPanel({
         id: "stamina",

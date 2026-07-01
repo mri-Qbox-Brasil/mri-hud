@@ -1,4 +1,4 @@
-import { faTableColumns } from "@fortawesome/free-solid-svg-icons";
+import { Columns3 } from "lucide-react";
 import { iconLayouts } from "../../types/types";
 import { useLayoutStore } from "../../stores/layoutStore";
 import { useI18nStore } from "../../utils/i18n";
@@ -16,7 +16,7 @@ export default function GlobalLayoutPanel() {
   const store = useLayoutStore.getState;
 
   return (
-    <Panel name={t.globalStatusIconLayoutSettings} icon={faTableColumns} color="white">
+    <Panel name={t.globalStatusIconLayoutSettings} icon={Columns3}>
       <div className="text-sm flex flex-col" style={{ color: "hsl(var(--muted-foreground))" }}>
         <div className="flex justify-center mb-4">
           <div className="w-55">

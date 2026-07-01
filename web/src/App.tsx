@@ -21,8 +21,42 @@ import PositioningOverlay from "./components/organisms/PositioningOverlay";
 import DevPanel from "./components/organisms/DevPanel";
 import ServerLogoHud from "./components/organisms/ServerLogoHud";
 import SupernaturalSkin from "./components/organisms/SupernaturalSkin";
+import HudConfigPanel from "./components/HudConfigPanel";
+import { useIsEmbedded } from "./plugin/useIsEmbedded";
+import { usePluginBridgeGuest } from "./plugin/usePluginBridge";
+
+// Modo embedded: a NUI do HUD roda dentro de um iframe do mri_Qadmin (host).
+// Bypassa a HUD inteira e renderiza so o painel de config global, controlado
+// pelo bridge de plugin (accent/locale/perms via postMessage).
+function EmbeddedConfig() {
+    const bridge = usePluginBridgeGuest({ defaultAccentColor: "#00E699" });
+    useAccentColor(bridge.accentColor);
+
+    if (!bridge.initialized) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-background text-muted-foreground">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-full h-full bg-background">
+            <HudConfigPanel embedded />
+        </div>
+    );
+}
 
 export default function App() {
+    // Estavel na sessao (depende so da URL). Ok ramificar componentes com hooks
+    // proprios em cada branch.
+    if (useIsEmbedded()) {
+        return <EmbeddedConfig />;
+    }
+    return <HudApp />;
+}
+
+function HudApp() {
     useEventHandler();
 
     // Suite MRI accent — Lua manda em updateUISettings; themeStore guarda;
@@ -83,7 +117,9 @@ export default function App() {
         <main className={`${debugMode ? "bg-gray-300" : "bg-transparent"} min-h-screen`}>
             <PositioningOverlay />
             {debugMode && <DevPanel />}
-            {!supernatural && <ServerLogoHud />}
+            {/* Logo do servidor (placa clássica) aparece sempre — inclusive na
+                skin sobrenatural, que teve o próprio painel de servidor removido. */}
+            <ServerLogoHud />
             {!isCinematicModeChecked && (
                 <>
                     <CompassHud />

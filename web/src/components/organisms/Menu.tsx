@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback } from "react";
-import { faSliders, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { GripHorizontal, SlidersHorizontal, Palette, X } from "lucide-react";
+import { MriSegmentedTabs, MriScrollArea } from "@mriqbox/ui-kit";
 import { useMenuStore } from "../../stores/menuStore";
 import { useI18nStore } from "../../utils/i18n";
 import HudPanel from "../menu/HudPanel";
@@ -8,14 +9,14 @@ import StatusIconsPanel from "../menu/StatusIconsPanel";
 interface Tab {
     key: string;
     labelKey: "generalTab" | "customizationTab";
-    icon: typeof faSliders;
+    icon: typeof SlidersHorizontal;
     adminOnly: boolean;
     content: React.ComponentType;
 }
 
 const TABS: Tab[] = [
-    { key: "hud", labelKey: "generalTab", icon: faSliders, adminOnly: false, content: HudPanel },
-    { key: "status", labelKey: "customizationTab", icon: faCircleNotch, adminOnly: true, content: StatusIconsPanel },
+    { key: "hud", labelKey: "generalTab", icon: SlidersHorizontal, adminOnly: false, content: HudPanel },
+    { key: "status", labelKey: "customizationTab", icon: Palette, adminOnly: true, content: StatusIconsPanel },
 ];
 
 export default function Menu() {
@@ -27,7 +28,7 @@ export default function Menu() {
     const [activeKey, setActiveKey] = useState("hud");
 
     // Drag state
-    const posRef = useRef({ x: Math.round(window.innerWidth / 5), y: Math.round(window.innerHeight / 5) });
+    const posRef = useRef({ x: Math.round(window.innerWidth / 5), y: Math.round(window.innerHeight / 6) });
     const [pos, setPos] = useState(posRef.current);
     const dragging = useRef(false);
     const dragStart = useRef({ mx: 0, my: 0, ox: 0, oy: 0 });
@@ -53,63 +54,49 @@ export default function Menu() {
 
     if (!show) return null;
 
-    const visibleTabs = TABS.filter((t) => !t.adminOnly || !adminOnly || (adminOnly && isAdmin));
-    const activeTab = visibleTabs.find((t) => t.key === activeKey) ?? visibleTabs[0];
+    const visibleTabs = TABS.filter((tab) => !tab.adminOnly || !adminOnly || (adminOnly && isAdmin));
+    const activeTab = visibleTabs.find((tab) => tab.key === activeKey) ?? visibleTabs[0];
+    const ActiveContent = activeTab.content;
 
     return (
         <section
-            className="w-[60vw] h-[60vh] flex flex-col rounded-t-2xl text-foreground bg-background/95 border border-primary/25 shadow-[0_8px_32px_rgba(0,0,0,0.7)]"
+            className="w-[58vw] max-w-[860px] h-[64vh] flex flex-col rounded-2xl overflow-hidden text-foreground bg-background/95 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
             style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 90 }}
         >
-            {/* Drag handle */}
+            {/* Header / drag handle */}
             <div
-                className="drag-bar rounded-t-2xl select-none bg-card/80 border-b border-primary/20"
+                className="drag-bar flex items-center gap-3 px-4 py-3 select-none bg-card/80 border-b border-border"
                 onMouseDown={onDragMouseDown}
                 style={{ cursor: "grab" }}
             >
-                <svg role="img" aria-label="drag handle" viewBox="0 0 24 24" height={24} width={24} className="mx-auto text-primary/60" style={{ opacity: 0.4 }}>
-                    <path fill="currentColor" d="M3,15V13H5V15H3M3,11V9H5V11H3M7,15V13H9V15H7M7,11V9H9V11H7M11,15V13H13V15H11M11,11V9H13V11H11M15,15V13H17V15H15M15,11V9H17V11H15M19,15V13H21V15H19M19,11V9H21V11H19Z" />
-                </svg>
-            </div>
-
-            <div className="flex font-semibold" style={{ height: "calc(100% - 24px)" }}>
-                {/* Sidebar tabs */}
-                <div className="flex flex-col w-1/6 bg-card/90 border-r border-primary/20">
-                    {visibleTabs.map((tab) => {
-                        const vbW = tab.icon.icon[0];
-                        const vbH = tab.icon.icon[1];
-                        const pathData = tab.icon.icon[4] as string;
-                        const isActive = activeTab.key === tab.key;
-                        return (
-                            <div
-                                key={tab.key}
-                                className={`px-4 py-4 flex flex-row gap-3 cursor-pointer select-none transition-colors border-l-2 ${
-                                    isActive
-                                        ? "bg-primary/15 border-primary text-primary"
-                                        : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                                }`}
-                                onClick={() => setActiveKey(tab.key)}
-                            >
-                                <svg width="16" height="16" viewBox={`0 0 ${vbW} ${vbH}`} className="shrink-0 mt-0.5">
-                                    <path d={pathData} fill="currentColor" />
-                                </svg>
-                                <span>{t[tab.labelKey]}</span>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                {/* Tab content */}
-                {visibleTabs.map((tab) => (
-                    <div
-                        key={tab.key}
-                        className="flex-col w-5/6 px-5 overflow-y-scroll bg-background/60"
-                        style={{ display: activeTab.key === tab.key ? "flex" : "none" }}
-                    >
-                        <tab.content />
+                <GripHorizontal className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+                <span className="text-sm font-bold tracking-wide text-foreground">HUD</span>
+                {visibleTabs.length > 1 && (
+                    <div className="ml-2" onMouseDown={(e) => e.stopPropagation()}>
+                        <MriSegmentedTabs
+                            items={visibleTabs.map((tab) => ({ id: tab.key, label: t[tab.labelKey], icon: tab.icon }))}
+                            value={activeTab.key}
+                            onChange={setActiveKey}
+                        />
                     </div>
-                ))}
+                )}
+                <button
+                    type="button"
+                    aria-label="close"
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onClick={() => useMenuStore.getState().closeMenu()}
+                    className="ml-auto grid place-items-center w-7 h-7 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                >
+                    <X className="w-4 h-4" />
+                </button>
             </div>
+
+            {/* Tab content */}
+            <MriScrollArea className="flex-1 min-h-0">
+                <div className="px-5">
+                    <ActiveContent />
+                </div>
+            </MriScrollArea>
         </section>
     );
 }

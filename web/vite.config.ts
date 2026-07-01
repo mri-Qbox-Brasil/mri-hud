@@ -22,6 +22,12 @@ export default defineConfig(({ mode }) => {
         }),
     ].filter(Boolean),
     base: "./",
+    // dedupe garante uma unica copia de React mesmo com @mriqbox/ui-kit linkado
+    // localmente (link:) durante o desenvolvimento — sem isso o pacote linkado
+    // poderia trazer sua propria React e quebrar os hooks ("invalid hook call").
+    resolve: {
+      dedupe: ["react", "react-dom"],
+    },
     build: {
       minify: isProduction,
       emptyOutDir: true,

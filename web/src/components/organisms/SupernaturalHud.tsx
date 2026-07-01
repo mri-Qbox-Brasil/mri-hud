@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 
 /* ----------------------------------------------------------------- tipos */
 export type SkinKey = "pergaminho" | "sangue" | "eterno" | "esmeralda" | "geada" | "cinzas";
-export type StyleKey = "orbes" | "aneis" | "barras" | "cristal";
+export type StyleKey = "orbes" | "aneis" | "barras" | "cristal" | "calice";
 export type LayoutKey = "unido" | "separado" | "classico";
 
 export interface VitalValues {
@@ -42,8 +42,33 @@ const LABELS: Record<keyof VitalValues, string> = { vida: "Vida", folego: "Fôle
 export const LABEL = LABELS;
 export const ORDER: (keyof VitalValues)[] = ["vida", "folego", "fome", "sede", "sanidade", "mana"];
 
-const vc  = (h: number) => `oklch(0.62 0.15 ${h})`;
-const vca = (h: number, a: number) => `oklch(0.62 0.15 ${h} / ${a})`;
+// Converte OKLCH -> sRGB. O CEF (Chromium) do FiveM e antigo e NAO suporta a
+// funcao css `oklch()` (so Chrome 111+), entao gradientes/fundos que usavam
+// oklch renderizavam invalidos in-game (orbes apareciam vazias). Convertendo
+// pra rgb()/rgba() em JS o visual fica identico e compativel com o CEF.
+function oklchToRgb(L: number, C: number, hDeg: number): [number, number, number] {
+  const h = (hDeg * Math.PI) / 180;
+  const a = C * Math.cos(h);
+  const b = C * Math.sin(h);
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+  const l = l_ * l_ * l_, m = m_ * m_ * m_, s = s_ * s_ * s_;
+  const lr =  4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  const lg = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  const lb = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s;
+  const g = (x: number) => {
+    const v = Math.max(0, Math.min(1, x));
+    return Math.round((v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055) * 255);
+  };
+  return [g(lr), g(lg), g(lb)];
+}
+const okc = (L: number, C: number, h: number, a?: number) => {
+  const [r, g, b] = oklchToRgb(L, C, h);
+  return a === undefined ? `rgb(${r}, ${g}, ${b})` : `rgba(${r}, ${g}, ${b}, ${a})`;
+};
+const vc  = (h: number) => okc(0.62, 0.15, h);
+const vca = (h: number, a: number) => okc(0.62, 0.15, h, a);
 
 /* ------------------------------------------------------- keyframes (uma vez) */
 export const KEYFRAMES = `
@@ -52,6 +77,8 @@ export const KEYFRAMES = `
 @keyframes hud-lowpulse{0%,100%{box-shadow:0 0 0 0 rgba(220,40,40,0),inset 0 0 28px rgba(0,0,0,.7)}50%{box-shadow:0 0 26px 4px rgba(220,40,40,.6),inset 0 0 28px rgba(0,0,0,.7)}}
 @keyframes hud-meniscus{0%,100%{transform:translateY(0);opacity:.85}50%{transform:translateY(-1.5px);opacity:1}}
 @keyframes hud-sheen{0%{transform:translate(-60%,-60%) rotate(28deg);opacity:0}18%{opacity:.5}40%{transform:translate(60%,60%) rotate(28deg);opacity:0}100%{transform:translate(60%,60%) rotate(28deg);opacity:0}}
+@keyframes hud-chalicebubble{0%{transform:translateY(110%) scale(.3);opacity:0}20%{opacity:.8}90%{opacity:.4}100%{transform:translateY(-10%) scale(1.1);opacity:0}}
+@keyframes hud-vsighalo{0%,100%{opacity:.35;transform:scale(.94)}50%{opacity:.85;transform:scale(1.02)}}
 `;
 
 /* --------------------------------------------------------- paineis de pedra */
@@ -90,7 +117,7 @@ function Orb({ k, value, size, low }: { k: keyof VitalValues; value: number; siz
             className="absolute left-0 right-0 bottom-0 transition-[height] duration-500"
             style={{ height: `${pct}%`, background: `linear-gradient(180deg, ${vca(hue, .95)}, ${vca(hue, .8)} 40%, ${vca(hue, .45)})`, boxShadow: `inset 0 6px 10px ${vca(hue, .7)}, 0 -2px 8px ${vca(hue, .55)}` }}
           >
-            <div className="absolute left-0 right-0" style={{ top: -1, height: big ? 5 : 3, background: `linear-gradient(180deg, oklch(0.85 0.12 ${hue} / .95), transparent)`, boxShadow: `0 0 7px ${vca(hue, .9)}`, animation: "hud-meniscus 3.4s ease-in-out infinite" }} />
+            <div className="absolute left-0 right-0" style={{ top: -1, height: big ? 5 : 3, background: `linear-gradient(180deg, ${okc(0.85, 0.12, hue, 0.95)}, transparent)`, boxShadow: `0 0 7px ${vca(hue, .9)}`, animation: "hud-meniscus 3.4s ease-in-out infinite" }} />
           </div>
           <div className="absolute rounded-full pointer-events-none" style={{ top: "9%", left: "15%", width: "44%", height: "32%", background: "radial-gradient(circle, rgba(255,255,255,.42), transparent 70%)" }} />
           <div className="absolute rounded-full pointer-events-none z-[3]" style={{ top: "8%", left: "14%", width: "46%", height: "38%", background: "radial-gradient(circle, rgba(255,255,255,.55), transparent 72%)", animation: "hud-sheen 6.5s ease-in-out infinite" }} />
@@ -101,6 +128,70 @@ function Orb({ k, value, size, low }: { k: keyof VitalValues; value: number; siz
         </div>
       </div>
       <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1.5, color: "#9c8458", textTransform: "uppercase" }}>{LABELS[k]}</span>
+    </div>
+  );
+}
+
+// Estilo 'calice' (handoff sobrenatural_plus): cálice de vidro com moldura de
+// pedra, líquido subindo por altura, bolhas fervendo e reflexo. Cor por vital
+// da paleta (vc/vca, já em rgb — CEF-safe).
+const CHALICE_BUBBLES = [
+  { left: "16%", delay: "0s",   dur: "3s",   s: 6 },
+  { left: "44%", delay: "1.2s", dur: "4.5s", s: 4 },
+  { left: "68%", delay: "0.6s", dur: "3.5s", s: 9 },
+  { left: "30%", delay: "2.5s", dur: "2.8s", s: 4 },
+  { left: "84%", delay: "1.7s", dur: "4s",   s: 6 },
+];
+function Chalice({ k, value, size, low }: { k: keyof VitalValues; value: number; size: number; low: boolean }) {
+  const hue = HUE[k], col = vc(hue), pct = Math.round(value), big = size > 70;
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <div
+        className="relative rounded-full flex items-center justify-center"
+        style={{
+          width: size, height: size,
+          border: `${big ? 4 : 3}px solid #2a2320`,
+          background: "rgba(10,7,3,.92)",
+          boxShadow: "0 4px 14px rgba(0,0,0,.6), inset 0 0 0 1px rgba(180,140,70,.15)",
+          animation: low ? "hud-lowpulse 1.6s ease-in-out infinite" : undefined,
+        }}
+      >
+        {/* globo de vidro (clip) */}
+        <div className="absolute rounded-full overflow-hidden" style={{ inset: 3 }}>
+          {/* nível do líquido */}
+          <div
+            className="absolute left-0 right-0 bottom-0 transition-[height] duration-500"
+            style={{
+              height: `${pct}%`,
+              background: `linear-gradient(180deg, ${vca(hue, .95)}, ${vca(hue, .7)} 45%, ${vca(hue, .45)})`,
+              boxShadow: `inset 0 6px 10px ${vca(hue, .6)}, 0 0 15px ${vca(hue, .55)}`,
+            }}
+          >
+            {CHALICE_BUBBLES.map((b, i) => (
+              <span
+                key={i}
+                className="absolute rounded-full pointer-events-none"
+                style={{
+                  bottom: 0, left: b.left, width: b.s, height: b.s,
+                  background: "rgba(255,255,255,.28)",
+                  animation: `hud-chalicebubble ${b.dur} ${b.delay} infinite linear`,
+                }}
+              />
+            ))}
+          </div>
+          {/* reflexo do vidro */}
+          <div
+            className="absolute rounded-full pointer-events-none"
+            style={{ top: "10%", left: "16%", width: "44%", height: "26%", background: "radial-gradient(circle, rgba(255,255,255,.2), transparent 70%)", transform: "rotate(-15deg)" }}
+          />
+        </div>
+        {/* glifo + valor + label */}
+        <div className="relative z-10 flex flex-col items-center justify-center" style={{ textShadow: "0 2px 4px rgba(0,0,0,.9)" }}>
+          <span style={{ fontSize: big ? 16 : 12, lineHeight: 1, color: col, textShadow: `0 0 8px ${vca(hue, .6)}` }}>{GLYPH[k]}</span>
+          <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: big ? 13 : 10, color: "#f3e9d4" }}>{pct}</span>
+        </div>
+      </div>
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1, color: "#9c8458", textTransform: "uppercase" }}>{LABELS[k]}</span>
     </div>
   );
 }
@@ -139,6 +230,10 @@ function Vital({ k, value, style }: { k: keyof VitalValues; value: number; style
   if (style === "orbes") {
     const big = k === "vida" || k === "mana";
     return <Orb k={k} value={value} size={big ? 96 : 58} low={k === "vida" && Math.round(value) < 30} />;
+  }
+  if (style === "calice") {
+    const big = k === "vida" || k === "mana";
+    return <Chalice k={k} value={value} size={big ? 96 : 58} low={k === "vida" && Math.round(value) < 30} />;
   }
   if (style === "aneis") return <Ring k={k} value={value} />;
   return <Bar k={k} value={value} cristal={style === "cristal"} />;
@@ -213,38 +308,102 @@ export function ClockPanel({ clock, c }: { clock: { time: string; date: string }
 }
 
 export function VoicePanel({ voice, c, framed }: { voice: { talking: boolean; range: string }; c: Skin; framed: boolean }) {
-  const accent = c.accent;
-  const body = (
-    <div className="flex flex-col items-center gap-1.5" style={{ padding: framed ? 0 : 0 }}>
-      <div className="relative flex items-center justify-center rounded-full" style={{ width: 42, height: 42, border: `1px solid ${voice.talking ? accent : "rgba(180,140,70,.35)"}`, background: voice.talking ? `${accent}22` : "rgba(0,0,0,.25)", boxShadow: voice.talking ? `0 0 16px ${c.glow}` : undefined, transition: "all .2s" }}>
-        {voice.talking && <span className="absolute inset-0 rounded-full" style={{ border: `1px solid ${accent}`, animation: "hud-voiceripple 1.1s ease-out infinite" }} />}
-        <span style={{ fontSize: 18, lineHeight: 1, color: voice.talking ? accent : "#857036", transition: "color .2s" }}>⊻</span>
-      </div>
-      <VoiceBars talking={voice.talking} accent={accent} />
-      <span style={{ ...labelMono, fontSize: 8, letterSpacing: 1, color: "#9c8458" }}>{voice.range}</span>
-    </div>
-  );
-  if (!framed) return body;
-  return <div style={{ ...panelBase(c), display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "12px 12px 10px" }}>{body}</div>;
+  const body = <VoiceSigil talking={voice.talking} accent={c.accent} glow={c.glow} />;
+  const inner = framed
+    ? <div style={{ ...panelBase(c), display: "flex", flexDirection: "column", alignItems: "center", gap: 6, padding: "12px 12px 10px" }}>{body}</div>
+    : body;
+  // Escala base 0.85 — o sigilo vinha grande demais no padrão. O resize do
+  // modo posicionamento (ScaledHudContent) multiplica sobre isto.
+  return <div style={{ transform: "scale(0.85)", transformOrigin: "center" }}>{inner}</div>;
 }
 
-/* Barrinhas de voz animadas via rAF (o handoff usava Date.now() inline). */
-function VoiceBars({ talking, accent }: { talking: boolean; accent: string }) {
-  const [, force] = useState(0);
-  const t = useRef(0);
+// VoiceSigil (handoff sobrenatural_plus): disco forjado com o mic num soquete
+// central, equalizador radial de runas, halo arcano pulsante ao falar e medidor
+// de alcance. Nosso HUD só distingue falando/mudo, então o alcance fica em
+// 'normal'. CEF-safe (accent hex, radial-gradient, box-shadow, 1 keyframe).
+const VSIG_BARS = 18;
+function VoiceSigil({ talking, accent, glow }: { talking: boolean; accent: string; glow: string }) {
+  const [phase, setPhase] = useState(0);
+  const lastRef = useRef(0);
   useEffect(() => {
     if (!talking) return;
     let raf = 0;
-    const loop = () => { t.current += 1; force((n) => (n + 1) % 1000); raf = requestAnimationFrame(loop); };
+    const loop = (t: number) => {
+      if (t - lastRef.current > 120) { setPhase((p) => p + 1); lastRef.current = t; }
+      raf = requestAnimationFrame(loop);
+    };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
   }, [talking]);
+
+  const label = talking ? "NORMAL" : "MUDO";
+  const micGlyph = talking ? "ᛘ" : "⊘";
+  const rIdx = talking ? 1 : -1; // 'normal' acende os pontos 0 e 1
+
   return (
-    <div className="flex gap-[3px] items-end" style={{ height: 16 }}>
-      {[0, 1, 2, 3, 4].map((i) => {
-        const h = talking ? 4 + Math.abs(Math.sin(t.current / 12 + i)) * 12 : 3;
-        return <span key={i} className="rounded-[2px]" style={{ width: 3, height: h, opacity: talking ? 1 : 0.35, background: accent }} />;
-      })}
+    <div className="flex flex-col items-center" style={{ gap: 8, fontFamily: "'Cinzel',serif" }}>
+      {/* disco forjado */}
+      <div
+        className="relative rounded-full"
+        style={{
+          width: 70, height: 70,
+          background: "radial-gradient(circle at 36% 28%, #f7e3ad, #c79a44 42%, #8a6526 64%, #4a3514 82%, #2a1d0c)",
+          boxShadow: `0 5px 16px rgba(0,0,0,.7), 0 0 20px ${talking ? glow : "rgba(0,0,0,0)"}, inset 0 2px 5px rgba(255,238,190,.6), inset 0 -5px 9px rgba(0,0,0,.6), inset 0 0 0 1px rgba(40,28,12,.7)`,
+          transition: "box-shadow .3s",
+        }}
+      >
+        {/* poço interno + equalizador radial */}
+        <div
+          className="absolute rounded-full overflow-hidden flex items-center justify-center"
+          style={{ inset: 3, background: "radial-gradient(circle at 40% 35%, #14100a, #070502)", boxShadow: "inset 0 0 16px rgba(0,0,0,.9), inset 0 0 0 2px rgba(0,0,0,.65), inset 0 0 0 3px rgba(180,140,70,.22)" }}
+        >
+          {talking && (
+            <span
+              className="absolute rounded-full"
+              style={{ inset: 12, background: `radial-gradient(circle, ${accent}44, transparent 68%)`, boxShadow: `inset 0 0 18px ${glow}, 0 0 16px ${glow}`, border: `1px solid ${accent}66`, animation: "hud-vsighalo 1.5s ease-in-out infinite" }}
+            />
+          )}
+          {Array.from({ length: VSIG_BARS }).map((_, i) => {
+            const deg = i * (360 / VSIG_BARS);
+            const amp = talking ? 0.45 + 0.55 * Math.abs(Math.sin(phase * 0.8 + i * 0.7)) : 0.18;
+            const len = 6 + amp * 13;
+            return (
+              <span
+                key={i}
+                style={{
+                  position: "absolute", left: "50%", top: "50%", width: 2.5, height: len, borderRadius: 2,
+                  transformOrigin: "center top", transform: `rotate(${deg}deg) translate(-50%, 21px)`,
+                  background: `linear-gradient(180deg, ${accent}, ${accent}00)`,
+                  opacity: talking ? 0.5 + amp * 0.5 : 0.32,
+                  boxShadow: talking ? `0 0 5px ${glow}` : "none",
+                  transition: "height .12s, opacity .12s",
+                }}
+              />
+            );
+          })}
+          {/* soquete central com o mic */}
+          <div
+            className="relative flex items-center justify-center rounded-full"
+            style={{ zIndex: 2, width: 30, height: 30, background: talking ? `radial-gradient(circle, ${accent}55, rgba(0,0,0,.4))` : "rgba(0,0,0,.35)", boxShadow: talking ? `inset 0 0 10px ${glow}, 0 0 8px ${glow}` : "inset 0 0 8px rgba(0,0,0,.7)", border: `1px solid ${talking ? accent + "aa" : "rgba(180,140,70,.28)"}`, transition: "all .2s" }}
+          >
+            <span style={{ fontFamily: "'Cinzel',serif", fontSize: 17, lineHeight: 1, color: talking ? "#f3e9d4" : "#6f5c34", textShadow: talking ? `0 0 8px ${accent}, 0 1px 2px #000` : "none", transition: "color .2s" }}>{micGlyph}</span>
+          </div>
+        </div>
+      </div>
+      {/* medidor de alcance */}
+      <div className="flex items-center" style={{ gap: 6, height: 10 }}>
+        {[0, 1, 2].map((i) => {
+          const on = i <= rIdx;
+          return (
+            <span
+              key={i}
+              className="rounded-full"
+              style={{ width: i === 1 ? 9 : 6, height: i === 1 ? 9 : 6, border: `1px solid ${on ? accent : "rgba(180,140,70,.3)"}`, background: on ? accent : "transparent", boxShadow: on ? `0 0 7px ${glow}` : "none", transition: "all .2s" }}
+            />
+          );
+        })}
+      </div>
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 2, textTransform: "uppercase", color: talking ? accent : "#857036", textShadow: talking ? `0 0 8px ${glow}` : "none", transition: "color .2s" }}>{label}</span>
     </div>
   );
 }

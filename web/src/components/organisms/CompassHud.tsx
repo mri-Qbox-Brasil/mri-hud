@@ -6,6 +6,8 @@ import { useVehicleThemeStore } from "../../stores/vehicleThemeStore";
 import { useVehicleHudStore } from "../../stores/vehicleHudStore";
 import debugMode from "../../stores/debugStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
+import DigitalCompassStrip from "../atoms/DigitalCompassStrip";
+import { useCompassStyleStore } from "../../stores/compassStyleStore";
 
 export default function CompassHud() {
   const show = useCompassHudStore((s) => s.show);
@@ -17,6 +19,7 @@ export default function CompassHud() {
   const isShowStreetsChecked = useMenuStore((s) => s.isShowStreetsChecked);
   const isPointerShowChecked = useMenuStore((s) => s.isPointerShowChecked);
   const positioningActive    = usePositioningStore((s) => s.active);
+  const compassType          = useCompassStyleStore((s) => s.type);
 
   // O tema digital de veiculo ja desenha a propria fita de bussola no cluster;
   // esconde a bussola legada quando ela estaria sobreposta (dentro do carro).
@@ -65,7 +68,10 @@ export default function CompassHud() {
   }, [heading]);
 
   if (!show && !debugMode && !positioningActive) return null;
-  if (vehicleTheme === "digital" && vehicleShown && !positioningActive) return null;
+  // Em jogo real: dentro de veiculo com tema digital, o cluster ja desenha a
+  // propria fita — esconde a standalone. Em debug nao esconde (pra poder testar
+  // os dois estilos), e em posicionamento tambem nao (pra poder reposicionar).
+  if (vehicleTheme === "digital" && vehicleShown && !positioningActive && !debugMode) return null;
 
   return (
     <DraggableHudElement
@@ -122,6 +128,14 @@ export default function CompassHud() {
       )}
 
       <div style={{ position: "relative" }}>
+        {compassType === "digital" ? (
+          (isShowCompassChecked || debugMode) && (
+            <div style={{ display: "flex", justifyContent: "center", paddingTop: "0.3vh" }}>
+              <DigitalCompassStrip bearing={tweened + 90} showPointer={isPointerShowChecked || debugMode} />
+            </div>
+          )
+        ) : (
+          <>
         {isPointerShowChecked && (
           <div
             style={{
@@ -198,6 +212,8 @@ export default function CompassHud() {
               <text x="225" y="-11" dominantBaseline="middle" textAnchor="middle" fill="white" fontSize="1.4vh" fontWeight="800">SW</text>
               <text x="270" y="1.5" dominantBaseline="middle" textAnchor="middle" fill="white">W</text>
             </svg>
+          </>
+        )}
           </>
         )}
       </div>
