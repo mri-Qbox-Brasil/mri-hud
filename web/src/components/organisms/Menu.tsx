@@ -62,8 +62,15 @@ export default function Menu() {
 
     return (
         <section
-            className="w-[58vw] max-w-[860px] h-[64vh] flex flex-col rounded-2xl overflow-hidden text-foreground bg-background/95 backdrop-blur-md shadow-[0_8px_24px_rgba(0,0,0,0.35)]"
-            style={{ position: "fixed", left: pos.x, top: pos.y, zIndex: 90 }}
+            className="w-[58vw] max-w-[860px] h-[64vh] flex flex-col rounded-2xl overflow-hidden text-foreground bg-background/95"
+            style={{
+                position: "fixed",
+                left: pos.x,
+                top: pos.y,
+                zIndex: 90,
+                WebkitMaskImage: "-webkit-radial-gradient(circle, #fff 100%, #000 100%)",
+                maskImage: "radial-gradient(circle, #fff 100%, #000 100%)",
+            }}
         >
             {/* Header / drag handle */}
             <div

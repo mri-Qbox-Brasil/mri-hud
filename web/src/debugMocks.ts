@@ -3,8 +3,9 @@ import { usePlayerStatusHudStore } from "./stores/playerStatusHudStore";
 import { useVehicleHudStore } from "./stores/vehicleHudStore";
 import { useCompassHudStore } from "./stores/compassHudStore";
 import { useMoneyHudStore } from "./stores/moneyHudStore";
-import { useDynamicGaugesStore } from "./stores/dynamicGaugesStore";
 import { useDynamicPanelsStore } from "./stores/dynamicPanelsStore";
+import { useCustomOrbsStore } from "./stores/customOrbsStore";
+import { useCustomDigitalStore } from "./stores/customDigitalStore";
 import { useAircraftHudStore } from "./stores/aircraftHudStore";
 import { useMarineHudStore } from "./stores/marineHudStore";
 import { useServerLogoStore } from "./stores/serverLogoStore";
@@ -32,12 +33,8 @@ if (debugMode) {
         useMPH: false,
     });
 
-    // Preview do tema novo: abre no 'digital' pra visualizar o cluster do
-    // handoff. Troque no menu (secao Veiculo) pra comparar com o 'classic'.
     useVehicleThemeStore.setState({ theme: "digital", variant: "ring" });
 
-    // Preview do skin sobrenatural: ativa e popula os vitais custom. Troque
-    // skin/paleta/estilo/layout no menu (secao Skin do HUD).
     usePlayerSkinStore.setState({ skin: "sobrenatural", palette: "pergaminho", vitalStyle: "orbes", layout: "classico" });
     useSupernaturalVitalsStore.setState({ folego: 64, sanidade: 34, mana: 55 });
 
@@ -54,9 +51,6 @@ if (debugMode) {
         bank: 87340,
     });
 
-    // 12° port heel, 18 knots, 72% RPM, 3° bow-up trim
-    // show:false = contexto atual é "carro"; o debugMode ainda os exibe no
-    // preview normal, mas o modo posicionamento (sem "Mostrar tudo") os filtra.
     useMarineHudStore.setState({
         show: false,
         speedKnots: 18,
@@ -65,7 +59,6 @@ if (debugMode) {
         roll: -12,
     });
 
-    // pitch 8° nose-up, 15° right bank
     useAircraftHudStore.setState({
         show: false,
         airspeed: 185,
@@ -75,8 +68,6 @@ if (debugMode) {
         roll: 15,
     });
 
-    // Placeholder do preview: mri-logo.png (asset bundlado que resolve no dev).
-    // Em jogo real o src vem do Config.ServerLogo enviado pelo Lua.
     useServerLogoStore.getState().setConfig({ enabled: true, src: mriLogo, width: 120, x: 8, y: 6 });
 
     useDynamicPanelsStore.getState().addPanel({
@@ -94,5 +85,17 @@ if (debugMode) {
             icon: "bolt",
         } as any,
         isShowing: true,
+    });
+
+    // Orbe custom de preview (API 'orb').
+    useCustomOrbsStore.getState().setOrb({
+        id: "corrupcao", label: "Corrupção", glyph: "ᛟ", color: "#c75b4a",
+        value: 66, size: 72, lowAt: 25, left: 480, bottom: 300,
+    });
+
+    // Elemento custom do cluster digital (API 'digitalelement').
+    useCustomDigitalStore.getState().setElement({
+        id: "nos", kind: "bar", label: "NOS", value: 80, color: "#a87fe0", glow: true,
+        left: "calc(50% + 220px)", bottom: 108,
     });
 }

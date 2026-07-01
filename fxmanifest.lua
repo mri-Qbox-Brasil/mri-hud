@@ -21,6 +21,7 @@ server_scripts {
     '@oxmysql/lib/MySQL.lua',
     'server/db.lua',
     'server/main.lua',
+    'server/vitals.lua',
     'server/settings.lua',
 }
 

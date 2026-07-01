@@ -29,6 +29,22 @@ Config.SupernaturalStyle   = 'orbes'      -- orbes | aneis | barras | cristal
 Config.SupernaturalLayout  = 'classico'   -- unido | separado | classico
 Config.SupernaturalFrameless = false      -- true = remove os fundos de pedra das orbes + dinheiro (servidor mantem)
 
+-- Vitais custom do skin sobrenatural (alimentam folego/sanidade/mana da orbe).
+--   folego   = stamina de sprint nativa (client-side, sem persistencia; = ao oxygen atual)
+--   mana     = stat persistido em metadata QBCore, server-autoritativo, com regen
+--   sanidade = idem mana
+-- Outros resources alteram via UM export unico (server-side):
+--   exports['ps-hud']:AdjustVital(src, 'mana', 25, 'remove')  -- gasta 25 de mana
+--   exports['ps-hud']:AdjustVital(src, 'sanidade', 10, 'add') -- recupera 10 de sanidade
+--   exports['ps-hud']:AdjustVital(src, 'mana', 100, 'set')    -- crava valor absoluto
+-- (retorna o novo valor 0..max; modo default = 'add'). Ver server/vitals.lua.
+Config.SupernaturalVitals = {
+    enabled       = true,   -- liga o sistema server-side (regen + sync). false = mana/sanidade ficam parados no default.
+    regenInterval = 5000,   -- ms entre cada tick de regeneracao no servidor
+    mana     = { default = 100, max = 100, regen = 2 }, -- regen = pontos recuperados por tick (0 = sem regen)
+    sanidade = { default = 100, max = 100, regen = 1 },
+}
+
 -- Admin only to change hud icons/shapes
 Config.AdminOnly = false
 

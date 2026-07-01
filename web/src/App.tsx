@@ -15,6 +15,7 @@ import CompassHud from "./components/organisms/CompassHud";
 import MoneyHud from "./components/organisms/MoneyHud";
 import VehicleHud from "./components/organisms/VehicleHud";
 import GaugesHud from "./components/organisms/GaugesHud";
+import CustomOrbs from "./components/organisms/CustomOrbs";
 import AircraftHud from "./components/organisms/AircraftHud";
 import MarineHud from "./components/organisms/MarineHud";
 import PositioningOverlay from "./components/organisms/PositioningOverlay";
@@ -133,6 +134,7 @@ function HudApp() {
                     )}
                     <VehicleHud />
                     <GaugesHud />
+                    <CustomOrbs />
                     <AircraftHud />
                     <MarineHud />
                     <MapBorderHud />

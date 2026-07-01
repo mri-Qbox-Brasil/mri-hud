@@ -27,6 +27,10 @@ local hp = 100
 local armed = 0
 local parachute = -1
 local oxygen = 100
+-- Vitais custom do skin sobrenatural (server-side, via statebag). Folego nao
+-- entra aqui: e a stamina (= oxygen). Ver server/vitals.lua.
+local mana = 100
+local sanidade = 100
 local engine = 0
 local dev = false
 local admin = false
@@ -232,6 +236,52 @@ end)
 exports('UpdateHudPanel', function(id, patch)
     sendUpdatePanel(id, patch)
 end)
+
+-- Custom orbs (skin sobrenatural): outros resources injetam orbes com cor/glifo/
+-- label livres. `orb` = tabela { id, label, glyph, color, value, size, maxValue,
+-- lowAt, left, bottom }. So o id e obrigatorio; o resto cai em defaults.
+local function sendSetOrb(orb)
+    SendNUIMessage({ action = 'orb', topic = 'set', orb = orb })
+end
+
+local function sendOrbValue(id, value)
+    SendNUIMessage({ action = 'orb', topic = 'value', id = id, value = value })
+end
+
+local function sendRemoveOrb(id)
+    SendNUIMessage({ action = 'orb', topic = 'remove', id = id })
+end
+
+RegisterNetEvent('hud:client:SetOrb', function(orb) sendSetOrb(orb) end)
+RegisterNetEvent('hud:client:UpdateOrbValue', function(id, value) sendOrbValue(id, value) end)
+RegisterNetEvent('hud:client:RemoveOrb', function(id) sendRemoveOrb(id) end)
+
+exports('SetHudOrb', function(orb) sendSetOrb(orb) end)            -- cria/atualiza a orbe
+exports('UpdateHudOrbValue', function(id, value) sendOrbValue(id, value) end) -- so o valor (barato)
+exports('RemoveHudOrb', function(id) sendRemoveOrb(id) end)
+
+-- Custom digital elements: outros resources injetam pecas no cluster digital do
+-- veiculo. `element` = { id, kind='bar'|'pill'|'text', label, value, text, color,
+-- glow, left, bottom }. Aparecem so no tema digital + cluster visivel.
+local function sendSetDigitalElement(element)
+    SendNUIMessage({ action = 'digitalelement', topic = 'set', element = element })
+end
+
+local function sendDigitalElementValue(id, value)
+    SendNUIMessage({ action = 'digitalelement', topic = 'value', id = id, value = value })
+end
+
+local function sendRemoveDigitalElement(id)
+    SendNUIMessage({ action = 'digitalelement', topic = 'remove', id = id })
+end
+
+RegisterNetEvent('hud:client:SetDigitalElement', function(element) sendSetDigitalElement(element) end)
+RegisterNetEvent('hud:client:UpdateDigitalElementValue', function(id, value) sendDigitalElementValue(id, value) end)
+RegisterNetEvent('hud:client:RemoveDigitalElement', function(id) sendRemoveDigitalElement(id) end)
+
+exports('SetDigitalElement', function(element) sendSetDigitalElement(element) end)
+exports('UpdateDigitalElementValue', function(id, value) sendDigitalElementValue(id, value) end)
+exports('RemoveDigitalElement', function(id) sendRemoveDigitalElement(id) end)
 
 local function HandleSetupResource()
     QBCore.Functions.TriggerCallback('hud:server:getRank', function(isAdminOrGreater)
@@ -852,6 +902,15 @@ AddStateBagChangeHandler('stress', ('player:%s'):format(serverId), function(_, _
     stress = value
 end)
 
+-- Mana/Sanidade do skin sobrenatural — alimentados por server/vitals.lua.
+AddStateBagChangeHandler('mana', ('player:%s'):format(serverId), function(_, _, value)
+    if value ~= nil then mana = value end
+end)
+
+AddStateBagChangeHandler('sanidade', ('player:%s'):format(serverId), function(_, _, value)
+    if value ~= nil then sanidade = value end
+end)
+
 RegisterNetEvent('hud:client:ToggleShowSeatbelt', function()
     showSeatbelt = not showSeatbelt
 end)
@@ -1179,6 +1238,17 @@ CreateThread(function()
             if IsEntityInWater(player) then
                 oxygen = GetPlayerUnderwaterTimeRemaining(playerId) * 10
             end
+
+            -- Vitais do skin sobrenatural: folego = stamina/oxygen; mana e
+            -- sanidade vem do statebag (server/vitals.lua). O store ignora se a
+            -- skin nao estiver ativa, entao mandar sempre e barato.
+            SendNUIMessage({
+                action = 'vitals',
+                topic = 'supernatural',
+                folego = oxygen,
+                mana = mana,
+                sanidade = sanidade,
+            })
 
             -- Voice setup
             local talking = NetworkIsPlayerTalking(playerId)

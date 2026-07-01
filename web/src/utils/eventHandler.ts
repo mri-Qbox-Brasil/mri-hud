@@ -17,6 +17,8 @@ import { useMarineHudStore } from "../stores/marineHudStore";
 import { useVehicleThemeStore } from "../stores/vehicleThemeStore";
 import { usePlayerSkinStore } from "../stores/playerSkinStore";
 import { useSupernaturalVitalsStore } from "../stores/supernaturalVitalsStore";
+import { useCustomOrbsStore } from "../stores/customOrbsStore";
+import { useCustomDigitalStore } from "../stores/customDigitalStore";
 import { useI18nStore } from "./i18n";
 import {
     colorStoreLocalStorageName,
@@ -217,6 +219,50 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
             // alimentados por outros resources.
             if (data.topic === "supernatural") {
                 useSupernaturalVitalsStore.getState().receiveMessage(data as any);
+            }
+            break;
+
+        case "orb":
+            // Orbes custom (skin sobrenatural) injetadas por outros resources.
+            switch (data.topic) {
+                case "set":
+                    if (data.orb?.id) useCustomOrbsStore.getState().setOrb(data.orb);
+                    break;
+                case "value":
+                    if (data.id != null && data.value != null)
+                        useCustomOrbsStore.getState().updateValue(data.id, data.value);
+                    break;
+                case "remove":
+                    if (data.id) useCustomOrbsStore.getState().removeOrb(data.id);
+                    break;
+                case "list":
+                    if (Array.isArray(data.orbs)) useCustomOrbsStore.getState().setAll(data.orbs);
+                    break;
+                case "clear":
+                    useCustomOrbsStore.getState().clear();
+                    break;
+            }
+            break;
+
+        case "digitalelement":
+            // Elementos custom do cluster digital do veiculo.
+            switch (data.topic) {
+                case "set":
+                    if (data.element?.id) useCustomDigitalStore.getState().setElement(data.element);
+                    break;
+                case "value":
+                    if (data.id != null && data.value != null)
+                        useCustomDigitalStore.getState().updateValue(data.id, data.value);
+                    break;
+                case "remove":
+                    if (data.id) useCustomDigitalStore.getState().removeElement(data.id);
+                    break;
+                case "list":
+                    if (Array.isArray(data.elements)) useCustomDigitalStore.getState().setAll(data.elements);
+                    break;
+                case "clear":
+                    useCustomDigitalStore.getState().clear();
+                    break;
             }
             break;
 

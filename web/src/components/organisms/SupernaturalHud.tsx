@@ -70,6 +70,20 @@ const okc = (L: number, C: number, h: number, a?: number) => {
 const vc  = (h: number) => okc(0.62, 0.15, h);
 const vca = (h: number, a: number) => okc(0.62, 0.15, h, a);
 
+// Orbes custom (API 'orb', injetadas por outros resources) recebem cor em hex;
+// convertemos pra rgba() por alpha — CEF-safe, do mesmo jeito que `vca` faz pros
+// vitais nativos a partir do hue.
+export function hexToRgb(hex: string): [number, number, number] {
+  let h = (hex || "").replace("#", "").trim();
+  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  const n = parseInt(h || "888888", 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const rgba = (hex: string, a: number) => {
+  const [r, g, b] = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+};
+
 /* ------------------------------------------------------- keyframes (uma vez) */
 export const KEYFRAMES = `
 @keyframes hud-glowpulse{0%,100%{opacity:.55}50%{opacity:1}}
@@ -128,6 +142,48 @@ function Orb({ k, value, size, low }: { k: keyof VitalValues; value: number; siz
         </div>
       </div>
       <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1.5, color: "#9c8458", textTransform: "uppercase" }}>{LABELS[k]}</span>
+    </div>
+  );
+}
+
+/** Orbe custom (API 'orb'): mesmo visual da orbe nativa, mas cor/glifo/label
+ * livres (vindos de outro resource). Usa as keyframes do kit (hud-meniscus/
+ * hud-sheen/hud-lowpulse) — o container CustomOrbs injeta KEYFRAMES. */
+export function CustomOrb({
+  value, color, glyph, label, size = 58, low = false,
+}: { value: number; color: string; glyph: string; label: string; size?: number; low?: boolean }) {
+  const pct = Math.max(0, Math.min(100, Math.round(value)));
+  const big = size > 70;
+  return (
+    <div className="flex flex-col items-center gap-1.5">
+      <div
+        className="relative rounded-full"
+        style={{
+          width: size, height: size,
+          background: "radial-gradient(circle at 36% 28%, #f7e3ad, #c79a44 42%, #8a6526 64%, #4a3514 82%, #2a1d0c)",
+          boxShadow: `0 5px 16px rgba(0,0,0,.7), 0 0 22px ${rgba(color, .3)}, inset 0 2px 5px rgba(255,238,190,.65), inset 0 -5px 9px rgba(0,0,0,.6), inset 0 0 0 1px rgba(40,28,12,.7)`,
+          animation: low ? "hud-lowpulse 1.1s infinite" : undefined,
+        }}
+      >
+        <div
+          className="absolute rounded-full overflow-hidden"
+          style={{ inset: 3, background: "radial-gradient(circle at 40% 35%, #1c150c, #0a0703)", boxShadow: "inset 0 0 18px rgba(0,0,0,.9), inset 0 0 0 2px rgba(0,0,0,.65), inset 0 0 0 3px rgba(180,140,70,.22)" }}
+        >
+          <div
+            className="absolute left-0 right-0 bottom-0 transition-[height] duration-500"
+            style={{ height: `${pct}%`, background: `linear-gradient(180deg, ${rgba(color, .95)}, ${rgba(color, .8)} 40%, ${rgba(color, .45)})`, boxShadow: `inset 0 6px 10px ${rgba(color, .7)}, 0 -2px 8px ${rgba(color, .55)}` }}
+          >
+            <div className="absolute left-0 right-0" style={{ top: -1, height: big ? 5 : 3, background: `linear-gradient(180deg, ${rgba(color, .95)}, transparent)`, boxShadow: `0 0 7px ${rgba(color, .9)}`, animation: "hud-meniscus 3.4s ease-in-out infinite" }} />
+          </div>
+          <div className="absolute rounded-full pointer-events-none" style={{ top: "9%", left: "15%", width: "44%", height: "32%", background: "radial-gradient(circle, rgba(255,255,255,.42), transparent 70%)" }} />
+          <div className="absolute rounded-full pointer-events-none z-[3]" style={{ top: "8%", left: "14%", width: "46%", height: "38%", background: "radial-gradient(circle, rgba(255,255,255,.55), transparent 72%)", animation: "hud-sheen 6.5s ease-in-out infinite" }} />
+        </div>
+        <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center gap-px">
+          <span style={{ fontFamily: "'Cinzel',serif", fontSize: big ? 19 : 15, lineHeight: 1, color: "#f3e9d4", textShadow: `0 0 8px ${color}, 0 1px 2px #000` }}>{glyph}</span>
+          <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: big ? 12 : 10, color: "#f3e9d4", textShadow: "0 1px 2px #000" }}>{pct}</span>
+        </div>
+      </div>
+      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 8, letterSpacing: 1.5, color: "#9c8458", textTransform: "uppercase" }}>{label}</span>
     </div>
   );
 }

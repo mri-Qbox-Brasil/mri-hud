@@ -8,6 +8,7 @@ import { useVehicleThemeStore, type SpeedoVariant } from "../../stores/vehicleTh
 import debugMode from "../../stores/debugStore";
 import DraggableHudElement from "../atoms/DraggableHudElement";
 import ScaledHudContent from "../atoms/ScaledHudContent";
+import CustomDigitalElements from "./CustomDigitalElements";
 import { useSmoothValue } from "../../hooks/useSmoothValue";
 
 const FONT = "'Chakra Petch', 'Yantramanav', sans-serif";
@@ -163,6 +164,10 @@ export default function VehicleDigitalHud() {
       <DigitalEl id="digitalTach" label="Tacômetro" left="50%" bottom={50}>
         <Tachometer rpm={data.rpm} gear={data.gear} accent={data.accent} />
       </DigitalEl>
+
+      {/* Elementos custom injetados por outros resources (API 'digitalelement').
+          Herdam o gating do cluster: so aparecem aqui, no tema digital. */}
+      <CustomDigitalElements accent={data.accent} />
     </>
   );
 }

@@ -67,7 +67,31 @@
     "update": {"payload": "compass heading"},
     "updatemoney": {"payload": {"amount": "number", "bank": "number", "cash": "number", "minus": "boolean", "plus": "boolean", "type": "string"}},
     "updateUISettings": {"payload": {"icons": "object", "layout": "object", "colors": "object"}},
-    "setLocales": {"payload": {"locales": "object"}}
+    "setLocales": {"payload": {"locales": "object"}},
+    "vitals": {
+      "topics": ["supernatural"],
+      "payload": {"supernatural": {"folego": "number", "mana": "number", "sanidade": "number"}}
+    },
+    "orb": {
+      "topics": ["set", "value", "remove", "list", "clear"],
+      "payload": {
+        "set": {"orb": {"id": "string", "label": "string", "glyph": "string", "color": "string", "value": "number", "size": "number", "maxValue": "number", "lowAt": "number", "left": "number", "bottom": "number"}},
+        "value": {"id": "string", "value": "number"},
+        "remove": {"id": "string"},
+        "list": {"orbs": "array"},
+        "clear": null
+      }
+    },
+    "digitalelement": {
+      "topics": ["set", "value", "remove", "list", "clear"],
+      "payload": {
+        "set": {"element": {"id": "string", "kind": "bar|pill|text", "label": "string", "value": "number", "text": "string", "color": "string", "glow": "boolean", "left": "string", "bottom": "number"}},
+        "value": {"id": "string", "value": "number"},
+        "remove": {"id": "string"},
+        "list": {"elements": "array"},
+        "clear": null
+      }
+    }
   },
   "nui_to_lua": {
     "closeMenu": {"payload": null},
