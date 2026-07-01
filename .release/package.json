@@ -1,6 +1,6 @@
 {
   "name": "ps-hud",
-  "version": "2.5.1",
+  "version": "2.6.0",
   "description": "Ultra customizable FiveM HUD with analog gauges, positioning mode, and multi-vehicle support.",
   "main": "index.js",
   "scripts": {

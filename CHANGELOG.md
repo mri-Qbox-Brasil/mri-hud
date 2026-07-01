@@ -1,3 +1,13 @@
+# [2.6.0](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.5.1...v2.6.0) (2026-07-01)
+
+
+### Features
+
+* **hud:** customizador por vital, config global absoluta, convar sync + ui-kit 4.15.0 ([41a6335](https://github.com/mri-Qbox-Brasil/mri-hud/commit/41a6335dd1f1239079695c86bd3634eb1ed02693))
+* **hud:** menu em 3 abas (Preferências/Aparência/Ícones) + i18n via ox_lib ([5ed53d5](https://github.com/mri-Qbox-Brasil/mri-hud/commit/5ed53d569b31068a7e799174e7a73192e7213a17))
+* **hud:** vitais custom (mana/sanidade/folego) + orbs/elementos digitais custom + docs ([9ec6e7f](https://github.com/mri-Qbox-Brasil/mri-hud/commit/9ec6e7fe9341f2491bae71beb2c8b754fc944ebc))
+* menu no padrao ui-kit, config global no banco + plugin Qadmin, melhorias na skin/posicionamento ([2f38560](https://github.com/mri-Qbox-Brasil/mri-hud/commit/2f3856037c9ee2fb01e04fb1f2e35cbba5e40e1d))
+
 ## [2.5.1](https://github.com/mri-Qbox-Brasil/mri-hud/compare/v2.5.0...v2.5.1) (2026-06-30)
 
 

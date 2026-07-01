@@ -3,7 +3,7 @@ game 'gta5'
 
 description 'Ultra customizable hud featuring a unique and robust settings menu. Change eveything about your experience!'
 author 'Project-Sloth & GFive'
-version "2.5.1"
+version "2.6.0"
 
 shared_scripts {
     '@ox_lib/init.lua',
