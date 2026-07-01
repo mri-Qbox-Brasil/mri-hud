@@ -1,21 +1,28 @@
-import { create } from "zustand";
+{
+  "notify.hud_settings_loaded": "HUD Settings Loaded!",
+  "notify.hud_restart": "HUD Is Restarting!",
+  "notify.hud_start": "HUD Is Now Started!",
+  "notify.hud_command_info": "This command resets your current HUD settings!",
+  "notify.load_square_map": "Square Map Loading...",
+  "notify.loaded_square_map": "Square Map Has Loaded!",
+  "notify.load_circle_map": "Circle Map Loading...",
+  "notify.loaded_circle_map": "Circle Map Has Loaded!",
+  "notify.cinematic_on": "Cinematic Mode On!",
+  "notify.cinematic_off": "Cinematic Mode Off!",
+  "notify.engine_on": "Engine Started!",
+  "notify.engine_off": "Engine Shut Down!",
+  "notify.low_fuel": "Fuel Level Low!",
+  "notify.access_denied": "You Are Not Authorized!",
+  "notify.stress_gain": "Feeling More Stressed!",
+  "notify.stress_removed": "Feeling More Relaxed!",
 
-type Translation = Record<string, string>;
+  "info.toggle_engine": "Toggle Engine",
+  "info.open_menu": "Open Menu",
+  "info.check_cash_balance": "Check Cash Balance",
+  "info.check_bank_balance": "Check Bank Balance",
+  "info.toggle_dev_mode": "Enable/Disable developer Mode",
+  "info.positioning_mode": "Toggle HUD Positioning Mode",
 
-interface I18nState {
-  translations: Translation;
-  setTranslations: (t: Translation) => void;
-}
-
-/**
- * Fallback EN embutido — usado no modo debug/browser (sem FiveM), antes do
- * cliente Lua enviar o dict via ox_lib (`setLocales`). Em produção o Lua manda
- * `lib.getLocales()` e sobrescreve isto (ver eventHandler `setLocales`).
- *
- * Fonte canônica das traduções: `locales/en.json` / `locales/pt-br.json` (ox_lib).
- * Só as chaves `menu.*` moram aqui — a NUI não usa `notify.*` / `info.*`.
- */
-const defaultTranslations: Translation = {
   "menu.tabs.preferences": "Preferences",
   "menu.tabs.appearance": "Appearance",
   "menu.tabs.icons": "Status Icons",
@@ -150,29 +157,5 @@ const defaultTranslations: Translation = {
   "menu.icons.add_profile": "Add New Profile",
   "menu.icons.save_profile": "Save HUD To Profile",
   "menu.icons.apply_profile": "Apply Profile To HUD",
-  "menu.icons.delete_profile": "Delete Profile",
-};
-
-export const useI18nStore = create<I18nState>((set) => ({
-  translations: defaultTranslations,
-  // Merge sobre o default: chaves ausentes no dict do Lua caem no fallback EN.
-  setTranslations: (t) => set({ translations: { ...defaultTranslations, ...t } }),
-}));
-
-/**
- * Hook de tradução reativo estilo ox_lib. Uso:
- *   const t = useT();
- *   t("menu.tabs.preferences")
- *   t("menu.some.key", { name: "Bob" })  // interpola %{name}
- * Re-renderiza quando o dict muda (ex.: quando o Lua envia `setLocales`).
- */
-export function useT() {
-  const dict = useI18nStore((s) => s.translations);
-  return (key: string, vars?: Record<string, string | number>) => {
-    let str = dict[key] ?? key;
-    if (vars) {
-      for (const k in vars) str = str.replace(new RegExp(`%\\{${k}\\}`, "g"), String(vars[k]));
-    }
-    return str;
-  };
+  "menu.icons.delete_profile": "Delete Profile"
 }

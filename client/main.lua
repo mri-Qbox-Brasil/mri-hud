@@ -3,6 +3,10 @@ local serverId = GetPlayerServerId(PlayerId())
 local PlayerData = QBCore.Functions.GetPlayerData()
 local config = Config
 local UIConfig = UIConfig
+-- Locale ox_lib. Respeita o convar `qb_locale` ja usado pelo servidor; ox_lib
+-- faz fallback pro en pra chaves ausentes. `locale('notify.x')` traduz e
+-- `lib.getLocales()` devolve o dict (enviado pra NUI em sendUILang).
+lib.locale(GetConvar('qb_locale', 'en'))
 -- Valor inicial; recalculado em runtime quando o player troca a unidade no
 -- menu (ver callbacks toggleSpeedUnit / updateMenuSettingsToClient).
 local speedMultiplier = config.UseMPH and 2.23694 or 3.6
@@ -102,7 +106,7 @@ local function hasHarness()
 end
 
 local function loadSettings()
-    QBCore.Functions.Notify(Lang:t("notify.hud_settings_loaded"), "success")
+    QBCore.Functions.Notify(locale("notify.hud_settings_loaded"), "success")
     Wait(1000)
     TriggerEvent("hud:client:LoadMap")
 end
@@ -136,9 +140,11 @@ local function sendUIUpdateMessage(data)
 end
 
 local function sendUILang()
+    -- ox_lib: manda o dict completo (chaves planas dotted) pra NUI. O
+    -- eventHandler.ts escuta 'setLocales' e alimenta o useI18nStore.
     SendNUIMessage({
-        action = 'setLang',
-        lang = GetConvar('qb_locale', 'en')
+        action = 'setLocales',
+        locales = lib.getLocales(),
     })
 end
 
@@ -351,13 +357,13 @@ RegisterNUICallback('closePositioningMode', function(_, cb)
     SetNuiFocus(false, false)
 end)
 
-RegisterKeyMapping('menu', Lang:t('info.open_menu'), 'keyboard', Config.OpenMenu)
--- RegisterKeyMapping('positioningModeInternal', Lang:t('info.positioning_mode'), 'keyboard', Config.PositioningKey)
+RegisterKeyMapping('menu', locale('info.open_menu'), 'keyboard', Config.OpenMenu)
+-- RegisterKeyMapping('positioningModeInternal', locale('info.positioning_mode'), 'keyboard', Config.PositioningKey)
 
 -- Reset hud
 local function restartHud()
     TriggerEvent("hud:client:playResetHudSounds")
-    QBCore.Functions.Notify(Lang:t("notify.hud_restart"), "error")
+    QBCore.Functions.Notify(locale("notify.hud_restart"), "error")
     Wait(1500)
     if Config.VehicleEnabled and IsPedInAnyVehicle(PlayerPedId()) then
         SendNUIMessage({
@@ -386,7 +392,7 @@ local function restartHud()
         show = true,
     })
     Wait(500)
-    QBCore.Functions.Notify(Lang:t("notify.hud_start"), "success")
+    QBCore.Functions.Notify(locale("notify.hud_start"), "success")
     SendNUIMessage({
         action = 'menu',
         topic = 'restart',
@@ -588,7 +594,7 @@ RegisterNetEvent("hud:client:LoadMap", function()
             Wait(150)
         end
         if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.load_square_map"))
+            QBCore.Functions.Notify(locale("notify.load_square_map"))
         end
         SetMinimapClipType(0)
         AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "squaremap", "radarmasksm")
@@ -613,7 +619,7 @@ RegisterNetEvent("hud:client:LoadMap", function()
         SetRadarBigmapEnabled(false, false)
         Wait(1200)
         if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.loaded_square_map"))
+            QBCore.Functions.Notify(locale("notify.loaded_square_map"))
         end
     elseif Menu.isToggleMapShapeChecked == "circle" then
         RequestStreamedTextureDict("circlemap", false)
@@ -621,7 +627,7 @@ RegisterNetEvent("hud:client:LoadMap", function()
             Wait(150)
         end
         if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.load_circle_map"))
+            QBCore.Functions.Notify(locale("notify.load_circle_map"))
         end
         SetMinimapClipType(1)
         AddReplaceTexture("platform:/textures/graphics", "radarmasksm", "circlemap", "radarmasksm")
@@ -646,7 +652,7 @@ RegisterNetEvent("hud:client:LoadMap", function()
         SetRadarBigmapEnabled(false, false)
         Wait(1200)
         if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.loaded_circle_map"))
+            QBCore.Functions.Notify(locale("notify.loaded_circle_map"))
         end
     end
 end)
@@ -751,12 +757,12 @@ RegisterNUICallback('cinematicMode', function(data, cb)
     if data.checked then
         CinematicShow(true)
         if Menu.isCinematicNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.cinematic_on"))
+            QBCore.Functions.Notify(locale("notify.cinematic_on"))
         end
     else
         CinematicShow(false)
         if Menu.isCinematicNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.cinematic_off"), 'error')
+            QBCore.Functions.Notify(locale("notify.cinematic_off"), 'error')
         end
         local player = PlayerPedId()
         local vehicle = GetVehiclePedIsIn(player)
@@ -952,14 +958,14 @@ RegisterCommand('+engine', function()
     local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if vehicle == 0 or GetPedInVehicleSeat(vehicle, -1) ~= PlayerPedId() then return end
     if GetIsVehicleEngineRunning(vehicle) then
-        QBCore.Functions.Notify(Lang:t("notify.engine_off"))
+        QBCore.Functions.Notify(locale("notify.engine_off"))
     else
-        QBCore.Functions.Notify(Lang:t("notify.engine_on"))
+        QBCore.Functions.Notify(locale("notify.engine_on"))
     end
     SetVehicleEngineOn(vehicle, not GetIsVehicleEngineRunning(vehicle), false, true)
 end)
 
-    RegisterKeyMapping('+engine', Lang:t('info.toggle_engine'), 'keyboard', 'G')
+    RegisterKeyMapping('+engine', locale('info.toggle_engine'), 'keyboard', 'G')
 end
 
 local function IsWhitelistedWeaponArmed(weapon)
@@ -1411,7 +1417,7 @@ CreateThread(function()
                 if GetFuel(GetVehiclePedIsIn(ped, false)) <= 20 then -- At 20% Fuel Left
                     if Menu.isLowFuelChecked then
                         TriggerServerEvent("InteractSound_SV:PlayOnSource", "pager", 0.10)
-                        QBCore.Functions.Notify(Lang:t("notify.low_fuel"), "error")
+                        QBCore.Functions.Notify(locale("notify.low_fuel"), "error")
                         Wait(60000) -- repeats every 1 min until empty
                     end
                 end

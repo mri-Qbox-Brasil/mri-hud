@@ -2,7 +2,7 @@ import { Globe } from "lucide-react";
 import { shapes } from "../../types/types";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
-import { useI18nStore } from "../../utils/i18n";
+import { useT } from "../../utils/i18n";
 import Panel from "../atoms/Panel";
 import HudSelect from "../atoms/HudSelect";
 import NumberInput from "../atoms/NumberInput";
@@ -11,17 +11,17 @@ import ColorPicker from "../atoms/ColorPicker";
 import type { shapekind } from "../../types/types";
 
 export default function GlobalStatusIconPanel() {
-  const t = useI18nStore((s) => s.translations);
+  const t = useT();
   const gs = usePlayerStatusHudStore((s) => s.globalIconSettings);
   const gc = useColorEffectStore((s) => s.globalColorSettings);
   const playerStore = usePlayerStatusHudStore.getState;
   const colorStore = useColorEffectStore.getState;
 
   return (
-    <Panel name={t.globalStatusIconsSettings} icon={Globe}>
+    <Panel name={t("menu.icons.global_settings")} icon={Globe}>
       <div className="flex justify-center mb-8">
         <div className="w-50">
-          <p className="text-lg text-center mb-2">{t.iconShape}</p>
+          <p className="text-lg text-center mb-2">{t("menu.icons.shape")}</p>
           <HudSelect
             values={shapes}
             value={gs.shape ?? "circle-ring"}
@@ -34,92 +34,92 @@ export default function GlobalStatusIconPanel() {
       </div>
 
       <div className="mx-8">
-        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t.globalSizeAndPositionSection}</p>
+        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t("menu.icons.global_size_section")}</p>
         <hr className="mb-6" style={{ borderColor: "hsl(var(--border))" }} />
       </div>
 
       <div className="mx-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 items-end">
-        <Field label={t.widthSize}>
+        <Field label={t("menu.icons.width")}>
           <NumberInput min={1} max={200} value={gs.width ?? 50} onChange={playerStore().updateAllWidth} />
         </Field>
-        <Field label={t.heightSize}>
+        <Field label={t("menu.icons.height")}>
           <NumberInput min={1} max={200} value={gs.height ?? 50} onChange={playerStore().updateAllHeight} />
         </Field>
         {gs.ringSize != null && (
-          <Field label={t.ringSize}>
+          <Field label={t("menu.icons.ring_size")}>
             <NumberInput min={1} max={25} step={0.5} value={gs.ringSize} onChange={playerStore().updateAllRingSize} />
           </Field>
         )}
         {gs.displayOutline != null && (
-          <Field label={t.showProgressOutline}>
+          <Field label={t("menu.icons.show_outline")}>
             <Switch center checked={gs.displayOutline} onChange={playerStore().updateAllDisplayOutline} />
           </Field>
         )}
-        <Field label={t.xAxisPosition}>
+        <Field label={t("menu.icons.x_pos")}>
           <NumberInput min={-20} max={20} step={0.25} value={gs.translateX ?? 0} onChange={playerStore().updateAllTranslateX} />
         </Field>
-        <Field label={t.yAxisPosition}>
+        <Field label={t("menu.icons.y_pos")}>
           <NumberInput min={-20} max={20} step={0.25} value={gs.translateY ?? 0} onChange={playerStore().updateAllTranslateY} />
         </Field>
-        <Field label={t.rotation}>
+        <Field label={t("menu.icons.rotation")}>
           <NumberInput min={0} max={360} value={gs.rotateDegree ?? 0} onChange={playerStore().updateAllRotateDegree} />
         </Field>
-        <Field label={t.iconXAxisPosition}>
+        <Field label={t("menu.icons.icon_x_pos")}>
           <NumberInput min={-10} max={10} step={0.01} value={gs.iconTranslateX ?? 0} onChange={playerStore().updateAllTranslateIconX} />
         </Field>
-        <Field label={t.iconYAxisPosition}>
+        <Field label={t("menu.icons.icon_y_pos")}>
           <NumberInput min={-10} max={10} step={0.01} value={gs.iconTranslateY ?? 0} onChange={playerStore().updateAllTranslateIconY} />
         </Field>
-        <Field label={t.iconSize}>
+        <Field label={t("menu.icons.icon_size")}>
           <NumberInput min={0} max={3} step={0.01} value={gs.iconScaling ?? 0.4} onChange={playerStore().updateAllIconScale} />
         </Field>
         {gs.xAxisRound != null && (
-          <Field label={t.xAxisCurve}>
+          <Field label={t("menu.icons.x_curve")}>
             <NumberInput min={0} max={100} value={gs.xAxisRound} onChange={playerStore().updateAllRoundXAxis} />
           </Field>
         )}
         {gs.yAxisRound != null && (
-          <Field label={t.yAxisCurve}>
+          <Field label={t("menu.icons.y_curve")}>
             <NumberInput min={0} max={100} value={gs.yAxisRound} onChange={playerStore().updateAllRoundYAxis} />
           </Field>
         )}
       </div>
 
       <div className="mx-8 mt-8">
-        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t.globalColorSection}</p>
+        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t("menu.icons.global_color_section")}</p>
         <hr style={{ borderColor: "hsl(var(--border))" }} />
       </div>
 
       <div className="mx-4 mt-6 mb-10 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-        <Field label={t.progressColor}>
+        <Field label={t("menu.icons.progress_color")}>
           <ColorPicker color={gc.progressColor} onChange={(c) => colorStore().updateAllDefaultEffectColorSetting("progressColor", c)} />
         </Field>
-        <Field label={t.progressContrast}>
+        <Field label={t("menu.icons.progress_contrast")}>
           <NumberInput min={0} max={300} value={gc.progressContrast} onChange={(v) => colorStore().updateAllDefaultEffectColorSetting("progressContrast", v)} />
         </Field>
-        <Field label={t.progressShadow}>
+        <Field label={t("menu.icons.progress_shadow")}>
           <NumberInput min={0} max={20} value={gc.progressDropShadowAmount} onChange={(v) => colorStore().updateAllDefaultEffectColorSetting("progressDropShadowAmount", v)} />
         </Field>
-        <Field label={t.iconColor}>
+        <Field label={t("menu.icons.icon_color")}>
           <ColorPicker color={gc.iconColor} onChange={(c) => colorStore().updateAllDefaultEffectColorSetting("iconColor", c)} />
         </Field>
-        <Field label={t.iconContrast}>
+        <Field label={t("menu.icons.icon_contrast")}>
           <NumberInput min={0} max={300} value={gc.iconContrast} onChange={(v) => colorStore().updateAllDefaultEffectColorSetting("iconContrast", v)} />
         </Field>
-        <Field label={t.iconShadow}>
+        <Field label={t("menu.icons.icon_shadow")}>
           <NumberInput min={0} max={20} value={gc.iconDropShadowAmount} onChange={(v) => colorStore().updateAllDefaultEffectColorSetting("iconDropShadowAmount", v)} />
         </Field>
-        <Field label={t.outlineColor}>
+        <Field label={t("menu.icons.outline_color")}>
           <ColorPicker color={gc.outlineColor} onChange={(c) => colorStore().updateAllDefaultEffectColorSetting("outlineColor", c)} />
         </Field>
-        <Field label={t.outlineContrast}>
+        <Field label={t("menu.icons.outline_contrast")}>
           <NumberInput min={0} max={300} value={gc.outlineContrast} onChange={(v) => colorStore().updateAllDefaultEffectColorSetting("outlineContrast", v)} />
         </Field>
-        <Field label={t.outlineShadow}>
+        <Field label={t("menu.icons.outline_shadow")}>
           <NumberInput min={0} max={20} value={gc.outlineDropShadowAmount} onChange={(v) => colorStore().updateAllDefaultEffectColorSetting("outlineDropShadowAmount", v)} />
         </Field>
         {gc.editableColors?.innerColor && (
-          <Field label={t.innerColor}>
+          <Field label={t("menu.icons.inner_color")}>
             <ColorPicker color={gc.innerColor} onChange={(c) => colorStore().updateAllDefaultEffectColorSetting("innerColor", c)} />
           </Field>
         )}

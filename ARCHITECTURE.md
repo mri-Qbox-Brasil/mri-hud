@@ -38,7 +38,7 @@ escuta via `window.addEventListener('message', ...)` em
 `utils/eventHandler.ts` (`mainEvent()`). Todas as actions suportadas:
 
 `hudtick`, `car`, `externalstatus`, `menu`, `panel`, `baseplate`, `open`,
-`show`, `showconstant`, `update`, `updatemoney`, `updateUISettings`, `setLang`.
+`show`, `showconstant`, `update`, `updatemoney`, `updateUISettings`, `setLocales`.
 
 Cada action é roteada via `switch` pra um método `receive*Message()` no store
 correspondente.

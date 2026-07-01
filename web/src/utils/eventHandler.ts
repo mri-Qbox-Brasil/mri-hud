@@ -17,7 +17,7 @@ import { useMarineHudStore } from "../stores/marineHudStore";
 import { useVehicleThemeStore } from "../stores/vehicleThemeStore";
 import { usePlayerSkinStore } from "../stores/playerSkinStore";
 import { useSupernaturalVitalsStore } from "../stores/supernaturalVitalsStore";
-import { initI18n } from "./i18n";
+import { useI18nStore } from "./i18n";
 import {
     colorStoreLocalStorageName,
     playerStoreLocalStorageName,
@@ -220,8 +220,11 @@ function mainEvent(event: MessageEvent<NuiMessage["data"]>) {
             }
             break;
 
-        case "setLang":
-            initI18n(data.lang);
+        case "setLocales":
+            // ox_lib: o cliente Lua manda o dict completo (lib.getLocales()) —
+            // chaves planas dotted (notify.* / info.* / menu.*). Merge sobre o
+            // fallback EN embutido no i18n.ts.
+            if (data.locales) useI18nStore.getState().setTranslations(data.locales);
             break;
 
         case "hudconfig":

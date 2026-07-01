@@ -1,19 +1,22 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local ResetStress = false
 
-QBCore.Commands.Add('cash', Lang:t('info.check_cash_balance'), {}, false, function(source, args)
+-- Locale ox_lib (mesmo convar do cliente). Ver locales/*.json.
+lib.locale(GetConvar('qb_locale', 'en'))
+
+QBCore.Commands.Add('cash', locale('info.check_cash_balance'), {}, false, function(source, args)
     local Player = QBCore.Functions.GetPlayer(source)
     local cashamount = Player.PlayerData.money.cash
     TriggerClientEvent('hud:client:ShowAccounts', source, 'cash', cashamount)
 end)
 
-QBCore.Commands.Add('bank', Lang:t('info.check_bank_balance'), {}, false, function(source, args)
+QBCore.Commands.Add('bank', locale('info.check_bank_balance'), {}, false, function(source, args)
     local Player = QBCore.Functions.GetPlayer(source)
     local bankamount = Player.PlayerData.money.bank
     TriggerClientEvent('hud:client:ShowAccounts', source, 'bank', bankamount)
 end)
 
-QBCore.Commands.Add("dev", Lang:t('info.toggle_dev_mode'), {}, false, function(source, args)
+QBCore.Commands.Add("dev", locale('info.toggle_dev_mode'), {}, false, function(source, args)
     TriggerClientEvent("qb-admin:client:ToggleDevmode", source)
 end, 'admin')
 
@@ -36,7 +39,7 @@ RegisterNetEvent('hud:server:GainStress', function(amount)
     end
     Player.Functions.SetMetaData('stress', newStress)
     TriggerClientEvent('hud:client:UpdateStress', src, newStress)
-    TriggerClientEvent('QBCore:Notify', src, Lang:t("notify.stress_gain"), 'error', 1500)
+    TriggerClientEvent('QBCore:Notify', src, locale("notify.stress_gain"), 'error', 1500)
 end)
 
 RegisterNetEvent('hud:server:RelieveStress', function(amount)
@@ -58,7 +61,7 @@ RegisterNetEvent('hud:server:RelieveStress', function(amount)
     end
     Player.Functions.SetMetaData('stress', newStress)
     TriggerClientEvent('hud:client:UpdateStress', src, newStress)
-    TriggerClientEvent('QBCore:Notify', src, Lang:t("notify.stress_removed"))
+    TriggerClientEvent('QBCore:Notify', src, locale("notify.stress_removed"))
 end)
 
 RegisterNetEvent('hud:server:saveUIData', function(data)

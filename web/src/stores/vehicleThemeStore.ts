@@ -12,7 +12,7 @@ import { vehicleThemeLocalStorageName } from "../types/types";
  *   2. Override local do player (admin escolhe no menu) -> persistido em
  *      localStorage; vence o default do config quando presente.
  *
- * O override do menu eh gated por admin no HudPanel ("admin escolher").
+ * O override do menu eh gated por admin no AppearancePanel ("admin escolher").
  */
 export type VehicleTheme = "classic" | "digital";
 export type SpeedoVariant = "ring" | "arc" | "linear";

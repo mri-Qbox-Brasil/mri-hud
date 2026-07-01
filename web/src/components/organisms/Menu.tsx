@@ -1,31 +1,33 @@
 import { useRef, useState, useCallback } from "react";
-import { GripHorizontal, SlidersHorizontal, Palette, X } from "lucide-react";
+import { GripHorizontal, SlidersHorizontal, Palette, Shapes, X } from "lucide-react";
 import { MriSegmentedTabs, MriScrollArea } from "@mriqbox/ui-kit";
 import { useMenuStore } from "../../stores/menuStore";
-import { useI18nStore } from "../../utils/i18n";
-import HudPanel from "../menu/HudPanel";
+import { useT } from "../../utils/i18n";
+import PreferencesPanel from "../menu/PreferencesPanel";
+import AppearancePanel from "../menu/AppearancePanel";
 import StatusIconsPanel from "../menu/StatusIconsPanel";
 
 interface Tab {
     key: string;
-    labelKey: "generalTab" | "customizationTab";
+    labelKey: string;
     icon: typeof SlidersHorizontal;
     adminOnly: boolean;
     content: React.ComponentType;
 }
 
 const TABS: Tab[] = [
-    { key: "hud", labelKey: "generalTab", icon: SlidersHorizontal, adminOnly: false, content: HudPanel },
-    { key: "status", labelKey: "customizationTab", icon: Palette, adminOnly: true, content: StatusIconsPanel },
+    { key: "preferences", labelKey: "menu.tabs.preferences", icon: SlidersHorizontal, adminOnly: false, content: PreferencesPanel },
+    { key: "appearance", labelKey: "menu.tabs.appearance", icon: Palette, adminOnly: false, content: AppearancePanel },
+    { key: "icons", labelKey: "menu.tabs.icons", icon: Shapes, adminOnly: true, content: StatusIconsPanel },
 ];
 
 export default function Menu() {
     const show = useMenuStore((s) => s.show);
     const adminOnly = useMenuStore((s) => s.adminOnly);
     const isAdmin = useMenuStore((s) => s.isAdmin);
-    const t = useI18nStore((s) => s.translations);
+    const t = useT();
 
-    const [activeKey, setActiveKey] = useState("hud");
+    const [activeKey, setActiveKey] = useState("preferences");
 
     // Drag state
     const posRef = useRef({ x: Math.round(window.innerWidth / 5), y: Math.round(window.innerHeight / 6) });
@@ -74,7 +76,7 @@ export default function Menu() {
                 {visibleTabs.length > 1 && (
                     <div className="ml-2" onMouseDown={(e) => e.stopPropagation()}>
                         <MriSegmentedTabs
-                            items={visibleTabs.map((tab) => ({ id: tab.key, label: t[tab.labelKey], icon: tab.icon }))}
+                            items={visibleTabs.map((tab) => ({ id: tab.key, label: t(tab.labelKey), icon: tab.icon }))}
                             value={activeTab.key}
                             onChange={setActiveKey}
                         />

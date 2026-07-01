@@ -3,7 +3,7 @@ import { Gauge } from "lucide-react";
 import { shapes, iconNames } from "../../types/types";
 import { usePlayerStatusHudStore } from "../../stores/playerStatusHudStore";
 import { useColorEffectStore } from "../../stores/colorEffectStore";
-import { useI18nStore } from "../../utils/i18n";
+import { useT } from "../../utils/i18n";
 import Panel from "../atoms/Panel";
 import HudSelect from "../atoms/HudSelect";
 import NumberInput from "../atoms/NumberInput";
@@ -17,8 +17,12 @@ const iconColors = [
   "rgb(182, 72, 255)", "rgb(255, 72, 133)", "#D64763", "rgb(0, 0, 0)",
 ];
 
+// 'dev' e um icone interno de debug, nao um status personalizavel — fora do
+// seletor de edicao.
+const editableIconNames = iconNames.filter((n) => n !== "dev");
+
 export default function SingleStatusIconPanel() {
-  const t = useI18nStore((s) => s.translations);
+  const t = useT();
   const icons = usePlayerStatusHudStore((s) => s.icons);
   const colorIcons = useColorEffectStore((s) => s.icons);
   const playerStore = usePlayerStatusHudStore.getState;
@@ -51,16 +55,16 @@ export default function SingleStatusIconPanel() {
   }
 
   return (
-    <Panel name={t.singleStatusIconSettings} icon={Gauge}>
+    <Panel name={t("menu.icons.single_settings")} icon={Gauge}>
       <div className="flex flex-row mb-8 mt-4">
         <div className="flex-1">
           <div className="max-w-50 ml-8">
-            <p className="text-lg text-center mb-2">{t.iconStatusToEdit}</p>
-            <HudSelect values={[...iconNames]} value={iconName} onChange={handleIconChange} />
+            <p className="text-lg text-center mb-2">{t("menu.icons.status_to_edit")}</p>
+            <HudSelect values={editableIconNames} value={iconName} onChange={handleIconChange} />
           </div>
         </div>
         <div className="w-50">
-          <p className="text-lg text-center mb-2">{t.iconShape}</p>
+          <p className="text-lg text-center mb-2">{t("menu.icons.shape")}</p>
           <HudSelect
             values={shapes}
             value={icon?.shape ?? "circle-ring"}
@@ -74,63 +78,63 @@ export default function SingleStatusIconPanel() {
       </div>
 
       <div className="mx-8">
-        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t.singleIconSizeAndPositionSection}</p>
+        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t("menu.icons.single_size_section")}</p>
         <hr className="mb-6" style={{ borderColor: "hsl(var(--border))" }} />
       </div>
 
       <div className="mx-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 items-end">
-        <Field label={t.widthSize}>
+        <Field label={t("menu.icons.width")}>
           <NumberInput min={1} max={200} value={icon?.width ?? 50}
             onChange={(v) => playerStore().updateIconSetting(iconName, "width", v)} />
         </Field>
-        <Field label={t.heightSize}>
+        <Field label={t("menu.icons.height")}>
           <NumberInput min={1} max={200} value={icon?.height ?? 50}
             onChange={(v) => playerStore().updateIconSetting(iconName, "height", v)} />
         </Field>
         {icon?.ringSize != null && (
-          <Field label={t.ringSize}>
+          <Field label={t("menu.icons.ring_size")}>
             <NumberInput min={1} max={25} step={0.5} value={icon.ringSize}
               onChange={(v) => playerStore().updateIconSetting(iconName, "ringSize", v)} />
           </Field>
         )}
         {icon?.displayOutline != null && (
-          <Field label={t.showProgressOutline}>
+          <Field label={t("menu.icons.show_outline")}>
             <Switch center checked={icon.displayOutline}
               onChange={(v) => playerStore().updateIconSetting(iconName, "displayOutline", v)} />
           </Field>
         )}
-        <Field label={t.xAxisPosition}>
+        <Field label={t("menu.icons.x_pos")}>
           <NumberInput min={-20} max={20} step={0.25} value={icon?.translateX ?? 0}
             onChange={(v) => playerStore().updateIconSetting(iconName, "translateX", v)} />
         </Field>
-        <Field label={t.yAxisPosition}>
+        <Field label={t("menu.icons.y_pos")}>
           <NumberInput min={-20} max={20} step={0.25} value={icon?.translateY ?? 0}
             onChange={(v) => playerStore().updateIconSetting(iconName, "translateY", v)} />
         </Field>
-        <Field label={t.rotation}>
+        <Field label={t("menu.icons.rotation")}>
           <NumberInput min={0} max={360} value={icon?.rotateDegree ?? 0}
             onChange={(v) => playerStore().updateIconSetting(iconName, "rotateDegree", v)} />
         </Field>
-        <Field label={t.iconXAxisPosition}>
+        <Field label={t("menu.icons.icon_x_pos")}>
           <NumberInput min={-10} max={10} step={0.01} value={icon?.iconTranslateX ?? 0}
             onChange={(v) => playerStore().updateIconSetting(iconName, "iconTranslateX", v)} />
         </Field>
-        <Field label={t.iconYAxisPosition}>
+        <Field label={t("menu.icons.icon_y_pos")}>
           <NumberInput min={-10} max={10} step={0.01} value={icon?.iconTranslateY ?? 0}
             onChange={(v) => playerStore().updateIconSetting(iconName, "iconTranslateY", v)} />
         </Field>
-        <Field label={t.iconSize}>
+        <Field label={t("menu.icons.icon_size")}>
           <NumberInput min={0} max={3} step={0.01} value={icon?.iconScaling ?? 0.4}
             onChange={(v) => playerStore().updateIconSetting(iconName, "iconScaling", v)} />
         </Field>
         {icon?.xAxisRound != null && (
-          <Field label={t.xAxisCurve}>
+          <Field label={t("menu.icons.x_curve")}>
             <NumberInput min={0} max={100} value={icon.xAxisRound}
               onChange={(v) => playerStore().updateIconSetting(iconName, "xAxisRound", v)} />
           </Field>
         )}
         {icon?.yAxisRound != null && (
-          <Field label={t.yAxisCurve}>
+          <Field label={t("menu.icons.y_curve")}>
             <NumberInput min={0} max={100} value={icon.yAxisRound}
               onChange={(v) => playerStore().updateIconSetting(iconName, "yAxisRound", v)} />
           </Field>
@@ -138,14 +142,14 @@ export default function SingleStatusIconPanel() {
       </div>
 
       <div className="mx-8 mt-8">
-        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t.singleIconColorSection}</p>
+        <p className="text-sm font-semibold uppercase" style={{ color: "hsl(var(--muted-foreground))", letterSpacing: "0.06em" }}>{t("menu.icons.single_color_section")}</p>
         <hr style={{ borderColor: "hsl(var(--border))" }} />
       </div>
 
       {colorStatesArray.length > 1 && (
         <div className="flex flex-row justify-center mt-4">
           <div className="w-50">
-            <p className="text-lg text-center mb-2">{t.iconState}</p>
+            <p className="text-lg text-center mb-2">{t("menu.icons.state")}</p>
             <HudSelect
               values={colorStatesArray}
               value={colorStatesArray[stageIndex] ?? colorStatesArray[0]}
@@ -157,44 +161,44 @@ export default function SingleStatusIconPanel() {
 
       {currentStage && (
         <div className="mx-4 mt-6 mb-10 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          <Field label={t.progressColor}>
+          <Field label={t("menu.icons.progress_color")}>
             <ColorPicker color={currentStage.progressColor}
               onChange={(c) => colorStore().updateColorSetting(iconName, stageIndex, "progressColor", c)} />
           </Field>
-          <Field label={t.progressContrast}>
+          <Field label={t("menu.icons.progress_contrast")}>
             <NumberInput min={0} max={300} value={currentStage.progressContrast}
               onChange={(v) => colorStore().updateColorSetting(iconName, stageIndex, "progressContrast", v)} />
           </Field>
-          <Field label={t.progressShadow}>
+          <Field label={t("menu.icons.progress_shadow")}>
             <NumberInput min={0} max={20} value={currentStage.progressDropShadowAmount}
               onChange={(v) => colorStore().updateColorSetting(iconName, stageIndex, "progressDropShadowAmount", v)} />
           </Field>
-          <Field label={t.iconColor}>
+          <Field label={t("menu.icons.icon_color")}>
             <ColorPicker color={currentStage.iconColor}
               onChange={(c) => colorStore().updateColorSetting(iconName, stageIndex, "iconColor", c)} />
           </Field>
-          <Field label={t.iconContrast}>
+          <Field label={t("menu.icons.icon_contrast")}>
             <NumberInput min={0} max={300} value={currentStage.iconContrast}
               onChange={(v) => colorStore().updateColorSetting(iconName, stageIndex, "iconContrast", v)} />
           </Field>
-          <Field label={t.iconShadow}>
+          <Field label={t("menu.icons.icon_shadow")}>
             <NumberInput min={0} max={20} value={currentStage.iconDropShadowAmount}
               onChange={(v) => colorStore().updateColorSetting(iconName, stageIndex, "iconDropShadowAmount", v)} />
           </Field>
-          <Field label={t.outlineColor}>
+          <Field label={t("menu.icons.outline_color")}>
             <ColorPicker color={currentStage.outlineColor}
               onChange={(c) => colorStore().updateColorSetting(iconName, stageIndex, "outlineColor", c)} />
           </Field>
-          <Field label={t.outlineContrast}>
+          <Field label={t("menu.icons.outline_contrast")}>
             <NumberInput min={0} max={300} value={currentStage.outlineContrast}
               onChange={(v) => colorStore().updateColorSetting(iconName, stageIndex, "outlineContrast", v)} />
           </Field>
-          <Field label={t.outlineShadow}>
+          <Field label={t("menu.icons.outline_shadow")}>
             <NumberInput min={0} max={20} value={currentStage.outlineDropShadowAmount}
               onChange={(v) => colorStore().updateColorSetting(iconName, stageIndex, "outlineDropShadowAmount", v)} />
           </Field>
           {colorData?.editableColors?.innerColor && (
-            <Field label={t.innerColor}>
+            <Field label={t("menu.icons.inner_color")}>
               <ColorPicker color={currentStage.innerColor}
                 onChange={(c) => colorStore().updateColorSetting(iconName, stageIndex, "innerColor", c)} />
             </Field>

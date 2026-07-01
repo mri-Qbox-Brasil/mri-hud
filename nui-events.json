@@ -67,7 +67,7 @@
     "update": {"payload": "compass heading"},
     "updatemoney": {"payload": {"amount": "number", "bank": "number", "cash": "number", "minus": "boolean", "plus": "boolean", "type": "string"}},
     "updateUISettings": {"payload": {"icons": "object", "layout": "object", "colors": "object"}},
-    "setLang": {"payload": {"lang": "string"}}
+    "setLocales": {"payload": {"locales": "object"}}
   },
   "nui_to_lua": {
     "closeMenu": {"payload": null},

@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { minify } from "html-minifier";
-import { viteStaticCopy } from "vite-plugin-static-copy";
 
 const minifyHtml = () => ({
   name: "html-transform",
@@ -16,10 +15,6 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       isProduction && minifyHtml(),
-      isProduction &&
-        viteStaticCopy({
-          targets: [{ src: "./src/locale/*.json", dest: "../html" }],
-        }),
     ].filter(Boolean),
     base: "./",
     // dedupe garante uma unica copia de React mesmo com @mriqbox/ui-kit linkado
